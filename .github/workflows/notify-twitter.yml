@@ -7,7 +7,7 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
-      - uses: nearform/github-action-notify-twitter@initial-implementation
+      - uses: nearform/github-action-notify-twitter@feat/initial-implementation
         with:
           message: "[Message from GH Action] Hello there! $GITHUB_RUN_NUMBER"
           twitter-app-key: ${{ secrets.TWITTER_APP_KEY }}
