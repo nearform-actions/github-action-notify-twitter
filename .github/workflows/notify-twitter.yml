@@ -1,0 +1,4 @@
+name: Notify twitter
+
+on:
+  workflow_dispatch:
