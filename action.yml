@@ -1,0 +1,21 @@
+# See the syntax docs at
+# https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions
+
+name: github-action-notify-twitter
+description: GitHub action that can send a custom message to a Twitter account
+
+inputs:
+  input1:
+    description: 'First input'
+    required: true
+  input2:
+    description: 'Second input'
+    required: false
+
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
+
+branding:
+  icon: 'x'
+  color: 'gray-dark'
