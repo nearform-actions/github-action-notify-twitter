@@ -22,7 +22,6 @@ jest.mock('@actions/core', () => ({
 }))
 jest.mock('twitter-api-v2')
 
-
 describe('action', () => {
   afterEach(() => {
     jest.clearAllMocks()
@@ -49,7 +48,7 @@ describe('action', () => {
       return {
         readWrite: {
           v2: {
-            tweet: async message => {
+            tweet: async () => {
               throw Error('Something went wrong')
             }
           }
@@ -59,6 +58,8 @@ describe('action', () => {
 
     await run()
 
-    expect(core.setFailed).toHaveBeenCalledWith('Action failed with error. Error: Something went wrong')
+    expect(core.setFailed).toHaveBeenCalledWith(
+      'Action failed with error. Error: Something went wrong'
+    )
   })
 })
