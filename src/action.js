@@ -21,7 +21,7 @@ export async function run() {
     core.info(`Twitter message: ${message}`)
     await rwClient.v2.tweet(message)
   } catch (err) {
-    core.setFailed(`Action failed with error ${err}`)
+    core.setFailed(`Action failed with error. ${err}`)
   } finally {
     core.info(`
     *** ACTION RUN - END ***
