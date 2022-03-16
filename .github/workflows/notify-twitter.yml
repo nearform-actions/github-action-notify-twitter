@@ -2,6 +2,8 @@ name: Notify twitter
 
 on:
   workflow_dispatch:
+  release:
+    types: [published]
 
 jobs:
   setup:
@@ -9,7 +11,8 @@ jobs:
     steps:
       - uses: nearform/github-action-notify-twitter@feat/initial-implementation
         with:
-          message: "[Message from GH Action] Hello there! $GITHUB_RUN_NUMBER"
+          message: |
+            ${{ GITHUB_REPOSITORY }} ${{ github.event.release.tag_name }} has been released. Check out the release notes: ${{ github.event.release.html_url }}
           twitter-app-key: ${{ secrets.TWITTER_APP_KEY }}
           twitter-app-secret: ${{ secrets.TWITTER_APP_SECRET }}
           twitter-access-token: ${{ secrets.TWITTER_ACCESS_TOKEN }}
