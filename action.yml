@@ -5,12 +5,25 @@ name: github-action-notify-twitter
 description: GitHub action that can send a custom message to a Twitter account
 
 inputs:
-  input1:
-    description: 'First input'
-    required: true
-  input2:
-    description: 'Second input'
-    required: false
+  message:
+    description: >
+      Message to post to Twitter.
+  twitter-app-key:
+    description: >
+      Consumer API key, available in the "Keys and tokens"
+      section of your application in the Twitter Developer site.
+  twitter-app-secret:
+    description: >
+      Consumer API secret key, available in the "Keys and tokens"
+      section of your application in the Twitter Developer site.
+  twitter-access-token:
+    description: >
+      Application access token, available in the "Keys and tokens"
+      section of your application in the Twitter Developer site.
+  twitter-access-token-secret:
+    description: >
+      Application access token secret, available in the "Keys and tokens"
+      section of your application in the Twitter Developer site.
 
 runs:
   using: 'node16'
