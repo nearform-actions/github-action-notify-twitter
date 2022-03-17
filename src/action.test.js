@@ -62,25 +62,6 @@ describe('action', () => {
     )
   })
 
-  it('fail the action when missing input params', async () => {
-    getInput.mockImplementation(() => undefined)
-    TwitterApi.mockImplementation(() => {
-      return {
-        readWrite: {
-          v2: {
-            tweet: async message => message || null
-          }
-        }
-      }
-    })
-
-    await run()
-
-    expect(setFailed).toHaveBeenCalledWith(
-      'Missing inputs parameters. Please provide all of the following inputs: "message", "twitter-app-key", "twitter-app-secret", "twitter-access-token", and "twitter-access-token-secret"'
-    )
-  })
-
   it('fail the action when message is more than 280 characters long', async () => {
     const MESSAGE_TOO_LONG_ACTION_INPUTS = {
       message:

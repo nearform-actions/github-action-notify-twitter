@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/nearform/github-action-notify-twitter/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/nearform/github-action-notify-twitter/actions/workflows/ci.yml)
 
-GitHub action that can send a custom message to a Twitter account
+GitHub action that can send a custom message to a Twitter account.
 
 ## Example usage
 
@@ -33,7 +33,7 @@ jobs:
 
 ## Usage
 
-Configure this action in your workflows providing the following inputs described below
+Configure this action in your workflows providing the following inputs described below:
 - you need to specify the message that is going to be sent to Twitter (remember that message is limited to 280 characters!)
 - App Key
 - App Secret
