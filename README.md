@@ -1,4 +1,4 @@
-# github-action-notify-twitter GitHub Action
+# Github Action to send Twitter notifications
 
 [![CI](https://github.com/nearform/github-action-notify-twitter/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/nearform/github-action-notify-twitter/actions/workflows/ci.yml)
 
