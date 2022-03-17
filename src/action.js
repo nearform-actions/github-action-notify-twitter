@@ -7,21 +7,13 @@ export async function run() {
   *** ACTION RUN - START ***
   `)
   const MAX_MESSAGE_LENGTH = 280
-  const message = core.getInput('message')
-  const appKey = core.getInput('twitter-app-key')
-  const appSecret = core.getInput('twitter-app-secret')
-  const accessToken = core.getInput('twitter-access-token')
-  const accessSecret = core.getInput('twitter-access-token-secret')
-
-  if (!message || !appKey || !appSecret || !accessToken || !accessSecret) {
-    core.setFailed(
-      'Missing inputs parameters. Please provide all of the following inputs: "message", "twitter-app-key", "twitter-app-secret", "twitter-access-token", and "twitter-access-token-secret"'
-    )
-    core.info(`
-    *** ACTION RUN - END ***
-    `)
-    return
-  }
+  const message = core.getInput('message', { required: true })
+  const appKey = core.getInput('twitter-app-key', { required: true })
+  const appSecret = core.getInput('twitter-app-secret', { required: true })
+  const accessToken = core.getInput('twitter-access-token', { required: true })
+  const accessSecret = core.getInput('twitter-access-token-secret', {
+    required: true
+  })
 
   if (message.length > MAX_MESSAGE_LENGTH) {
     core.setFailed(
