@@ -13,4 +13,4 @@ jobs:
         id: check-linked-issues
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          exclude-branches: "release/**, dependabot/**"
+          exclude-branches: 'release/**, dependabot/**'
