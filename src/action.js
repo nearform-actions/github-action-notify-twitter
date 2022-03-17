@@ -14,7 +14,9 @@ export async function run() {
   const accessSecret = core.getInput('twitter-access-token-secret')
 
   if (!message || !appKey || !appSecret || !accessToken || !accessSecret) {
-    core.setFailed('Missing inputs parameters. Please provide all of the following inputs: "message", "twitter-app-key", "twitter-app-secret", "twitter-access-token", and "twitter-access-token-secret"')
+    core.setFailed(
+      'Missing inputs parameters. Please provide all of the following inputs: "message", "twitter-app-key", "twitter-app-secret", "twitter-access-token", and "twitter-access-token-secret"'
+    )
     core.info(`
     *** ACTION RUN - END ***
     `)
@@ -22,7 +24,9 @@ export async function run() {
   }
 
   if (message.length > MAX_MESSAGE_LENGTH) {
-    core.setFailed('The message is too long. The message may contain up to 280 characters.')
+    core.setFailed(
+      'The message is too long. The message may contain up to 280 characters.'
+    )
     core.info(`
     *** ACTION RUN - END ***
     `)
