@@ -8182,25 +8182,51 @@ async function run() {
   action_core.info(`
   *** ACTION RUN - START ***
   `)
+  const MAX_MESSAGE_LENGTH = 280
+  const message = action_core.getInput('message')
+  const appKey = action_core.getInput('twitter-app-key')
+  const appSecret = action_core.getInput('twitter-app-secret')
+  const accessToken = action_core.getInput('twitter-access-token')
+  const accessSecret = action_core.getInput('twitter-access-token-secret')
+
+  if (!message || !appKey || !appSecret || !accessToken || !accessSecret) {
+    action_core.setFailed(
+      'Missing inputs parameters. Please provide all of the following inputs: "message", "twitter-app-key", "twitter-app-secret", "twitter-access-token", and "twitter-access-token-secret"'
+    )
+    action_core.info(`
+    *** ACTION RUN - END ***
+    `)
+    return
+  }
+
+  if (message.length > MAX_MESSAGE_LENGTH) {
+    action_core.setFailed(
+      'The message is too long. The message may contain up to 280 characters.'
+    )
+    action_core.info(`
+    *** ACTION RUN - END ***
+    `)
+    return
+  }
 
   const client = new TwitterApi({
-    appKey: action_core.getInput('twitter-app-key'),
-    appSecret: action_core.getInput('twitter-app-secret'),
-    accessToken: action_core.getInput('twitter-access-token'),
-    accessSecret: action_core.getInput('twitter-access-token-secret')
+    appKey,
+    appSecret,
+    accessToken,
+    accessSecret
   })
 
   const rwClient = client.readWrite
 
   try {
-    const twitterResponse = await rwClient.v2.tweet(action_core.getInput('message'))
-    action_core.info(`Twitter output: ${twitterResponse}`)
+    action_core.info(`Twitter message: ${message}`)
+    await rwClient.v2.tweet(message)
   } catch (err) {
-    action_core.setFailed(`Action failed with error ${err}`)
+    action_core.setFailed(`Action failed with error. ${err}`)
   } finally {
     action_core.info(`
-    *** ACTION RUN - END ***
-    `)
+      *** ACTION RUN - END ***
+      `)
   }
 }
 
