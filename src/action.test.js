@@ -1,5 +1,5 @@
 'use strict'
-const core = require('@actions/core')
+const { getInput, setFailed, info } = require('@actions/core')
 const { TwitterApi } = require('twitter-api-v2')
 const { run } = require('./action')
 
@@ -11,23 +11,21 @@ const ACTION_INPUTS = {
   'twitter-access-token-secret': 'access-token-secret'
 }
 
-jest.mock('@actions/core', () => ({
-  getInput: jest.fn().mockImplementation(inputName => ACTION_INPUTS[inputName]),
-  setFailed: jest.fn().mockImplementation(message => {
-    console.log(message)
-  }),
-  info: jest.fn().mockImplementation(message => {
-    console.log(message)
-  })
-}))
+jest.mock('@actions/core')
 jest.mock('twitter-api-v2')
 
 describe('action', () => {
+  beforeEach(() => {
+    setFailed.mockImplementation(message => message)
+    info.mockImplementation(message => message)
+  })
+
   afterEach(() => {
     jest.clearAllMocks()
   })
 
   it('tweet was sent successfully', async () => {
+    getInput.mockImplementation(inputName => ACTION_INPUTS[inputName])
     TwitterApi.mockImplementation(() => {
       return {
         readWrite: {
@@ -40,10 +38,11 @@ describe('action', () => {
 
     await run()
 
-    expect(core.setFailed).not.toHaveBeenCalled()
+    expect(setFailed).not.toHaveBeenCalled()
   })
 
   it('sending tweet failed', async () => {
+    getInput.mockImplementation(inputName => ACTION_INPUTS[inputName])
     TwitterApi.mockImplementation(() => {
       return {
         readWrite: {
@@ -58,8 +57,56 @@ describe('action', () => {
 
     await run()
 
-    expect(core.setFailed).toHaveBeenCalledWith(
+    expect(setFailed).toHaveBeenCalledWith(
       'Action failed with error. Error: Something went wrong'
+    )
+  })
+
+  it('fail the action when missing input params', async () => {
+    getInput.mockImplementation(() => undefined)
+    TwitterApi.mockImplementation(() => {
+      return {
+        readWrite: {
+          v2: {
+            tweet: async message => message || null
+          }
+        }
+      }
+    })
+
+    await run()
+
+    expect(setFailed).toHaveBeenCalledWith(
+      'Missing inputs parameters. Please provide all of the following inputs: "message", "twitter-app-key", "twitter-app-secret", "twitter-access-token", and "twitter-access-token-secret"'
+    )
+  })
+
+  it('fail the action when message is more than 280 characters long', async () => {
+    const MESSAGE_TOO_LONG_ACTION_INPUTS = {
+      message:
+        'Donec quis ipsum a mi tempor venenatis tincidunt feugiat nisi. Donec ac arcu dictum, efficitur nisl vehicula, fringilla sem. Fusce sed interdum sapien, id placerat felis. Sed vel velit urna. Proin pretium mauris at mi fermentum tincidunt. Praesent laoreet mi lectus, nec fringilla velit blandit ut.',
+      'twitter-app-key': 'app-key',
+      'twitter-app-secret': 'app-secret',
+      'twitter-access-token': 'access-token',
+      'twitter-access-token-secret': 'access-token-secret'
+    }
+    getInput.mockImplementation(
+      inputName => MESSAGE_TOO_LONG_ACTION_INPUTS[inputName]
+    )
+    TwitterApi.mockImplementation(() => {
+      return {
+        readWrite: {
+          v2: {
+            tweet: async message => message || null
+          }
+        }
+      }
+    })
+
+    await run()
+
+    expect(setFailed).toHaveBeenCalledWith(
+      'The message is too long. The message may contain up to 280 characters.'
     )
   })
 })
