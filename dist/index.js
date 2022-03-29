@@ -1933,7 +1933,7 @@ class RequestHandlerHelper {
     constructor(requestData) {
         this.requestData = requestData;
         this.requestErrorHandled = false;
-        this.responseData = '';
+        this.responseData = [];
     }
     /* Request helpers */
     get hrefPathname() {
@@ -1969,7 +1969,7 @@ class RequestHandlerHelper {
             request: this.req,
             response: this.res,
             responseError: error,
-            rawContent: this.responseData,
+            rawContent: Buffer.concat(this.responseData).toString(),
         });
     }
     formatV1Errors(errors) {
@@ -2038,22 +2038,43 @@ class RequestHandlerHelper {
         }
         return res;
     }
-    getParsedResponse(res) {
-        var _a;
-        let data = this.responseData;
+    detectResponseType(res) {
+        var _a, _b;
         // Auto parse if server responds with JSON body
-        if (data.length && ((_a = res.headers['content-type']) === null || _a === void 0 ? void 0 : _a.includes('application/json'))) {
-            data = JSON.parse(data);
+        if (((_a = res.headers['content-type']) === null || _a === void 0 ? void 0 : _a.includes('application/json')) || ((_b = res.headers['content-type']) === null || _b === void 0 ? void 0 : _b.includes('application/problem+json'))) {
+            return 'json';
         }
         // f-e oauth token endpoints
         else if (this.isFormEncodedEndpoint()) {
+            return 'url';
+        }
+        return 'text';
+    }
+    getParsedResponse(res) {
+        const data = this.responseData;
+        const mode = this.requestData.forceParseMode || this.detectResponseType(res);
+        if (mode === 'buffer') {
+            return Buffer.concat(data);
+        }
+        else if (mode === 'text') {
+            return Buffer.concat(data).toString();
+        }
+        else if (mode === 'json') {
+            const asText = Buffer.concat(data).toString();
+            return asText.length ? JSON.parse(asText) : undefined;
+        }
+        else if (mode === 'url') {
+            const asText = Buffer.concat(data).toString();
             const formEntries = {};
-            for (const [item, value] of new URLSearchParams(data)) {
+            for (const [item, value] of new URLSearchParams(asText)) {
                 formEntries[item] = value;
             }
-            data = formEntries;
+            return formEntries;
         }
-        return data;
+        else {
+            // mode === 'none'
+            return undefined;
+        }
     }
     getRateLimitFromResponse(res) {
         let rateLimit = undefined;
@@ -2100,7 +2121,7 @@ class RequestHandlerHelper {
         this.res = res;
         const dataStream = this.getResponseDataStream(res);
         // Register the response data
-        dataStream.on('data', chunk => this.responseData += chunk);
+        dataStream.on('data', chunk => this.responseData.push(chunk));
         dataStream.on('end', this.onResponseEndHandler.bind(this, resolve, reject));
         dataStream.on('close', this.onResponseCloseHandler.bind(this, resolve, reject));
         // Debug handlers
@@ -2302,9 +2323,9 @@ class ClientRequestMaker {
     }
     /** Send a new request and returns a wrapped `Promise<TwitterResponse<T>`. */
     async send(requestParams) {
-        var _a, _b;
+        var _a, _b, _c, _d, _e, _f;
         // Pre-request config hooks
-        if (this.clientSettings.plugins) {
+        if ((_a = this.clientSettings.plugins) === null || _a === void 0 ? void 0 : _a.length) {
             const possibleResponse = await this.applyPreRequestConfigHooks(requestParams);
             if (possibleResponse) {
                 return possibleResponse;
@@ -2322,20 +2343,25 @@ class ClientRequestMaker {
             request_param_helper_1.default.setBodyLengthHeader(options, args.body);
         }
         // Pre-request hooks
-        if (this.clientSettings.plugins) {
+        if ((_b = this.clientSettings.plugins) === null || _b === void 0 ? void 0 : _b.length) {
             await this.applyPreRequestHooks(requestParams, args, options);
         }
-        const response = await new request_handler_helper_1.default({
+        const request = new request_handler_helper_1.default({
             url: args.url,
             options,
             body: args.body,
             rateLimitSaver: enableRateLimitSave ? this.saveRateLimit.bind(this, args.rawUrl) : undefined,
             requestEventDebugHandler: requestParams.requestEventDebugHandler,
-            compression: (_b = (_a = requestParams.compression) !== null && _a !== void 0 ? _a : this.clientSettings.compression) !== null && _b !== void 0 ? _b : true,
+            compression: (_d = (_c = requestParams.compression) !== null && _c !== void 0 ? _c : this.clientSettings.compression) !== null && _d !== void 0 ? _d : true,
+            forceParseMode: requestParams.forceParseMode,
         })
             .makeRequest();
+        if ((_e = this.clientSettings.plugins) === null || _e === void 0 ? void 0 : _e.length) {
+            this.applyResponseErrorHooks(requestParams, args, options, request);
+        }
+        const response = await request;
         // Post-request hooks
-        if (this.clientSettings.plugins) {
+        if ((_f = this.clientSettings.plugins) === null || _f === void 0 ? void 0 : _f.length) {
             await this.applyPostRequestHooks(requestParams, args, options, response);
         }
         return response;
@@ -2570,6 +2596,9 @@ class ClientRequestMaker {
             requestOptions,
             response,
         });
+    }
+    applyResponseErrorHooks(requestParams, computedParams, requestOptions, promise) {
+        promise.catch(helpers_1.applyResponseHooks.bind(this, requestParams, computedParams, requestOptions));
     }
 }
 exports.ClientRequestMaker = ClientRequestMaker;
@@ -3394,8 +3423,9 @@ exports.API_V1_1_STREAM_PREFIX = 'https://stream.twitter.com/1.1/';
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.safeDeprecationWarning = exports.hasMultipleItems = exports.isTweetStreamV2ErrorPayload = exports.trimUndefinedProperties = exports.arrayWrap = exports.sharedPromise = void 0;
+exports.safeDeprecationWarning = exports.applyResponseHooks = exports.hasMultipleItems = exports.isTweetStreamV2ErrorPayload = exports.trimUndefinedProperties = exports.arrayWrap = exports.sharedPromise = void 0;
 const settings_1 = __nccwpck_require__(6273);
+const types_1 = __nccwpck_require__(1638);
 function sharedPromise(getter) {
     const sharedPromise = {
         value: undefined,
@@ -3436,6 +3466,28 @@ function hasMultipleItems(item) {
     return item.toString().includes(',');
 }
 exports.hasMultipleItems = hasMultipleItems;
+/* Response helpers */
+function applyResponseHooks(requestParams, computedParams, requestOptions, error) {
+    if (error instanceof types_1.ApiRequestError || error instanceof types_1.ApiPartialResponseError) {
+        this.applyPluginMethod('onRequestError', {
+            url: this.getUrlObjectFromUrlString(requestParams.url),
+            params: requestParams,
+            computedParams,
+            requestOptions,
+            error,
+        });
+    }
+    else if (error instanceof types_1.ApiResponseError) {
+        this.applyPluginMethod('onResponseError', {
+            url: this.getUrlObjectFromUrlString(requestParams.url),
+            params: requestParams,
+            computedParams,
+            requestOptions,
+            error,
+        });
+    }
+}
+exports.applyResponseHooks = applyResponseHooks;
 const deprecationWarningsCache = new Set();
 function safeDeprecationWarning(message) {
     if (typeof console === 'undefined' || !console.warn || !settings_1.TwitterApiV2Settings.deprecationWarnings) {
@@ -3870,6 +3922,9 @@ class ListTimelineV2Paginator extends v2_paginator_1.TimelineV2Paginator {
         var _a;
         return (_a = this._realData.data) !== null && _a !== void 0 ? _a : [];
     }
+    get meta() {
+        return super.meta;
+    }
 }
 class UserOwnedListsV2Paginator extends ListTimelineV2Paginator {
     constructor() {
@@ -4125,6 +4180,15 @@ class TweetTimelineV2Paginator extends v2_paginator_1.TwitterV2Paginator {
             params.next_token = this._realData.meta.next_token;
         }
         else {
+            if (params.start_time) {
+                // until_id and start_time are forbidden together for some reason, so convert start_time to a since_id.
+                params.since_id = this.dateStringToSnowflakeId(params.start_time);
+                delete params.start_time;
+            }
+            if (params.end_time) {
+                // until_id overrides end_time, so delete it
+                delete params.end_time;
+            }
             params.until_id = this._realData.meta.oldest_id;
         }
         return params;
@@ -4150,12 +4214,24 @@ class TweetTimelineV2Paginator extends v2_paginator_1.TwitterV2Paginator {
     getItemArray() {
         return this.tweets;
     }
+    dateStringToSnowflakeId(dateStr) {
+        const TWITTER_START_EPOCH = BigInt('1288834974657');
+        const date = new Date(dateStr);
+        if (isNaN(date.valueOf())) {
+            throw new Error('Unable to convert start_time/end_time to a valid date. A ISO 8601 DateTime is excepted, please check your input.');
+        }
+        const dateTimestamp = BigInt(date.valueOf());
+        return ((dateTimestamp - TWITTER_START_EPOCH) << BigInt('22')).toString();
+    }
     /**
      * Tweets returned by paginator.
      */
     get tweets() {
         var _a;
         return (_a = this._realData.data) !== null && _a !== void 0 ? _a : [];
+    }
+    get meta() {
+        return super.meta;
     }
 }
 /** A generic PreviousableTwitterPaginator able to consume TweetV2 timelines with pagination_tokens. */
@@ -4179,6 +4255,9 @@ class TweetPaginableTimelineV2Paginator extends v2_paginator_1.TimelineV2Paginat
     get tweets() {
         var _a;
         return (_a = this._realData.data) !== null && _a !== void 0 ? _a : [];
+    }
+    get meta() {
+        return super.meta;
     }
 }
 // ----------------
@@ -4223,6 +4302,9 @@ class TweetListV2Paginator extends v2_paginator_1.TimelineV2Paginator {
     get tweets() {
         var _a;
         return (_a = this._realData.data) !== null && _a !== void 0 ? _a : [];
+    }
+    get meta() {
+        return super.meta;
     }
     getItemArray() {
         return this.tweets;
@@ -4358,6 +4440,9 @@ class UserTimelineV2Paginator extends v2_paginator_1.TimelineV2Paginator {
     get users() {
         var _a;
         return (_a = this._realData.data) !== null && _a !== void 0 ? _a : [];
+    }
+    get meta() {
+        return super.meta;
     }
 }
 class UserBlockingUsersV2Paginator extends UserTimelineV2Paginator {
@@ -5753,6 +5838,25 @@ class TwitterApiv1 extends client_v1_write_1.default {
         return this.post('direct_messages/indicate_typing.json', {
             recipient_id: recipientId,
         }, { forceBodyMode: 'url' });
+    }
+    // Part: Images
+    /**
+     * Get a single image attached to a direct message. TwitterApi client must be logged with OAuth 1.0a.
+     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/message-attachments/guides/retrieving-media
+     */
+    async downloadDmImage(urlOrDm) {
+        if (typeof urlOrDm !== 'string') {
+            const attachment = urlOrDm[types_1.EDirectMessageEventTypeV1.Create].message_data.attachment;
+            if (!attachment) {
+                throw new Error('The given direct message doesn\'t contain any attachment');
+            }
+            urlOrDm = attachment.media_url_https;
+        }
+        const data = await this.get(urlOrDm, undefined, { forceParseMode: 'buffer', prefix: '' });
+        if (!data.length) {
+            throw new Error('Image not found. Make sure you are logged with credentials able to access direct messages, and check the URL.');
+        }
+        return data;
     }
 }
 exports.TwitterApiv1 = TwitterApiv1;
@@ -8183,21 +8287,13 @@ async function run() {
   *** ACTION RUN - START ***
   `)
   const MAX_MESSAGE_LENGTH = 280
-  const message = action_core.getInput('message')
-  const appKey = action_core.getInput('twitter-app-key')
-  const appSecret = action_core.getInput('twitter-app-secret')
-  const accessToken = action_core.getInput('twitter-access-token')
-  const accessSecret = action_core.getInput('twitter-access-token-secret')
-
-  if (!message || !appKey || !appSecret || !accessToken || !accessSecret) {
-    action_core.setFailed(
-      'Missing inputs parameters. Please provide all of the following inputs: "message", "twitter-app-key", "twitter-app-secret", "twitter-access-token", and "twitter-access-token-secret"'
-    )
-    action_core.info(`
-    *** ACTION RUN - END ***
-    `)
-    return
-  }
+  const message = action_core.getInput('message', { required: true })
+  const appKey = action_core.getInput('twitter-app-key', { required: true })
+  const appSecret = action_core.getInput('twitter-app-secret', { required: true })
+  const accessToken = action_core.getInput('twitter-access-token', { required: true })
+  const accessSecret = action_core.getInput('twitter-access-token-secret', {
+    required: true
+  })
 
   if (message.length > MAX_MESSAGE_LENGTH) {
     action_core.setFailed(
