@@ -4072,11 +4072,17 @@ exports.ListTimelineV1Paginator = exports.UserTimelineV1Paginator = exports.Ment
 const TwitterPaginator_1 = __importDefault(__nccwpck_require__(5317));
 /** A generic TwitterPaginator able to consume TweetV1 timelines. */
 class TweetTimelineV1Paginator extends TwitterPaginator_1.default {
+    constructor() {
+        super(...arguments);
+        this.hasFinishedFetch = false;
+    }
     refreshInstanceFromResult(response, isNextPage) {
         const result = response.data;
         this._rateLimit = response.rateLimit;
         if (isNextPage) {
             this._realData.push(...result);
+            // HINT: This is an approximation, as "end" of pagination cannot be safely determined without cursors.
+            this.hasFinishedFetch = result.length === 0;
         }
     }
     getNextQueryParams(maxResults) {
@@ -4103,6 +4109,9 @@ class TweetTimelineV1Paginator extends TwitterPaginator_1.default {
      */
     get tweets() {
         return this._realData;
+    }
+    get done() {
+        return super.done || this.hasFinishedFetch;
     }
 }
 // Timelines
@@ -4148,7 +4157,7 @@ exports.ListTimelineV1Paginator = ListTimelineV1Paginator;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.TweetV2ListTweetsPaginator = exports.TweetV2UserLikedTweetsPaginator = exports.TweetUserMentionTimelineV2Paginator = exports.TweetUserTimelineV2Paginator = exports.TweetSearchAllV2Paginator = exports.TweetSearchRecentV2Paginator = void 0;
+exports.TweetV2ListTweetsPaginator = exports.TweetV2UserLikedTweetsPaginator = exports.TweetBookmarksTimelineV2Paginator = exports.TweetUserMentionTimelineV2Paginator = exports.TweetUserTimelineV2Paginator = exports.QuotedTweetsTimelineV2Paginator = exports.TweetSearchAllV2Paginator = exports.TweetSearchRecentV2Paginator = void 0;
 const v2_paginator_1 = __nccwpck_require__(8108);
 /** A generic PreviousableTwitterPaginator able to consume TweetV2 timelines with since_id, until_id and next_token (when available). */
 class TweetTimelineV2Paginator extends v2_paginator_1.TwitterV2Paginator {
@@ -4277,6 +4286,13 @@ class TweetSearchAllV2Paginator extends TweetTimelineV2Paginator {
     }
 }
 exports.TweetSearchAllV2Paginator = TweetSearchAllV2Paginator;
+class QuotedTweetsTimelineV2Paginator extends TweetPaginableTimelineV2Paginator {
+    constructor() {
+        super(...arguments);
+        this._endpoint = 'tweets/:id/quote_tweets';
+    }
+}
+exports.QuotedTweetsTimelineV2Paginator = QuotedTweetsTimelineV2Paginator;
 class TweetUserTimelineV2Paginator extends TweetPaginableTimelineV2Paginator {
     constructor() {
         super(...arguments);
@@ -4291,6 +4307,16 @@ class TweetUserMentionTimelineV2Paginator extends TweetPaginableTimelineV2Pagina
     }
 }
 exports.TweetUserMentionTimelineV2Paginator = TweetUserMentionTimelineV2Paginator;
+// -------------
+// - Bookmarks -
+// -------------
+class TweetBookmarksTimelineV2Paginator extends TweetPaginableTimelineV2Paginator {
+    constructor() {
+        super(...arguments);
+        this._endpoint = 'users/:id/bookmarks';
+    }
+}
+exports.TweetBookmarksTimelineV2Paginator = TweetBookmarksTimelineV2Paginator;
 // ---------------------------------------------------------------------------------
 // - Tweet lists (consume tweets with pagination tokens instead of since/until id) -
 // ---------------------------------------------------------------------------------
@@ -5611,6 +5637,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+;
 
 
 /***/ }),
@@ -6702,16 +6729,21 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
         // eslint-disable-next-line no-constant-condition
         while (true) {
             fullMediaData = await this.mediaInfo(fullMediaData.media_id_string);
-            if (!fullMediaData.processing_info || fullMediaData.processing_info.state === 'succeeded') {
+            const { processing_info } = fullMediaData;
+            if (!processing_info || processing_info.state === 'succeeded') {
                 // Ok, completed!
                 return;
             }
-            if (fullMediaData.processing_info.state === 'failed') {
+            if (processing_info.state === 'failed') {
+                if (processing_info.error) {
+                    const { name, message } = processing_info.error;
+                    throw new Error(`Failed to process media: ${name} - ${message}.`);
+                }
                 throw new Error('Failed to process the media.');
             }
-            if (fullMediaData.processing_info.check_after_secs) {
+            if (processing_info.check_after_secs) {
                 // Await for given seconds
-                await media_helpers_v1_1.sleepSecs(fullMediaData.processing_info.check_after_secs);
+                await media_helpers_v1_1.sleepSecs(processing_info.check_after_secs);
             }
             else {
                 // No info; Await for 5 seconds
@@ -7155,13 +7187,10 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
             return this._labs;
         return this._labs = new client_v2_labs_read_1.default(this);
     }
-    /* Tweets */
-    /**
-     * The recent search endpoint returns Tweets from the last seven days that match a search query.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/search/api-reference/get-tweets-search-recent
-     */
-    async search(query, options = {}) {
-        const queryParams = { ...options, query };
+    async search(queryOrOptions, options = {}) {
+        const query = typeof queryOrOptions === 'string' ? queryOrOptions : undefined;
+        const realOptions = typeof queryOrOptions === 'object' && queryOrOptions !== null ? queryOrOptions : options;
+        const queryParams = { ...realOptions, query };
         const initialRq = await this.get('tweets/search/recent', queryParams, { fullResponse: true });
         return new paginators_1.TweetSearchRecentV2Paginator({
             realData: initialRq.data,
@@ -7294,6 +7323,46 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
             instance: this,
             queryParams: options,
             sharedParams: { id: userId },
+        });
+    }
+    /**
+     * Returns Quote Tweets for a Tweet specified by the requested Tweet ID.
+     * https://developer.twitter.com/en/docs/twitter-api/tweets/quote-tweets/api-reference/get-tweets-id-quote_tweets
+     *
+     * OAuth2 scopes: `users.read` `tweet.read`
+     */
+    async quotes(tweetId, options = {}) {
+        const initialRq = await this.get('tweets/:id/quote_tweets', options, {
+            fullResponse: true,
+            params: { id: tweetId },
+        });
+        return new paginators_1.QuotedTweetsTimelineV2Paginator({
+            realData: initialRq.data,
+            rateLimit: initialRq.rateLimit,
+            instance: this,
+            queryParams: options,
+            sharedParams: { id: tweetId },
+        });
+    }
+    /* Bookmarks */
+    /**
+     * Allows you to get information about a authenticated user’s 800 most recent bookmarked Tweets.
+     * https://developer.twitter.com/en/docs/twitter-api/tweets/bookmarks/api-reference/get-users-id-bookmarks
+     *
+     * OAuth2 scopes: `users.read` `tweet.read` `bookmark.read`
+     */
+    async bookmarks(options = {}) {
+        const user = await this.getCurrentUserV2Object();
+        const initialRq = await this.get('users/:id/bookmarks', options, {
+            fullResponse: true,
+            params: { id: user.data.id },
+        });
+        return new paginators_1.TweetBookmarksTimelineV2Paginator({
+            realData: initialRq.data,
+            rateLimit: initialRq.rateLimit,
+            instance: this,
+            queryParams: options,
+            sharedParams: { id: user.data.id },
         });
     }
     /* Users */
@@ -7546,6 +7615,19 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     searchSpaces(options) {
         return this.get('spaces/search', options);
     }
+    /**
+    * Returns a list of user who purchased a ticket to the requested Space.
+    * You must authenticate the request using the Access Token of the creator of the requested Space.
+    *
+    * **OAuth 2.0 Access Token required**
+    *
+    * https://developer.twitter.com/en/docs/twitter-api/spaces/lookup/api-reference/get-spaces-id-buyers
+    *
+    * OAuth2 scopes: `tweet.read`, `users.read`, `space.read`.
+    */
+    spaceBuyers(spaceId, options = {}) {
+        return this.get('spaces/:id/buyers', options, { params: { id: spaceId } });
+    }
     searchStream({ autoConnect, ...options } = {}) {
         return this.getStream('tweets/search/stream', options, { payloadIsError: helpers_1.isTweetStreamV2ErrorPayload, autoConnect });
     }
@@ -7765,6 +7847,27 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
                 id: tweetId,
             },
         });
+    }
+    /* Bookmarks */
+    /**
+     * Causes the user ID of an authenticated user identified in the path parameter to Bookmark the target Tweet provided in the request body.
+     * https://developer.twitter.com/en/docs/twitter-api/tweets/bookmarks/api-reference/post-users-id-bookmarks
+     *
+     * OAuth2 scopes: `users.read` `tweet.read` `bookmark.write`
+     */
+    async bookmark(tweetId) {
+        const user = await this.getCurrentUserV2Object();
+        return this.post('users/:id/bookmarks', { tweet_id: tweetId }, { params: { id: user.data.id } });
+    }
+    /**
+     * Allows a user or authenticated user ID to remove a Bookmark of a Tweet.
+     * https://developer.twitter.com/en/docs/twitter-api/tweets/bookmarks/api-reference/delete-users-id-bookmarks-tweet_id
+     *
+     * OAuth2 scopes: `users.read` `tweet.read` `bookmark.write`
+     */
+    async deleteBookmark(tweetId) {
+        const user = await this.getCurrentUserV2Object();
+        return this.delete('users/:id/bookmarks/:tweet_id', undefined, { params: { id: user.data.id, tweet_id: tweetId } });
     }
     /* Users */
     /**
