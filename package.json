@@ -40,6 +40,6 @@
   "dependencies": {
     "@actions/core": "^1.6.0",
     "@actions/github": "^5.0.1",
-    "twitter-api-v2": "^1.11.3"
+    "twitter-api-v2": "^1.12.0"
   }
 }
