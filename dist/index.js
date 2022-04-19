@@ -2300,8 +2300,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ClientRequestMaker = void 0;
+const types_1 = __nccwpck_require__(1638);
 const TweetStream_1 = __importDefault(__nccwpck_require__(9362));
-const helpers_1 = __nccwpck_require__(1120);
+const helpers_1 = __nccwpck_require__(247);
+const helpers_2 = __nccwpck_require__(1120);
 const oauth1_helper_1 = __importDefault(__nccwpck_require__(8291));
 const request_handler_helper_1 = __importDefault(__nccwpck_require__(3768));
 const request_param_helper_1 = __importDefault(__nccwpck_require__(7954));
@@ -2323,7 +2325,7 @@ class ClientRequestMaker {
     }
     /** Send a new request and returns a wrapped `Promise<TwitterResponse<T>`. */
     async send(requestParams) {
-        var _a, _b, _c, _d, _e, _f;
+        var _a, _b, _c, _d, _e;
         // Pre-request config hooks
         if ((_a = this.clientSettings.plugins) === null || _a === void 0 ? void 0 : _a.length) {
             const possibleResponse = await this.applyPreRequestConfigHooks(requestParams);
@@ -2346,7 +2348,7 @@ class ClientRequestMaker {
         if ((_b = this.clientSettings.plugins) === null || _b === void 0 ? void 0 : _b.length) {
             await this.applyPreRequestHooks(requestParams, args, options);
         }
-        const request = new request_handler_helper_1.default({
+        let request = new request_handler_helper_1.default({
             url: args.url,
             options,
             body: args.body,
@@ -2356,13 +2358,16 @@ class ClientRequestMaker {
             forceParseMode: requestParams.forceParseMode,
         })
             .makeRequest();
-        if ((_e = this.clientSettings.plugins) === null || _e === void 0 ? void 0 : _e.length) {
-            this.applyResponseErrorHooks(requestParams, args, options, request);
+        if (helpers_1.hasRequestErrorPlugins(this)) {
+            request = this.applyResponseErrorHooks(requestParams, args, options, request);
         }
         const response = await request;
         // Post-request hooks
-        if ((_f = this.clientSettings.plugins) === null || _f === void 0 ? void 0 : _f.length) {
-            await this.applyPostRequestHooks(requestParams, args, options, response);
+        if ((_e = this.clientSettings.plugins) === null || _e === void 0 ? void 0 : _e.length) {
+            const responseOverride = await this.applyPostRequestHooks(requestParams, args, options, response);
+            if (responseOverride) {
+                return responseOverride.value;
+            }
         }
         return response;
     }
@@ -2476,9 +2481,14 @@ class ClientRequestMaker {
     }
     async applyPluginMethod(method, args) {
         var _a;
+        let returnValue;
         for (const plugin of this.getPlugins()) {
-            await ((_a = plugin[method]) === null || _a === void 0 ? void 0 : _a.call(plugin, args));
+            const value = await ((_a = plugin[method]) === null || _a === void 0 ? void 0 : _a.call(plugin, args));
+            if (value && value instanceof types_1.TwitterApiPluginResponseOverride) {
+                returnValue = value;
+            }
         }
+        return returnValue;
     }
     /* Request helpers */
     writeAuthHeaders({ headers, bodyInSignature, url, method, query, body }) {
@@ -2534,7 +2544,7 @@ class ClientRequestMaker {
         request_param_helper_1.default.moveUrlQueryParamsIntoObject(url, query);
         // Delete undefined parameters
         if (!(rawBody instanceof Buffer)) {
-            helpers_1.trimUndefinedProperties(rawBody);
+            helpers_2.trimUndefinedProperties(rawBody);
         }
         // OAuth signature should not include parameters when using multipart.
         const bodyType = forceBodyMode !== null && forceBodyMode !== void 0 ? forceBodyMode : request_param_helper_1.default.autoDetectBodyType(url);
@@ -2562,6 +2572,7 @@ class ClientRequestMaker {
         const url = this.getUrlObjectFromUrlString(requestParams.url);
         for (const plugin of this.getPlugins()) {
             const result = await ((_a = plugin.onBeforeRequestConfig) === null || _a === void 0 ? void 0 : _a.call(plugin, {
+                client: this,
                 url,
                 params: requestParams,
             }));
@@ -2575,6 +2586,7 @@ class ClientRequestMaker {
         const url = this.getUrlObjectFromUrlString(requestParams.url);
         for (const plugin of this.getPlugins()) {
             (_a = plugin.onBeforeStreamRequestConfig) === null || _a === void 0 ? void 0 : _a.call(plugin, {
+                client: this,
                 url,
                 params: requestParams,
             });
@@ -2582,6 +2594,7 @@ class ClientRequestMaker {
     }
     async applyPreRequestHooks(requestParams, computedParams, requestOptions) {
         await this.applyPluginMethod('onBeforeRequest', {
+            client: this,
             url: this.getUrlObjectFromUrlString(requestParams.url),
             params: requestParams,
             computedParams,
@@ -2589,7 +2602,8 @@ class ClientRequestMaker {
         });
     }
     async applyPostRequestHooks(requestParams, computedParams, requestOptions, response) {
-        await this.applyPluginMethod('onAfterRequest', {
+        return await this.applyPluginMethod('onAfterRequest', {
+            client: this,
             url: this.getUrlObjectFromUrlString(requestParams.url),
             params: requestParams,
             computedParams,
@@ -2598,7 +2612,7 @@ class ClientRequestMaker {
         });
     }
     applyResponseErrorHooks(requestParams, computedParams, requestOptions, promise) {
-        promise.catch(helpers_1.applyResponseHooks.bind(this, requestParams, computedParams, requestOptions));
+        return promise.catch(helpers_1.applyResponseHooks.bind(this, requestParams, computedParams, requestOptions));
     }
 }
 exports.ClientRequestMaker = ClientRequestMaker;
@@ -3135,6 +3149,7 @@ class TwitterApiReadOnly extends client_base_1.default {
         }
         if (this._requestMaker.hasPlugins()) {
             this._requestMaker.applyPluginMethod('onOAuth1RequestToken', {
+                client: this._requestMaker,
                 url,
                 oauthResult,
             });
@@ -3259,6 +3274,7 @@ class TwitterApiReadOnly extends client_base_1.default {
         };
         if (this._requestMaker.hasPlugins()) {
             this._requestMaker.applyPluginMethod('onOAuth2RequestToken', {
+                client: this._requestMaker,
                 result,
                 redirectUri,
             });
@@ -3423,9 +3439,8 @@ exports.API_V1_1_STREAM_PREFIX = 'https://stream.twitter.com/1.1/';
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.safeDeprecationWarning = exports.applyResponseHooks = exports.hasMultipleItems = exports.isTweetStreamV2ErrorPayload = exports.trimUndefinedProperties = exports.arrayWrap = exports.sharedPromise = void 0;
+exports.safeDeprecationWarning = exports.hasMultipleItems = exports.isTweetStreamV2ErrorPayload = exports.trimUndefinedProperties = exports.arrayWrap = exports.sharedPromise = void 0;
 const settings_1 = __nccwpck_require__(6273);
-const types_1 = __nccwpck_require__(1638);
 function sharedPromise(getter) {
     const sharedPromise = {
         value: undefined,
@@ -3466,28 +3481,6 @@ function hasMultipleItems(item) {
     return item.toString().includes(',');
 }
 exports.hasMultipleItems = hasMultipleItems;
-/* Response helpers */
-function applyResponseHooks(requestParams, computedParams, requestOptions, error) {
-    if (error instanceof types_1.ApiRequestError || error instanceof types_1.ApiPartialResponseError) {
-        this.applyPluginMethod('onRequestError', {
-            url: this.getUrlObjectFromUrlString(requestParams.url),
-            params: requestParams,
-            computedParams,
-            requestOptions,
-            error,
-        });
-    }
-    else if (error instanceof types_1.ApiResponseError) {
-        this.applyPluginMethod('onResponseError', {
-            url: this.getUrlObjectFromUrlString(requestParams.url),
-            params: requestParams,
-            computedParams,
-            requestOptions,
-            error,
-        });
-    }
-}
-exports.applyResponseHooks = applyResponseHooks;
 const deprecationWarningsCache = new Set();
 function safeDeprecationWarning(message) {
     if (typeof console === 'undefined' || !console.warn || !settings_1.TwitterApiV2Settings.deprecationWarnings) {
@@ -4652,6 +4645,60 @@ exports.TimelineV2Paginator = TimelineV2Paginator;
 
 /***/ }),
 
+/***/ 247:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.applyResponseHooks = exports.hasRequestErrorPlugins = void 0;
+const types_1 = __nccwpck_require__(1638);
+/* Plugin helpers */
+function hasRequestErrorPlugins(client) {
+    var _a;
+    if (!((_a = client.clientSettings.plugins) === null || _a === void 0 ? void 0 : _a.length)) {
+        return false;
+    }
+    for (const plugin of client.clientSettings.plugins) {
+        if (plugin.onRequestError || plugin.onResponseError) {
+            return true;
+        }
+    }
+    return false;
+}
+exports.hasRequestErrorPlugins = hasRequestErrorPlugins;
+async function applyResponseHooks(requestParams, computedParams, requestOptions, error) {
+    let override;
+    if (error instanceof types_1.ApiRequestError || error instanceof types_1.ApiPartialResponseError) {
+        override = await this.applyPluginMethod('onRequestError', {
+            client: this,
+            url: this.getUrlObjectFromUrlString(requestParams.url),
+            params: requestParams,
+            computedParams,
+            requestOptions,
+            error,
+        });
+    }
+    else if (error instanceof types_1.ApiResponseError) {
+        override = await this.applyPluginMethod('onResponseError', {
+            client: this,
+            url: this.getUrlObjectFromUrlString(requestParams.url),
+            params: requestParams,
+            computedParams,
+            requestOptions,
+            error,
+        });
+    }
+    if (override && override instanceof types_1.TwitterApiPluginResponseOverride) {
+        return override.value;
+    }
+    return Promise.reject(error);
+}
+exports.applyResponseHooks = applyResponseHooks;
+
+
+/***/ }),
+
 /***/ 6273:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -5391,6 +5438,13 @@ __exportStar(__nccwpck_require__(547), exports);
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.TwitterApiPluginResponseOverride = void 0;
+class TwitterApiPluginResponseOverride {
+    constructor(value) {
+        this.value = value;
+    }
+}
+exports.TwitterApiPluginResponseOverride = TwitterApiPluginResponseOverride;
 
 
 /***/ }),
@@ -6473,6 +6527,14 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
             ...payload,
         };
         return this.post('statuses/update.json', queryParams);
+    }
+    /**
+     * Quote an existing tweet.
+     * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/post-statuses-update
+     */
+    async quote(status, quotingStatusId, payload = {}) {
+        const url = 'https://twitter.com/i/statuses/' + quotingStatusId;
+        return this.tweet(status, { ...payload, attachment_url: url });
     }
     /**
      * Post a series of tweets.
@@ -7812,6 +7874,13 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
         var _a;
         const reply = { in_reply_to_tweet_id: toTweetId, ...(_a = payload.reply) !== null && _a !== void 0 ? _a : {} };
         return this.post('tweets', { text: status, ...payload, reply });
+    }
+    /**
+     * Quote an existing Tweet on behalf of an authenticated user.
+     * https://developer.twitter.com/en/docs/twitter-api/tweets/manage-tweets/api-reference/post-tweets
+     */
+    quote(status, quotedTweetId, payload = {}) {
+        return this.tweet(status, { ...payload, quote_tweet_id: quotedTweetId });
     }
     /**
      * Post a series of tweets.
