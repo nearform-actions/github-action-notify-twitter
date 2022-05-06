@@ -415,11 +415,6 @@ function getIDToken(aud) {
     });
 }
 exports.getIDToken = getIDToken;
-/**
- * Markdown summary exports
- */
-var markdown_summary_1 = __nccwpck_require__(8042);
-Object.defineProperty(exports, "markdownSummary", ({ enumerable: true, get: function () { return markdown_summary_1.markdownSummary; } }));
 //# sourceMappingURL=core.js.map
 
 /***/ }),
@@ -470,292 +465,6 @@ function issueCommand(command, message) {
 }
 exports.issueCommand = issueCommand;
 //# sourceMappingURL=file-command.js.map
-
-/***/ }),
-
-/***/ 8042:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.markdownSummary = exports.SUMMARY_DOCS_URL = exports.SUMMARY_ENV_VAR = void 0;
-const os_1 = __nccwpck_require__(2037);
-const fs_1 = __nccwpck_require__(7147);
-const { access, appendFile, writeFile } = fs_1.promises;
-exports.SUMMARY_ENV_VAR = 'GITHUB_STEP_SUMMARY';
-exports.SUMMARY_DOCS_URL = 'https://docs.github.com/actions/using-workflows/workflow-commands-for-github-actions#adding-a-markdown-summary';
-class MarkdownSummary {
-    constructor() {
-        this._buffer = '';
-    }
-    /**
-     * Finds the summary file path from the environment, rejects if env var is not found or file does not exist
-     * Also checks r/w permissions.
-     *
-     * @returns step summary file path
-     */
-    filePath() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this._filePath) {
-                return this._filePath;
-            }
-            const pathFromEnv = process.env[exports.SUMMARY_ENV_VAR];
-            if (!pathFromEnv) {
-                throw new Error(`Unable to find environment variable for $${exports.SUMMARY_ENV_VAR}. Check if your runtime environment supports markdown summaries.`);
-            }
-            try {
-                yield access(pathFromEnv, fs_1.constants.R_OK | fs_1.constants.W_OK);
-            }
-            catch (_a) {
-                throw new Error(`Unable to access summary file: '${pathFromEnv}'. Check if the file has correct read/write permissions.`);
-            }
-            this._filePath = pathFromEnv;
-            return this._filePath;
-        });
-    }
-    /**
-     * Wraps content in an HTML tag, adding any HTML attributes
-     *
-     * @param {string} tag HTML tag to wrap
-     * @param {string | null} content content within the tag
-     * @param {[attribute: string]: string} attrs key-value list of HTML attributes to add
-     *
-     * @returns {string} content wrapped in HTML element
-     */
-    wrap(tag, content, attrs = {}) {
-        const htmlAttrs = Object.entries(attrs)
-            .map(([key, value]) => ` ${key}="${value}"`)
-            .join('');
-        if (!content) {
-            return `<${tag}${htmlAttrs}>`;
-        }
-        return `<${tag}${htmlAttrs}>${content}</${tag}>`;
-    }
-    /**
-     * Writes text in the buffer to the summary buffer file and empties buffer. Will append by default.
-     *
-     * @param {SummaryWriteOptions} [options] (optional) options for write operation
-     *
-     * @returns {Promise<MarkdownSummary>} markdown summary instance
-     */
-    write(options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const overwrite = !!(options === null || options === void 0 ? void 0 : options.overwrite);
-            const filePath = yield this.filePath();
-            const writeFunc = overwrite ? writeFile : appendFile;
-            yield writeFunc(filePath, this._buffer, { encoding: 'utf8' });
-            return this.emptyBuffer();
-        });
-    }
-    /**
-     * Clears the summary buffer and wipes the summary file
-     *
-     * @returns {MarkdownSummary} markdown summary instance
-     */
-    clear() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return this.emptyBuffer().write({ overwrite: true });
-        });
-    }
-    /**
-     * Returns the current summary buffer as a string
-     *
-     * @returns {string} string of summary buffer
-     */
-    stringify() {
-        return this._buffer;
-    }
-    /**
-     * If the summary buffer is empty
-     *
-     * @returns {boolen} true if the buffer is empty
-     */
-    isEmptyBuffer() {
-        return this._buffer.length === 0;
-    }
-    /**
-     * Resets the summary buffer without writing to summary file
-     *
-     * @returns {MarkdownSummary} markdown summary instance
-     */
-    emptyBuffer() {
-        this._buffer = '';
-        return this;
-    }
-    /**
-     * Adds raw text to the summary buffer
-     *
-     * @param {string} text content to add
-     * @param {boolean} [addEOL=false] (optional) append an EOL to the raw text (default: false)
-     *
-     * @returns {MarkdownSummary} markdown summary instance
-     */
-    addRaw(text, addEOL = false) {
-        this._buffer += text;
-        return addEOL ? this.addEOL() : this;
-    }
-    /**
-     * Adds the operating system-specific end-of-line marker to the buffer
-     *
-     * @returns {MarkdownSummary} markdown summary instance
-     */
-    addEOL() {
-        return this.addRaw(os_1.EOL);
-    }
-    /**
-     * Adds an HTML codeblock to the summary buffer
-     *
-     * @param {string} code content to render within fenced code block
-     * @param {string} lang (optional) language to syntax highlight code
-     *
-     * @returns {MarkdownSummary} markdown summary instance
-     */
-    addCodeBlock(code, lang) {
-        const attrs = Object.assign({}, (lang && { lang }));
-        const element = this.wrap('pre', this.wrap('code', code), attrs);
-        return this.addRaw(element).addEOL();
-    }
-    /**
-     * Adds an HTML list to the summary buffer
-     *
-     * @param {string[]} items list of items to render
-     * @param {boolean} [ordered=false] (optional) if the rendered list should be ordered or not (default: false)
-     *
-     * @returns {MarkdownSummary} markdown summary instance
-     */
-    addList(items, ordered = false) {
-        const tag = ordered ? 'ol' : 'ul';
-        const listItems = items.map(item => this.wrap('li', item)).join('');
-        const element = this.wrap(tag, listItems);
-        return this.addRaw(element).addEOL();
-    }
-    /**
-     * Adds an HTML table to the summary buffer
-     *
-     * @param {SummaryTableCell[]} rows table rows
-     *
-     * @returns {MarkdownSummary} markdown summary instance
-     */
-    addTable(rows) {
-        const tableBody = rows
-            .map(row => {
-            const cells = row
-                .map(cell => {
-                if (typeof cell === 'string') {
-                    return this.wrap('td', cell);
-                }
-                const { header, data, colspan, rowspan } = cell;
-                const tag = header ? 'th' : 'td';
-                const attrs = Object.assign(Object.assign({}, (colspan && { colspan })), (rowspan && { rowspan }));
-                return this.wrap(tag, data, attrs);
-            })
-                .join('');
-            return this.wrap('tr', cells);
-        })
-            .join('');
-        const element = this.wrap('table', tableBody);
-        return this.addRaw(element).addEOL();
-    }
-    /**
-     * Adds a collapsable HTML details element to the summary buffer
-     *
-     * @param {string} label text for the closed state
-     * @param {string} content collapsable content
-     *
-     * @returns {MarkdownSummary} markdown summary instance
-     */
-    addDetails(label, content) {
-        const element = this.wrap('details', this.wrap('summary', label) + content);
-        return this.addRaw(element).addEOL();
-    }
-    /**
-     * Adds an HTML image tag to the summary buffer
-     *
-     * @param {string} src path to the image you to embed
-     * @param {string} alt text description of the image
-     * @param {SummaryImageOptions} options (optional) addition image attributes
-     *
-     * @returns {MarkdownSummary} markdown summary instance
-     */
-    addImage(src, alt, options) {
-        const { width, height } = options || {};
-        const attrs = Object.assign(Object.assign({}, (width && { width })), (height && { height }));
-        const element = this.wrap('img', null, Object.assign({ src, alt }, attrs));
-        return this.addRaw(element).addEOL();
-    }
-    /**
-     * Adds an HTML section heading element
-     *
-     * @param {string} text heading text
-     * @param {number | string} [level=1] (optional) the heading level, default: 1
-     *
-     * @returns {MarkdownSummary} markdown summary instance
-     */
-    addHeading(text, level) {
-        const tag = `h${level}`;
-        const allowedTag = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(tag)
-            ? tag
-            : 'h1';
-        const element = this.wrap(allowedTag, text);
-        return this.addRaw(element).addEOL();
-    }
-    /**
-     * Adds an HTML thematic break (<hr>) to the summary buffer
-     *
-     * @returns {MarkdownSummary} markdown summary instance
-     */
-    addSeparator() {
-        const element = this.wrap('hr', null);
-        return this.addRaw(element).addEOL();
-    }
-    /**
-     * Adds an HTML line break (<br>) to the summary buffer
-     *
-     * @returns {MarkdownSummary} markdown summary instance
-     */
-    addBreak() {
-        const element = this.wrap('br', null);
-        return this.addRaw(element).addEOL();
-    }
-    /**
-     * Adds an HTML blockquote to the summary buffer
-     *
-     * @param {string} text quote text
-     * @param {string} cite (optional) citation url
-     *
-     * @returns {MarkdownSummary} markdown summary instance
-     */
-    addQuote(text, cite) {
-        const attrs = Object.assign({}, (cite && { cite }));
-        const element = this.wrap('blockquote', text, attrs);
-        return this.addRaw(element).addEOL();
-    }
-    /**
-     * Adds an HTML anchor tag to the summary buffer
-     *
-     * @param {string} text link text/content
-     * @param {string} href hyperlink
-     *
-     * @returns {MarkdownSummary} markdown summary instance
-     */
-    addLink(text, href) {
-        const element = this.wrap('a', text, { href });
-        return this.addRaw(element).addEOL();
-    }
-}
-// singleton export
-exports.markdownSummary = new MarkdownSummary();
-//# sourceMappingURL=markdown-summary.js.map
 
 /***/ }),
 
@@ -2591,10 +2300,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ClientRequestMaker = void 0;
-const types_1 = __nccwpck_require__(1638);
 const TweetStream_1 = __importDefault(__nccwpck_require__(9362));
-const helpers_1 = __nccwpck_require__(247);
-const helpers_2 = __nccwpck_require__(1120);
+const helpers_1 = __nccwpck_require__(1120);
 const oauth1_helper_1 = __importDefault(__nccwpck_require__(8291));
 const request_handler_helper_1 = __importDefault(__nccwpck_require__(3768));
 const request_param_helper_1 = __importDefault(__nccwpck_require__(7954));
@@ -2616,7 +2323,7 @@ class ClientRequestMaker {
     }
     /** Send a new request and returns a wrapped `Promise<TwitterResponse<T>`. */
     async send(requestParams) {
-        var _a, _b, _c, _d, _e;
+        var _a, _b, _c, _d, _e, _f;
         // Pre-request config hooks
         if ((_a = this.clientSettings.plugins) === null || _a === void 0 ? void 0 : _a.length) {
             const possibleResponse = await this.applyPreRequestConfigHooks(requestParams);
@@ -2639,7 +2346,7 @@ class ClientRequestMaker {
         if ((_b = this.clientSettings.plugins) === null || _b === void 0 ? void 0 : _b.length) {
             await this.applyPreRequestHooks(requestParams, args, options);
         }
-        let request = new request_handler_helper_1.default({
+        const request = new request_handler_helper_1.default({
             url: args.url,
             options,
             body: args.body,
@@ -2649,16 +2356,13 @@ class ClientRequestMaker {
             forceParseMode: requestParams.forceParseMode,
         })
             .makeRequest();
-        if (helpers_1.hasRequestErrorPlugins(this)) {
-            request = this.applyResponseErrorHooks(requestParams, args, options, request);
+        if ((_e = this.clientSettings.plugins) === null || _e === void 0 ? void 0 : _e.length) {
+            this.applyResponseErrorHooks(requestParams, args, options, request);
         }
         const response = await request;
         // Post-request hooks
-        if ((_e = this.clientSettings.plugins) === null || _e === void 0 ? void 0 : _e.length) {
-            const responseOverride = await this.applyPostRequestHooks(requestParams, args, options, response);
-            if (responseOverride) {
-                return responseOverride.value;
-            }
+        if ((_f = this.clientSettings.plugins) === null || _f === void 0 ? void 0 : _f.length) {
+            await this.applyPostRequestHooks(requestParams, args, options, response);
         }
         return response;
     }
@@ -2772,14 +2476,9 @@ class ClientRequestMaker {
     }
     async applyPluginMethod(method, args) {
         var _a;
-        let returnValue;
         for (const plugin of this.getPlugins()) {
-            const value = await ((_a = plugin[method]) === null || _a === void 0 ? void 0 : _a.call(plugin, args));
-            if (value && value instanceof types_1.TwitterApiPluginResponseOverride) {
-                returnValue = value;
-            }
+            await ((_a = plugin[method]) === null || _a === void 0 ? void 0 : _a.call(plugin, args));
         }
-        return returnValue;
     }
     /* Request helpers */
     writeAuthHeaders({ headers, bodyInSignature, url, method, query, body }) {
@@ -2835,7 +2534,7 @@ class ClientRequestMaker {
         request_param_helper_1.default.moveUrlQueryParamsIntoObject(url, query);
         // Delete undefined parameters
         if (!(rawBody instanceof Buffer)) {
-            helpers_2.trimUndefinedProperties(rawBody);
+            helpers_1.trimUndefinedProperties(rawBody);
         }
         // OAuth signature should not include parameters when using multipart.
         const bodyType = forceBodyMode !== null && forceBodyMode !== void 0 ? forceBodyMode : request_param_helper_1.default.autoDetectBodyType(url);
@@ -2863,7 +2562,6 @@ class ClientRequestMaker {
         const url = this.getUrlObjectFromUrlString(requestParams.url);
         for (const plugin of this.getPlugins()) {
             const result = await ((_a = plugin.onBeforeRequestConfig) === null || _a === void 0 ? void 0 : _a.call(plugin, {
-                client: this,
                 url,
                 params: requestParams,
             }));
@@ -2877,7 +2575,6 @@ class ClientRequestMaker {
         const url = this.getUrlObjectFromUrlString(requestParams.url);
         for (const plugin of this.getPlugins()) {
             (_a = plugin.onBeforeStreamRequestConfig) === null || _a === void 0 ? void 0 : _a.call(plugin, {
-                client: this,
                 url,
                 params: requestParams,
             });
@@ -2885,7 +2582,6 @@ class ClientRequestMaker {
     }
     async applyPreRequestHooks(requestParams, computedParams, requestOptions) {
         await this.applyPluginMethod('onBeforeRequest', {
-            client: this,
             url: this.getUrlObjectFromUrlString(requestParams.url),
             params: requestParams,
             computedParams,
@@ -2893,8 +2589,7 @@ class ClientRequestMaker {
         });
     }
     async applyPostRequestHooks(requestParams, computedParams, requestOptions, response) {
-        return await this.applyPluginMethod('onAfterRequest', {
-            client: this,
+        await this.applyPluginMethod('onAfterRequest', {
             url: this.getUrlObjectFromUrlString(requestParams.url),
             params: requestParams,
             computedParams,
@@ -2903,7 +2598,7 @@ class ClientRequestMaker {
         });
     }
     applyResponseErrorHooks(requestParams, computedParams, requestOptions, promise) {
-        return promise.catch(helpers_1.applyResponseHooks.bind(this, requestParams, computedParams, requestOptions));
+        promise.catch(helpers_1.applyResponseHooks.bind(this, requestParams, computedParams, requestOptions));
     }
 }
 exports.ClientRequestMaker = ClientRequestMaker;
@@ -3440,7 +3135,6 @@ class TwitterApiReadOnly extends client_base_1.default {
         }
         if (this._requestMaker.hasPlugins()) {
             this._requestMaker.applyPluginMethod('onOAuth1RequestToken', {
-                client: this._requestMaker,
                 url,
                 oauthResult,
             });
@@ -3565,7 +3259,6 @@ class TwitterApiReadOnly extends client_base_1.default {
         };
         if (this._requestMaker.hasPlugins()) {
             this._requestMaker.applyPluginMethod('onOAuth2RequestToken', {
-                client: this._requestMaker,
                 result,
                 redirectUri,
             });
@@ -3730,8 +3423,9 @@ exports.API_V1_1_STREAM_PREFIX = 'https://stream.twitter.com/1.1/';
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.safeDeprecationWarning = exports.hasMultipleItems = exports.isTweetStreamV2ErrorPayload = exports.trimUndefinedProperties = exports.arrayWrap = exports.sharedPromise = void 0;
+exports.safeDeprecationWarning = exports.applyResponseHooks = exports.hasMultipleItems = exports.isTweetStreamV2ErrorPayload = exports.trimUndefinedProperties = exports.arrayWrap = exports.sharedPromise = void 0;
 const settings_1 = __nccwpck_require__(6273);
+const types_1 = __nccwpck_require__(1638);
 function sharedPromise(getter) {
     const sharedPromise = {
         value: undefined,
@@ -3772,6 +3466,28 @@ function hasMultipleItems(item) {
     return item.toString().includes(',');
 }
 exports.hasMultipleItems = hasMultipleItems;
+/* Response helpers */
+function applyResponseHooks(requestParams, computedParams, requestOptions, error) {
+    if (error instanceof types_1.ApiRequestError || error instanceof types_1.ApiPartialResponseError) {
+        this.applyPluginMethod('onRequestError', {
+            url: this.getUrlObjectFromUrlString(requestParams.url),
+            params: requestParams,
+            computedParams,
+            requestOptions,
+            error,
+        });
+    }
+    else if (error instanceof types_1.ApiResponseError) {
+        this.applyPluginMethod('onResponseError', {
+            url: this.getUrlObjectFromUrlString(requestParams.url),
+            params: requestParams,
+            computedParams,
+            requestOptions,
+            error,
+        });
+    }
+}
+exports.applyResponseHooks = applyResponseHooks;
 const deprecationWarningsCache = new Set();
 function safeDeprecationWarning(message) {
     if (typeof console === 'undefined' || !console.warn || !settings_1.TwitterApiV2Settings.deprecationWarnings) {
@@ -4356,17 +4072,11 @@ exports.ListTimelineV1Paginator = exports.UserTimelineV1Paginator = exports.Ment
 const TwitterPaginator_1 = __importDefault(__nccwpck_require__(5317));
 /** A generic TwitterPaginator able to consume TweetV1 timelines. */
 class TweetTimelineV1Paginator extends TwitterPaginator_1.default {
-    constructor() {
-        super(...arguments);
-        this.hasFinishedFetch = false;
-    }
     refreshInstanceFromResult(response, isNextPage) {
         const result = response.data;
         this._rateLimit = response.rateLimit;
         if (isNextPage) {
             this._realData.push(...result);
-            // HINT: This is an approximation, as "end" of pagination cannot be safely determined without cursors.
-            this.hasFinishedFetch = result.length === 0;
         }
     }
     getNextQueryParams(maxResults) {
@@ -4393,9 +4103,6 @@ class TweetTimelineV1Paginator extends TwitterPaginator_1.default {
      */
     get tweets() {
         return this._realData;
-    }
-    get done() {
-        return super.done || this.hasFinishedFetch;
     }
 }
 // Timelines
@@ -4441,7 +4148,7 @@ exports.ListTimelineV1Paginator = ListTimelineV1Paginator;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.TweetV2ListTweetsPaginator = exports.TweetV2UserLikedTweetsPaginator = exports.TweetBookmarksTimelineV2Paginator = exports.TweetUserMentionTimelineV2Paginator = exports.TweetUserTimelineV2Paginator = exports.QuotedTweetsTimelineV2Paginator = exports.TweetSearchAllV2Paginator = exports.TweetSearchRecentV2Paginator = void 0;
+exports.TweetV2ListTweetsPaginator = exports.TweetV2UserLikedTweetsPaginator = exports.TweetUserMentionTimelineV2Paginator = exports.TweetUserTimelineV2Paginator = exports.TweetSearchAllV2Paginator = exports.TweetSearchRecentV2Paginator = void 0;
 const v2_paginator_1 = __nccwpck_require__(8108);
 /** A generic PreviousableTwitterPaginator able to consume TweetV2 timelines with since_id, until_id and next_token (when available). */
 class TweetTimelineV2Paginator extends v2_paginator_1.TwitterV2Paginator {
@@ -4570,13 +4277,6 @@ class TweetSearchAllV2Paginator extends TweetTimelineV2Paginator {
     }
 }
 exports.TweetSearchAllV2Paginator = TweetSearchAllV2Paginator;
-class QuotedTweetsTimelineV2Paginator extends TweetPaginableTimelineV2Paginator {
-    constructor() {
-        super(...arguments);
-        this._endpoint = 'tweets/:id/quote_tweets';
-    }
-}
-exports.QuotedTweetsTimelineV2Paginator = QuotedTweetsTimelineV2Paginator;
 class TweetUserTimelineV2Paginator extends TweetPaginableTimelineV2Paginator {
     constructor() {
         super(...arguments);
@@ -4591,16 +4291,6 @@ class TweetUserMentionTimelineV2Paginator extends TweetPaginableTimelineV2Pagina
     }
 }
 exports.TweetUserMentionTimelineV2Paginator = TweetUserMentionTimelineV2Paginator;
-// -------------
-// - Bookmarks -
-// -------------
-class TweetBookmarksTimelineV2Paginator extends TweetPaginableTimelineV2Paginator {
-    constructor() {
-        super(...arguments);
-        this._endpoint = 'users/:id/bookmarks';
-    }
-}
-exports.TweetBookmarksTimelineV2Paginator = TweetBookmarksTimelineV2Paginator;
 // ---------------------------------------------------------------------------------
 // - Tweet lists (consume tweets with pagination tokens instead of since/until id) -
 // ---------------------------------------------------------------------------------
@@ -4932,60 +4622,6 @@ class TimelineV2Paginator extends TwitterV2Paginator {
     }
 }
 exports.TimelineV2Paginator = TimelineV2Paginator;
-
-
-/***/ }),
-
-/***/ 247:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.applyResponseHooks = exports.hasRequestErrorPlugins = void 0;
-const types_1 = __nccwpck_require__(1638);
-/* Plugin helpers */
-function hasRequestErrorPlugins(client) {
-    var _a;
-    if (!((_a = client.clientSettings.plugins) === null || _a === void 0 ? void 0 : _a.length)) {
-        return false;
-    }
-    for (const plugin of client.clientSettings.plugins) {
-        if (plugin.onRequestError || plugin.onResponseError) {
-            return true;
-        }
-    }
-    return false;
-}
-exports.hasRequestErrorPlugins = hasRequestErrorPlugins;
-async function applyResponseHooks(requestParams, computedParams, requestOptions, error) {
-    let override;
-    if (error instanceof types_1.ApiRequestError || error instanceof types_1.ApiPartialResponseError) {
-        override = await this.applyPluginMethod('onRequestError', {
-            client: this,
-            url: this.getUrlObjectFromUrlString(requestParams.url),
-            params: requestParams,
-            computedParams,
-            requestOptions,
-            error,
-        });
-    }
-    else if (error instanceof types_1.ApiResponseError) {
-        override = await this.applyPluginMethod('onResponseError', {
-            client: this,
-            url: this.getUrlObjectFromUrlString(requestParams.url),
-            params: requestParams,
-            computedParams,
-            requestOptions,
-            error,
-        });
-    }
-    if (override && override instanceof types_1.TwitterApiPluginResponseOverride) {
-        return override.value;
-    }
-    return Promise.reject(error);
-}
-exports.applyResponseHooks = applyResponseHooks;
 
 
 /***/ }),
@@ -5729,13 +5365,6 @@ __exportStar(__nccwpck_require__(547), exports);
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.TwitterApiPluginResponseOverride = void 0;
-class TwitterApiPluginResponseOverride {
-    constructor(value) {
-        this.value = value;
-    }
-}
-exports.TwitterApiPluginResponseOverride = TwitterApiPluginResponseOverride;
 
 
 /***/ }),
@@ -5982,7 +5611,6 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-;
 
 
 /***/ }),
@@ -6820,14 +6448,6 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
         return this.post('statuses/update.json', queryParams);
     }
     /**
-     * Quote an existing tweet.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/post-statuses-update
-     */
-    async quote(status, quotingStatusId, payload = {}) {
-        const url = 'https://twitter.com/i/statuses/' + quotingStatusId;
-        return this.tweet(status, { ...payload, attachment_url: url });
-    }
-    /**
      * Post a series of tweets.
      * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/post-statuses-update
      */
@@ -7082,21 +6702,16 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
         // eslint-disable-next-line no-constant-condition
         while (true) {
             fullMediaData = await this.mediaInfo(fullMediaData.media_id_string);
-            const { processing_info } = fullMediaData;
-            if (!processing_info || processing_info.state === 'succeeded') {
+            if (!fullMediaData.processing_info || fullMediaData.processing_info.state === 'succeeded') {
                 // Ok, completed!
                 return;
             }
-            if (processing_info.state === 'failed') {
-                if (processing_info.error) {
-                    const { name, message } = processing_info.error;
-                    throw new Error(`Failed to process media: ${name} - ${message}.`);
-                }
+            if (fullMediaData.processing_info.state === 'failed') {
                 throw new Error('Failed to process the media.');
             }
-            if (processing_info.check_after_secs) {
+            if (fullMediaData.processing_info.check_after_secs) {
                 // Await for given seconds
-                await media_helpers_v1_1.sleepSecs(processing_info.check_after_secs);
+                await media_helpers_v1_1.sleepSecs(fullMediaData.processing_info.check_after_secs);
             }
             else {
                 // No info; Await for 5 seconds
@@ -7540,10 +7155,13 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
             return this._labs;
         return this._labs = new client_v2_labs_read_1.default(this);
     }
-    async search(queryOrOptions, options = {}) {
-        const query = typeof queryOrOptions === 'string' ? queryOrOptions : undefined;
-        const realOptions = typeof queryOrOptions === 'object' && queryOrOptions !== null ? queryOrOptions : options;
-        const queryParams = { ...realOptions, query };
+    /* Tweets */
+    /**
+     * The recent search endpoint returns Tweets from the last seven days that match a search query.
+     * https://developer.twitter.com/en/docs/twitter-api/tweets/search/api-reference/get-tweets-search-recent
+     */
+    async search(query, options = {}) {
+        const queryParams = { ...options, query };
         const initialRq = await this.get('tweets/search/recent', queryParams, { fullResponse: true });
         return new paginators_1.TweetSearchRecentV2Paginator({
             realData: initialRq.data,
@@ -7676,46 +7294,6 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
             instance: this,
             queryParams: options,
             sharedParams: { id: userId },
-        });
-    }
-    /**
-     * Returns Quote Tweets for a Tweet specified by the requested Tweet ID.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/quote-tweets/api-reference/get-tweets-id-quote_tweets
-     *
-     * OAuth2 scopes: `users.read` `tweet.read`
-     */
-    async quotes(tweetId, options = {}) {
-        const initialRq = await this.get('tweets/:id/quote_tweets', options, {
-            fullResponse: true,
-            params: { id: tweetId },
-        });
-        return new paginators_1.QuotedTweetsTimelineV2Paginator({
-            realData: initialRq.data,
-            rateLimit: initialRq.rateLimit,
-            instance: this,
-            queryParams: options,
-            sharedParams: { id: tweetId },
-        });
-    }
-    /* Bookmarks */
-    /**
-     * Allows you to get information about a authenticated user’s 800 most recent bookmarked Tweets.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/bookmarks/api-reference/get-users-id-bookmarks
-     *
-     * OAuth2 scopes: `users.read` `tweet.read` `bookmark.read`
-     */
-    async bookmarks(options = {}) {
-        const user = await this.getCurrentUserV2Object();
-        const initialRq = await this.get('users/:id/bookmarks', options, {
-            fullResponse: true,
-            params: { id: user.data.id },
-        });
-        return new paginators_1.TweetBookmarksTimelineV2Paginator({
-            realData: initialRq.data,
-            rateLimit: initialRq.rateLimit,
-            instance: this,
-            queryParams: options,
-            sharedParams: { id: user.data.id },
         });
     }
     /* Users */
@@ -7968,19 +7546,6 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     searchSpaces(options) {
         return this.get('spaces/search', options);
     }
-    /**
-    * Returns a list of user who purchased a ticket to the requested Space.
-    * You must authenticate the request using the Access Token of the creator of the requested Space.
-    *
-    * **OAuth 2.0 Access Token required**
-    *
-    * https://developer.twitter.com/en/docs/twitter-api/spaces/lookup/api-reference/get-spaces-id-buyers
-    *
-    * OAuth2 scopes: `tweet.read`, `users.read`, `space.read`.
-    */
-    spaceBuyers(spaceId, options = {}) {
-        return this.get('spaces/:id/buyers', options, { params: { id: spaceId } });
-    }
     searchStream({ autoConnect, ...options } = {}) {
         return this.getStream('tweets/search/stream', options, { payloadIsError: helpers_1.isTweetStreamV2ErrorPayload, autoConnect });
     }
@@ -8167,13 +7732,6 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
         return this.post('tweets', { text: status, ...payload, reply });
     }
     /**
-     * Quote an existing Tweet on behalf of an authenticated user.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/manage-tweets/api-reference/post-tweets
-     */
-    quote(status, quotedTweetId, payload = {}) {
-        return this.tweet(status, { ...payload, quote_tweet_id: quotedTweetId });
-    }
-    /**
      * Post a series of tweets.
      * https://developer.twitter.com/en/docs/twitter-api/tweets/manage-tweets/api-reference/post-tweets
      */
@@ -8207,27 +7765,6 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
                 id: tweetId,
             },
         });
-    }
-    /* Bookmarks */
-    /**
-     * Causes the user ID of an authenticated user identified in the path parameter to Bookmark the target Tweet provided in the request body.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/bookmarks/api-reference/post-users-id-bookmarks
-     *
-     * OAuth2 scopes: `users.read` `tweet.read` `bookmark.write`
-     */
-    async bookmark(tweetId) {
-        const user = await this.getCurrentUserV2Object();
-        return this.post('users/:id/bookmarks', { tweet_id: tweetId }, { params: { id: user.data.id } });
-    }
-    /**
-     * Allows a user or authenticated user ID to remove a Bookmark of a Tweet.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/bookmarks/api-reference/delete-users-id-bookmarks-tweet_id
-     *
-     * OAuth2 scopes: `users.read` `tweet.read` `bookmark.write`
-     */
-    async deleteBookmark(tweetId) {
-        const user = await this.getCurrentUserV2Object();
-        return this.delete('users/:id/bookmarks/:tweet_id', undefined, { params: { id: user.data.id, tweet_id: tweetId } });
     }
     /* Users */
     /**
