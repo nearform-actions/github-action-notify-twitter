@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Node.js runtime on build
-        uses: actions/setup-node@v3.1.0
+        uses: actions/setup-node@v3.4.1
         with:
           node-version: 16
 
