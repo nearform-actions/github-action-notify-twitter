@@ -39,7 +39,7 @@
   },
   "dependencies": {
     "@actions/core": "^1.9.1",
-    "@actions/github": "^5.0.3",
+    "@actions/github": "^5.1.0",
     "twitter-api-v2": "^1.12.7"
   }
 }
