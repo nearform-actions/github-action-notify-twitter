@@ -4283,6 +4283,86 @@ exports.WelcomeDmV1Paginator = WelcomeDmV1Paginator;
 
 /***/ }),
 
+/***/ 4509:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UserFollowerIdsV1Paginator = void 0;
+const paginator_v1_1 = __nccwpck_require__(593);
+class UserFollowerIdsV1Paginator extends paginator_v1_1.CursoredV1Paginator {
+    constructor() {
+        super(...arguments);
+        this._endpoint = 'followers/ids.json';
+        this._maxResultsWhenFetchLast = 5000;
+    }
+    refreshInstanceFromResult(response, isNextPage) {
+        const result = response.data;
+        this._rateLimit = response.rateLimit;
+        if (isNextPage) {
+            this._realData.ids.push(...result.ids);
+            this._realData.next_cursor = result.next_cursor;
+        }
+    }
+    getPageLengthFromRequest(result) {
+        return result.data.ids.length;
+    }
+    getItemArray() {
+        return this.ids;
+    }
+    /**
+     * Users IDs returned by paginator.
+     */
+    get ids() {
+        return this._realData.ids;
+    }
+}
+exports.UserFollowerIdsV1Paginator = UserFollowerIdsV1Paginator;
+
+
+/***/ }),
+
+/***/ 5905:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UserFollowersIdsV1Paginator = void 0;
+const paginator_v1_1 = __nccwpck_require__(593);
+class UserFollowersIdsV1Paginator extends paginator_v1_1.CursoredV1Paginator {
+    constructor() {
+        super(...arguments);
+        this._endpoint = 'friends/ids.json';
+        this._maxResultsWhenFetchLast = 5000;
+    }
+    refreshInstanceFromResult(response, isNextPage) {
+        const result = response.data;
+        this._rateLimit = response.rateLimit;
+        if (isNextPage) {
+            this._realData.ids.push(...result.ids);
+            this._realData.next_cursor = result.next_cursor;
+        }
+    }
+    getPageLengthFromRequest(result) {
+        return result.data.ids.length;
+    }
+    getItemArray() {
+        return this.ids;
+    }
+    /**
+     * Users IDs returned by paginator.
+     */
+    get ids() {
+        return this._realData.ids;
+    }
+}
+exports.UserFollowersIdsV1Paginator = UserFollowersIdsV1Paginator;
+
+
+/***/ }),
+
 /***/ 5814:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -4312,6 +4392,8 @@ __exportStar(__nccwpck_require__(8985), exports);
 __exportStar(__nccwpck_require__(2178), exports);
 __exportStar(__nccwpck_require__(5631), exports);
 __exportStar(__nccwpck_require__(7874), exports);
+__exportStar(__nccwpck_require__(5905), exports);
+__exportStar(__nccwpck_require__(4509), exports);
 
 
 /***/ }),
@@ -6521,6 +6603,8 @@ const helpers_1 = __nccwpck_require__(1120);
 const client_v1_1 = __importDefault(__nccwpck_require__(7030));
 const tweet_paginator_v1_1 = __nccwpck_require__(9848);
 const mutes_paginator_v1_1 = __nccwpck_require__(7277);
+const followers_paginator_v1_1 = __nccwpck_require__(4509);
+const friends_paginator_v1_1 = __nccwpck_require__(5905);
 const user_paginator_v1_1 = __nccwpck_require__(8985);
 const list_paginator_v1_1 = __nccwpck_require__(5631);
 /**
@@ -6720,6 +6804,40 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
         };
         const initialRq = await this.get('mutes/users/ids.json', queryParams, { fullResponse: true });
         return new mutes_paginator_v1_1.MuteUserIdsV1Paginator({
+            realData: initialRq.data,
+            rateLimit: initialRq.rateLimit,
+            instance: this,
+            queryParams,
+        });
+    }
+    /**
+     * Returns an array of numeric user ids of followers of the specified user.
+     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-followers-ids
+     */
+    async userFollowerIds(options = {}) {
+        const queryParams = {
+            stringify_ids: true,
+            ...options,
+        };
+        const initialRq = await this.get('followers/ids.json', queryParams, { fullResponse: true });
+        return new followers_paginator_v1_1.UserFollowerIdsV1Paginator({
+            realData: initialRq.data,
+            rateLimit: initialRq.rateLimit,
+            instance: this,
+            queryParams,
+        });
+    }
+    /**
+     * Returns an array of numeric user ids of friends of the specified user.
+     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friends-ids
+     */
+    async userFollowingIds(options = {}) {
+        const queryParams = {
+            stringify_ids: true,
+            ...options,
+        };
+        const initialRq = await this.get('friends/ids.json', queryParams, { fullResponse: true });
+        return new friends_paginator_v1_1.UserFollowersIdsV1Paginator({
             realData: initialRq.data,
             rateLimit: initialRq.rateLimit,
             instance: this,
