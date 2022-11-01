@@ -4289,8 +4289,35 @@ exports.WelcomeDmV1Paginator = WelcomeDmV1Paginator;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.UserFollowerIdsV1Paginator = void 0;
+exports.UserFollowerIdsV1Paginator = exports.UserFollowerListV1Paginator = void 0;
 const paginator_v1_1 = __nccwpck_require__(593);
+class UserFollowerListV1Paginator extends paginator_v1_1.CursoredV1Paginator {
+    constructor() {
+        super(...arguments);
+        this._endpoint = 'followers/list.json';
+    }
+    refreshInstanceFromResult(response, isNextPage) {
+        const result = response.data;
+        this._rateLimit = response.rateLimit;
+        if (isNextPage) {
+            this._realData.users.push(...result.users);
+            this._realData.next_cursor = result.next_cursor;
+        }
+    }
+    getPageLengthFromRequest(result) {
+        return result.data.users.length;
+    }
+    getItemArray() {
+        return this.users;
+    }
+    /**
+     * Users returned by paginator.
+     */
+    get users() {
+        return this._realData.users;
+    }
+}
+exports.UserFollowerListV1Paginator = UserFollowerListV1Paginator;
 class UserFollowerIdsV1Paginator extends paginator_v1_1.CursoredV1Paginator {
     constructor() {
         super(...arguments);
@@ -4329,8 +4356,35 @@ exports.UserFollowerIdsV1Paginator = UserFollowerIdsV1Paginator;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.UserFollowersIdsV1Paginator = void 0;
+exports.UserFollowersIdsV1Paginator = exports.UserFriendListV1Paginator = void 0;
 const paginator_v1_1 = __nccwpck_require__(593);
+class UserFriendListV1Paginator extends paginator_v1_1.CursoredV1Paginator {
+    constructor() {
+        super(...arguments);
+        this._endpoint = 'friends/list.json';
+    }
+    refreshInstanceFromResult(response, isNextPage) {
+        const result = response.data;
+        this._rateLimit = response.rateLimit;
+        if (isNextPage) {
+            this._realData.users.push(...result.users);
+            this._realData.next_cursor = result.next_cursor;
+        }
+    }
+    getPageLengthFromRequest(result) {
+        return result.data.users.length;
+    }
+    getItemArray() {
+        return this.users;
+    }
+    /**
+     * Users returned by paginator.
+     */
+    get users() {
+        return this._realData.users;
+    }
+}
+exports.UserFriendListV1Paginator = UserFriendListV1Paginator;
 class UserFollowersIdsV1Paginator extends paginator_v1_1.CursoredV1Paginator {
     constructor() {
         super(...arguments);
@@ -6804,6 +6858,38 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
         };
         const initialRq = await this.get('mutes/users/ids.json', queryParams, { fullResponse: true });
         return new mutes_paginator_v1_1.MuteUserIdsV1Paginator({
+            realData: initialRq.data,
+            rateLimit: initialRq.rateLimit,
+            instance: this,
+            queryParams,
+        });
+    }
+    /**
+     * Returns an array of user objects of friends of the specified user.
+     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friends-list
+     */
+    async userFriendList(options = {}) {
+        const queryParams = {
+            ...options,
+        };
+        const initialRq = await this.get('friends/list.json', queryParams, { fullResponse: true });
+        return new friends_paginator_v1_1.UserFriendListV1Paginator({
+            realData: initialRq.data,
+            rateLimit: initialRq.rateLimit,
+            instance: this,
+            queryParams,
+        });
+    }
+    /**
+     * Returns an array of user objects of followers of the specified user.
+     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-followers-list
+     */
+    async userFollowerList(options = {}) {
+        const queryParams = {
+            ...options,
+        };
+        const initialRq = await this.get('followers/list.json', queryParams, { fullResponse: true });
+        return new followers_paginator_v1_1.UserFollowerListV1Paginator({
             realData: initialRq.data,
             rateLimit: initialRq.rateLimit,
             instance: this,
