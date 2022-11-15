@@ -23,7 +23,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version-file: .nvmrc
-      - uses: nearform/optic-release-automation-action@v3
+      - uses: nearform/optic-release-automation-action@v4
         with:
           semver: ${{ github.event.inputs.semver }}
           sync-semver-tags: true
