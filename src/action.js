@@ -1,8 +1,12 @@
 'use strict'
 const core = require('@actions/core')
 const { TwitterApi } = require('twitter-api-v2')
+const toolkit = require('actions-toolkit')
 
 export async function run() {
+  toolkit.logActionRefWarning()
+  toolkit.logRepoWarning()
+
   core.info(`
   *** ACTION RUN - START ***
   `)

@@ -1762,6 +1762,58 @@ exports.checkBypass = checkBypass;
 
 /***/ }),
 
+/***/ 2020:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+const core = __nccwpck_require__(2186)
+
+/**
+ * Displays warning message if the action reference is pinned to master/main
+ */
+function logActionRefWarning() {
+  const actionRef = process.env.GITHUB_ACTION_REF
+  const repoName = process.env.GITHUB_ACTION_REPOSITORY
+
+  if (actionRef === 'main' || actionRef === 'master') {
+    core.warning(
+      `${repoName} is pinned at HEAD. We strongly ` +
+        `advise against pinning to "@${actionRef}" as it may be unstable. Please ` +
+        `update your GitHub Action YAML from:\n\n` +
+        `    uses: '${repoName}@${actionRef}'\n\n` +
+        `to:\n\n` +
+        `    uses: '${repoName}@<release/tag version>'\n\n` +
+        `Alternatively, you can pin to any git tag or git SHA in the ` +
+        `repository.`
+    )
+  }
+}
+
+/**
+ * Displays warning message if the repository is under the nearform organisation
+ */
+function logRepoWarning() {
+  const repoName = process.env.GITHUB_ACTION_REPOSITORY
+  const repoOrg = repoName.split('/')[0]
+
+  if (repoOrg != 'nearform-actions') {
+    core.warning(
+      `'${repoOrg}' is no longer a valid organisation for this action.` +
+        `Please update it to be under the 'nearform-actions' organisation.`
+    )
+  }
+}
+
+module.exports = {
+  logActionRefWarning,
+  logRepoWarning
+}
+
+
+/***/ }),
+
 /***/ 4294:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -2042,14 +2094,14 @@ exports.debug = debug; // for test
 
 /***/ }),
 
-/***/ 8274:
+/***/ 7068:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.FormDataHelper = void 0;
-const helpers_1 = __nccwpck_require__(1120);
+const helpers_1 = __nccwpck_require__(8169);
 // This class is partially inspired by https://github.com/form-data/form-data/blob/master/lib/form_data.js
 // All credits to their authors.
 class FormDataHelper {
@@ -2133,7 +2185,7 @@ FormDataHelper.DEFAULT_CONTENT_TYPE = 'application/octet-stream';
 
 /***/ }),
 
-/***/ 8291:
+/***/ 9129:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -2328,7 +2380,7 @@ function percentEncodeData(data) {
 
 /***/ }),
 
-/***/ 9791:
+/***/ 1343:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -2390,7 +2442,7 @@ exports.OAuth2Helper = OAuth2Helper;
 
 /***/ }),
 
-/***/ 3768:
+/***/ 2529:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -2424,9 +2476,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.RequestHandlerHelper = void 0;
 const https_1 = __nccwpck_require__(5687);
-const settings_1 = __nccwpck_require__(6273);
-const TweetStream_1 = __importDefault(__nccwpck_require__(9362));
-const types_1 = __nccwpck_require__(1638);
+const settings_1 = __nccwpck_require__(8064);
+const TweetStream_1 = __importDefault(__nccwpck_require__(5041));
+const types_1 = __nccwpck_require__(4000);
 const zlib = __importStar(__nccwpck_require__(9796));
 class RequestHandlerHelper {
     constructor(requestData) {
@@ -2789,7 +2841,7 @@ exports["default"] = RequestHandlerHelper;
 
 /***/ }),
 
-/***/ 6131:
+/***/ 2125:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -2799,14 +2851,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ClientRequestMaker = void 0;
-const types_1 = __nccwpck_require__(1638);
-const TweetStream_1 = __importDefault(__nccwpck_require__(9362));
-const helpers_1 = __nccwpck_require__(247);
-const helpers_2 = __nccwpck_require__(1120);
-const oauth1_helper_1 = __importDefault(__nccwpck_require__(8291));
-const request_handler_helper_1 = __importDefault(__nccwpck_require__(3768));
-const request_param_helper_1 = __importDefault(__nccwpck_require__(7954));
-const oauth2_helper_1 = __nccwpck_require__(9791);
+const types_1 = __nccwpck_require__(4000);
+const TweetStream_1 = __importDefault(__nccwpck_require__(5041));
+const helpers_1 = __nccwpck_require__(556);
+const helpers_2 = __nccwpck_require__(8169);
+const oauth1_helper_1 = __importDefault(__nccwpck_require__(9129));
+const request_handler_helper_1 = __importDefault(__nccwpck_require__(2529));
+const request_param_helper_1 = __importDefault(__nccwpck_require__(4072));
+const oauth2_helper_1 = __nccwpck_require__(1343);
 class ClientRequestMaker {
     constructor(settings) {
         this.rateLimits = {};
@@ -3120,7 +3172,7 @@ ClientRequestMaker.BODY_METHODS = new Set(['POST', 'PUT', 'PATCH']);
 
 /***/ }),
 
-/***/ 7954:
+/***/ 4072:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -3130,8 +3182,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.RequestParamHelpers = void 0;
-const form_data_helper_1 = __nccwpck_require__(8274);
-const oauth1_helper_1 = __importDefault(__nccwpck_require__(8291));
+const form_data_helper_1 = __nccwpck_require__(7068);
+const oauth1_helper_1 = __importDefault(__nccwpck_require__(9129));
 /* Helpers functions that are specific to this class but do not depends on instance */
 class RequestParamHelpers {
     static formatQueryToString(query) {
@@ -3183,11 +3235,15 @@ class RequestParamHelpers {
             return body;
         }
         if (mode === 'json') {
-            headers['content-type'] = 'application/json;charset=UTF-8';
+            if (!headers['content-type']) {
+                headers['content-type'] = 'application/json;charset=UTF-8';
+            }
             return JSON.stringify(body);
         }
         else if (mode === 'url') {
-            headers['content-type'] = 'application/x-www-form-urlencoded;charset=UTF-8';
+            if (!headers['content-type']) {
+                headers['content-type'] = 'application/x-www-form-urlencoded;charset=UTF-8';
+            }
             if (Object.keys(body).length) {
                 return new URLSearchParams(body)
                     .toString()
@@ -3203,8 +3259,10 @@ class RequestParamHelpers {
             for (const parameter in body) {
                 form.append(parameter, body[parameter]);
             }
-            const formHeaders = form.getHeaders();
-            headers['content-type'] = formHeaders['content-type'];
+            if (!headers['content-type']) {
+                const formHeaders = form.getHeaders();
+                headers['content-type'] = formHeaders['content-type'];
+            }
             return form.getBuffer();
         }
     }
@@ -3273,15 +3331,15 @@ exports["default"] = RequestParamHelpers;
 
 /***/ }),
 
-/***/ 8726:
+/***/ 2541:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const request_maker_mixin_1 = __nccwpck_require__(6131);
-const helpers_1 = __nccwpck_require__(1120);
-const globals_1 = __nccwpck_require__(3444);
+const request_maker_mixin_1 = __nccwpck_require__(2125);
+const helpers_1 = __nccwpck_require__(8169);
+const globals_1 = __nccwpck_require__(3031);
 /**
  * Base class for Twitter instances
  */
@@ -3460,7 +3518,7 @@ exports["default"] = TwitterApiBase;
 
 /***/ }),
 
-/***/ 3810:
+/***/ 294:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -3469,7 +3527,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const client_base_1 = __importDefault(__nccwpck_require__(8726));
+const client_base_1 = __importDefault(__nccwpck_require__(2541));
 /**
  * Base subclient for every v1 and v2 client.
  */
@@ -3486,7 +3544,7 @@ exports["default"] = TwitterApiSubClient;
 
 /***/ }),
 
-/***/ 6118:
+/***/ 9258:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -3496,9 +3554,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TwitterApiReadOnly = exports.TwitterApiReadWrite = exports.TwitterApi = void 0;
-const client_v1_1 = __importDefault(__nccwpck_require__(7030));
-const client_v2_1 = __importDefault(__nccwpck_require__(4692));
-const readwrite_1 = __importDefault(__nccwpck_require__(489));
+const client_v1_1 = __importDefault(__nccwpck_require__(845));
+const client_v2_1 = __importDefault(__nccwpck_require__(2105));
+const readwrite_1 = __importDefault(__nccwpck_require__(2561));
 // "Real" exported client for usage of TwitterApi.
 /**
  * Twitter v1.1 and v2 API client.
@@ -3555,16 +3613,16 @@ class TwitterApi extends readwrite_1.default {
     }
 }
 exports.TwitterApi = TwitterApi;
-var readwrite_2 = __nccwpck_require__(489);
+var readwrite_2 = __nccwpck_require__(2561);
 Object.defineProperty(exports, "TwitterApiReadWrite", ({ enumerable: true, get: function () { return __importDefault(readwrite_2).default; } }));
-var readonly_1 = __nccwpck_require__(7344);
+var readonly_1 = __nccwpck_require__(2353);
 Object.defineProperty(exports, "TwitterApiReadOnly", ({ enumerable: true, get: function () { return __importDefault(readonly_1).default; } }));
 exports["default"] = TwitterApi;
 
 
 /***/ }),
 
-/***/ 7344:
+/***/ 2353:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -3573,12 +3631,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const _1 = __importDefault(__nccwpck_require__(6118));
-const client_base_1 = __importDefault(__nccwpck_require__(8726));
-const client_v1_read_1 = __importDefault(__nccwpck_require__(4273));
-const client_v2_read_1 = __importDefault(__nccwpck_require__(7318));
-const oauth2_helper_1 = __nccwpck_require__(9791);
-const request_param_helper_1 = __importDefault(__nccwpck_require__(7954));
+const _1 = __importDefault(__nccwpck_require__(9258));
+const client_base_1 = __importDefault(__nccwpck_require__(2541));
+const client_v1_read_1 = __importDefault(__nccwpck_require__(6017));
+const client_v2_read_1 = __importDefault(__nccwpck_require__(6695));
+const oauth2_helper_1 = __nccwpck_require__(1343);
+const request_param_helper_1 = __importDefault(__nccwpck_require__(4072));
 /**
  * Twitter v1.1 and v2 API client.
  */
@@ -3877,7 +3935,7 @@ exports["default"] = TwitterApiReadOnly;
 
 /***/ }),
 
-/***/ 489:
+/***/ 2561:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -3886,9 +3944,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const client_v1_write_1 = __importDefault(__nccwpck_require__(6685));
-const client_v2_write_1 = __importDefault(__nccwpck_require__(5587));
-const readonly_1 = __importDefault(__nccwpck_require__(7344));
+const client_v1_write_1 = __importDefault(__nccwpck_require__(7028));
+const client_v2_write_1 = __importDefault(__nccwpck_require__(7128));
+const readonly_1 = __importDefault(__nccwpck_require__(2353));
 /**
  * Twitter v1.1 and v2 API client.
  */
@@ -3916,7 +3974,7 @@ exports["default"] = TwitterApiReadWrite;
 
 /***/ }),
 
-/***/ 3444:
+/***/ 3031:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -3932,14 +3990,14 @@ exports.API_V1_1_STREAM_PREFIX = 'https://stream.twitter.com/1.1/';
 
 /***/ }),
 
-/***/ 1120:
+/***/ 8169:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.safeDeprecationWarning = exports.hasMultipleItems = exports.isTweetStreamV2ErrorPayload = exports.trimUndefinedProperties = exports.arrayWrap = exports.sharedPromise = void 0;
-const settings_1 = __nccwpck_require__(6273);
+const settings_1 = __nccwpck_require__(8064);
 function sharedPromise(getter) {
     const sharedPromise = {
         value: undefined,
@@ -4000,7 +4058,7 @@ exports.safeDeprecationWarning = safeDeprecationWarning;
 
 /***/ }),
 
-/***/ 9360:
+/***/ 5395:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -4024,22 +4082,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports["default"] = void 0;
-var client_1 = __nccwpck_require__(6118);
+var client_1 = __nccwpck_require__(9258);
 Object.defineProperty(exports, "default", ({ enumerable: true, get: function () { return __importDefault(client_1).default; } }));
-__exportStar(__nccwpck_require__(6118), exports);
-__exportStar(__nccwpck_require__(7030), exports);
-__exportStar(__nccwpck_require__(4692), exports);
-__exportStar(__nccwpck_require__(876), exports);
-__exportStar(__nccwpck_require__(1204), exports);
-__exportStar(__nccwpck_require__(1638), exports);
-__exportStar(__nccwpck_require__(5814), exports);
-__exportStar(__nccwpck_require__(9362), exports);
-__exportStar(__nccwpck_require__(6273), exports);
+__exportStar(__nccwpck_require__(9258), exports);
+__exportStar(__nccwpck_require__(845), exports);
+__exportStar(__nccwpck_require__(2105), exports);
+__exportStar(__nccwpck_require__(5045), exports);
+__exportStar(__nccwpck_require__(3692), exports);
+__exportStar(__nccwpck_require__(4000), exports);
+__exportStar(__nccwpck_require__(2411), exports);
+__exportStar(__nccwpck_require__(5041), exports);
+__exportStar(__nccwpck_require__(8064), exports);
 
 
 /***/ }),
 
-/***/ 5317:
+/***/ 2698:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -4220,14 +4278,14 @@ exports["default"] = TwitterPaginator;
 
 /***/ }),
 
-/***/ 823:
+/***/ 2456:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.WelcomeDmV1Paginator = exports.DmEventsV1Paginator = void 0;
-const paginator_v1_1 = __nccwpck_require__(593);
+const paginator_v1_1 = __nccwpck_require__(2289);
 class DmEventsV1Paginator extends paginator_v1_1.CursoredV1Paginator {
     constructor() {
         super(...arguments);
@@ -4283,14 +4341,63 @@ exports.WelcomeDmV1Paginator = WelcomeDmV1Paginator;
 
 /***/ }),
 
-/***/ 4509:
+/***/ 1583:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ConversationDMTimelineV2Paginator = exports.OneToOneDMTimelineV2Paginator = exports.FullDMTimelineV2Paginator = exports.DMTimelineV2Paginator = void 0;
+const v2_paginator_1 = __nccwpck_require__(7899);
+class DMTimelineV2Paginator extends v2_paginator_1.TimelineV2Paginator {
+    getItemArray() {
+        return this.events;
+    }
+    /**
+     * Events returned by paginator.
+     */
+    get events() {
+        var _a;
+        return (_a = this._realData.data) !== null && _a !== void 0 ? _a : [];
+    }
+    get meta() {
+        return super.meta;
+    }
+}
+exports.DMTimelineV2Paginator = DMTimelineV2Paginator;
+class FullDMTimelineV2Paginator extends DMTimelineV2Paginator {
+    constructor() {
+        super(...arguments);
+        this._endpoint = 'dm_events';
+    }
+}
+exports.FullDMTimelineV2Paginator = FullDMTimelineV2Paginator;
+class OneToOneDMTimelineV2Paginator extends DMTimelineV2Paginator {
+    constructor() {
+        super(...arguments);
+        this._endpoint = 'dm_conversations/with/:participant_id/dm_events';
+    }
+}
+exports.OneToOneDMTimelineV2Paginator = OneToOneDMTimelineV2Paginator;
+class ConversationDMTimelineV2Paginator extends DMTimelineV2Paginator {
+    constructor() {
+        super(...arguments);
+        this._endpoint = 'dm_conversations/:dm_conversation_id/dm_events';
+    }
+}
+exports.ConversationDMTimelineV2Paginator = ConversationDMTimelineV2Paginator;
+
+
+/***/ }),
+
+/***/ 9407:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UserFollowerIdsV1Paginator = exports.UserFollowerListV1Paginator = void 0;
-const paginator_v1_1 = __nccwpck_require__(593);
+const paginator_v1_1 = __nccwpck_require__(2289);
 class UserFollowerListV1Paginator extends paginator_v1_1.CursoredV1Paginator {
     constructor() {
         super(...arguments);
@@ -4350,14 +4457,14 @@ exports.UserFollowerIdsV1Paginator = UserFollowerIdsV1Paginator;
 
 /***/ }),
 
-/***/ 5905:
+/***/ 275:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UserFollowersIdsV1Paginator = exports.UserFriendListV1Paginator = void 0;
-const paginator_v1_1 = __nccwpck_require__(593);
+const paginator_v1_1 = __nccwpck_require__(2289);
 class UserFriendListV1Paginator extends paginator_v1_1.CursoredV1Paginator {
     constructor() {
         super(...arguments);
@@ -4417,7 +4524,7 @@ exports.UserFollowersIdsV1Paginator = UserFollowersIdsV1Paginator;
 
 /***/ }),
 
-/***/ 5814:
+/***/ 2411:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -4437,29 +4544,29 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-__exportStar(__nccwpck_require__(6301), exports);
-__exportStar(__nccwpck_require__(5317), exports);
-__exportStar(__nccwpck_require__(823), exports);
-__exportStar(__nccwpck_require__(7277), exports);
-__exportStar(__nccwpck_require__(9848), exports);
-__exportStar(__nccwpck_require__(8985), exports);
-__exportStar(__nccwpck_require__(2178), exports);
-__exportStar(__nccwpck_require__(5631), exports);
-__exportStar(__nccwpck_require__(7874), exports);
-__exportStar(__nccwpck_require__(5905), exports);
-__exportStar(__nccwpck_require__(4509), exports);
+__exportStar(__nccwpck_require__(8279), exports);
+__exportStar(__nccwpck_require__(2698), exports);
+__exportStar(__nccwpck_require__(2456), exports);
+__exportStar(__nccwpck_require__(6219), exports);
+__exportStar(__nccwpck_require__(2843), exports);
+__exportStar(__nccwpck_require__(6060), exports);
+__exportStar(__nccwpck_require__(5966), exports);
+__exportStar(__nccwpck_require__(5269), exports);
+__exportStar(__nccwpck_require__(7353), exports);
+__exportStar(__nccwpck_require__(275), exports);
+__exportStar(__nccwpck_require__(9407), exports);
 
 
 /***/ }),
 
-/***/ 5631:
+/***/ 5269:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ListSubscribersV1Paginator = exports.ListMembersV1Paginator = exports.ListSubscriptionsV1Paginator = exports.ListOwnershipsV1Paginator = exports.ListMembershipsV1Paginator = void 0;
-const paginator_v1_1 = __nccwpck_require__(593);
+const paginator_v1_1 = __nccwpck_require__(2289);
 class ListListsV1Paginator extends paginator_v1_1.CursoredV1Paginator {
     refreshInstanceFromResult(response, isNextPage) {
         const result = response.data;
@@ -4543,14 +4650,14 @@ exports.ListSubscribersV1Paginator = ListSubscribersV1Paginator;
 
 /***/ }),
 
-/***/ 7874:
+/***/ 7353:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UserListFollowedV2Paginator = exports.UserListMembershipsV2Paginator = exports.UserOwnedListsV2Paginator = void 0;
-const v2_paginator_1 = __nccwpck_require__(8108);
+const v2_paginator_1 = __nccwpck_require__(7899);
 class ListTimelineV2Paginator extends v2_paginator_1.TimelineV2Paginator {
     getItemArray() {
         return this.lists;
@@ -4591,14 +4698,14 @@ exports.UserListFollowedV2Paginator = UserListFollowedV2Paginator;
 
 /***/ }),
 
-/***/ 7277:
+/***/ 6219:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MuteUserIdsV1Paginator = exports.MuteUserListV1Paginator = void 0;
-const paginator_v1_1 = __nccwpck_require__(593);
+const paginator_v1_1 = __nccwpck_require__(2289);
 class MuteUserListV1Paginator extends paginator_v1_1.CursoredV1Paginator {
     constructor() {
         super(...arguments);
@@ -4658,7 +4765,7 @@ exports.MuteUserIdsV1Paginator = MuteUserIdsV1Paginator;
 
 /***/ }),
 
-/***/ 593:
+/***/ 2289:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -4668,7 +4775,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CursoredV1Paginator = void 0;
-const TwitterPaginator_1 = __importDefault(__nccwpck_require__(5317));
+const TwitterPaginator_1 = __importDefault(__nccwpck_require__(2698));
 class CursoredV1Paginator extends TwitterPaginator_1.default {
     getNextQueryParams(maxResults) {
         var _a;
@@ -4699,7 +4806,7 @@ exports.CursoredV1Paginator = CursoredV1Paginator;
 
 /***/ }),
 
-/***/ 9848:
+/***/ 2843:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -4709,7 +4816,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UserFavoritesV1Paginator = exports.ListTimelineV1Paginator = exports.UserTimelineV1Paginator = exports.MentionTimelineV1Paginator = exports.HomeTimelineV1Paginator = void 0;
-const TwitterPaginator_1 = __importDefault(__nccwpck_require__(5317));
+const TwitterPaginator_1 = __importDefault(__nccwpck_require__(2698));
 /** A generic TwitterPaginator able to consume TweetV1 timelines. */
 class TweetTimelineV1Paginator extends TwitterPaginator_1.default {
     constructor() {
@@ -4799,14 +4906,14 @@ exports.UserFavoritesV1Paginator = UserFavoritesV1Paginator;
 
 /***/ }),
 
-/***/ 6301:
+/***/ 8279:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TweetV2ListTweetsPaginator = exports.TweetV2UserLikedTweetsPaginator = exports.TweetBookmarksTimelineV2Paginator = exports.TweetUserMentionTimelineV2Paginator = exports.TweetUserTimelineV2Paginator = exports.TweetHomeTimelineV2Paginator = exports.QuotedTweetsTimelineV2Paginator = exports.TweetSearchAllV2Paginator = exports.TweetSearchRecentV2Paginator = void 0;
-const v2_paginator_1 = __nccwpck_require__(8108);
+const v2_paginator_1 = __nccwpck_require__(7899);
 /** A generic PreviousableTwitterPaginator able to consume TweetV2 timelines with since_id, until_id and next_token (when available). */
 class TweetTimelineV2Paginator extends v2_paginator_1.TwitterV2Paginator {
     refreshInstanceFromResult(response, isNextPage) {
@@ -5012,7 +5119,7 @@ exports.TweetV2ListTweetsPaginator = TweetV2ListTweetsPaginator;
 
 /***/ }),
 
-/***/ 8985:
+/***/ 6060:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -5022,8 +5129,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.FriendshipsOutgoingV1Paginator = exports.FriendshipsIncomingV1Paginator = exports.UserSearchV1Paginator = void 0;
-const TwitterPaginator_1 = __importDefault(__nccwpck_require__(5317));
-const paginator_v1_1 = __nccwpck_require__(593);
+const TwitterPaginator_1 = __importDefault(__nccwpck_require__(2698));
+const paginator_v1_1 = __nccwpck_require__(2289);
 /** A generic TwitterPaginator able to consume TweetV1 timelines. */
 class UserSearchV1Paginator extends TwitterPaginator_1.default {
     constructor() {
@@ -5105,14 +5212,14 @@ exports.FriendshipsOutgoingV1Paginator = FriendshipsOutgoingV1Paginator;
 
 /***/ }),
 
-/***/ 2178:
+/***/ 5966:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TweetRetweetersUsersV2Paginator = exports.TweetLikingUsersV2Paginator = exports.UserListFollowersV2Paginator = exports.UserListMembersV2Paginator = exports.UserFollowingV2Paginator = exports.UserFollowersV2Paginator = exports.UserMutingUsersV2Paginator = exports.UserBlockingUsersV2Paginator = void 0;
-const v2_paginator_1 = __nccwpck_require__(8108);
+const v2_paginator_1 = __nccwpck_require__(7899);
 /** A generic PreviousableTwitterPaginator able to consume UserV2 timelines. */
 class UserTimelineV2Paginator extends v2_paginator_1.TimelineV2Paginator {
     getItemArray() {
@@ -5189,15 +5296,15 @@ exports.TweetRetweetersUsersV2Paginator = TweetRetweetersUsersV2Paginator;
 
 /***/ }),
 
-/***/ 8108:
+/***/ 7899:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TimelineV2Paginator = exports.TwitterV2Paginator = void 0;
-const includes_v2_helper_1 = __nccwpck_require__(876);
-const TwitterPaginator_1 = __nccwpck_require__(5317);
+const includes_v2_helper_1 = __nccwpck_require__(5045);
+const TwitterPaginator_1 = __nccwpck_require__(2698);
 /** A generic PreviousableTwitterPaginator with common v2 helper methods. */
 class TwitterV2Paginator extends TwitterPaginator_1.PreviousableTwitterPaginator {
     updateIncludes(data) {
@@ -5310,14 +5417,14 @@ exports.TimelineV2Paginator = TimelineV2Paginator;
 
 /***/ }),
 
-/***/ 247:
+/***/ 556:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.applyResponseHooks = exports.hasRequestErrorPlugins = void 0;
-const types_1 = __nccwpck_require__(1638);
+const types_1 = __nccwpck_require__(4000);
 /* Plugin helpers */
 function hasRequestErrorPlugins(client) {
     var _a;
@@ -5364,7 +5471,7 @@ exports.applyResponseHooks = applyResponseHooks;
 
 /***/ }),
 
-/***/ 6273:
+/***/ 8064:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -5380,7 +5487,7 @@ exports.TwitterApiV2Settings = {
 
 /***/ }),
 
-/***/ 9362:
+/***/ 5041:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -5414,10 +5521,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TweetStream = void 0;
 const events_1 = __nccwpck_require__(2361);
-const request_handler_helper_1 = __importDefault(__nccwpck_require__(3768));
-const types_1 = __nccwpck_require__(1638);
-const TweetStreamEventCombiner_1 = __importDefault(__nccwpck_require__(1132));
-const TweetStreamParser_1 = __importStar(__nccwpck_require__(7467));
+const request_handler_helper_1 = __importDefault(__nccwpck_require__(2529));
+const types_1 = __nccwpck_require__(4000);
+const TweetStreamEventCombiner_1 = __importDefault(__nccwpck_require__(2630));
+const TweetStreamParser_1 = __importStar(__nccwpck_require__(7937));
 // In seconds
 const basicRetriesAttempt = [5, 15, 30, 60, 90, 120, 180, 300, 600, 900];
 // Default retry function
@@ -5691,7 +5798,7 @@ exports["default"] = TweetStream;
 
 /***/ }),
 
-/***/ 1132:
+/***/ 2630:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -5699,7 +5806,7 @@ exports["default"] = TweetStream;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TweetStreamEventCombiner = void 0;
 const events_1 = __nccwpck_require__(2361);
-const types_1 = __nccwpck_require__(1638);
+const types_1 = __nccwpck_require__(4000);
 class TweetStreamEventCombiner extends events_1.EventEmitter {
     constructor(stream) {
         super();
@@ -5754,7 +5861,7 @@ exports["default"] = TweetStreamEventCombiner;
 
 /***/ }),
 
-/***/ 7467:
+/***/ 7937:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -5816,7 +5923,7 @@ var EStreamParserEvent;
 
 /***/ }),
 
-/***/ 8294:
+/***/ 1688:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -5826,7 +5933,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ 948:
+/***/ 542:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -5854,7 +5961,7 @@ var ETwitterStreamEvent;
 
 /***/ }),
 
-/***/ 3549:
+/***/ 2278:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -6085,7 +6192,7 @@ var EApiV2ErrorCode;
 
 /***/ }),
 
-/***/ 1638:
+/***/ 4000:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -6105,18 +6212,18 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-__exportStar(__nccwpck_require__(5401), exports);
-__exportStar(__nccwpck_require__(7109), exports);
-__exportStar(__nccwpck_require__(3549), exports);
-__exportStar(__nccwpck_require__(6296), exports);
-__exportStar(__nccwpck_require__(948), exports);
-__exportStar(__nccwpck_require__(8294), exports);
-__exportStar(__nccwpck_require__(547), exports);
+__exportStar(__nccwpck_require__(3074), exports);
+__exportStar(__nccwpck_require__(9385), exports);
+__exportStar(__nccwpck_require__(2278), exports);
+__exportStar(__nccwpck_require__(7852), exports);
+__exportStar(__nccwpck_require__(542), exports);
+__exportStar(__nccwpck_require__(1688), exports);
+__exportStar(__nccwpck_require__(6709), exports);
 
 
 /***/ }),
 
-/***/ 3924:
+/***/ 6151:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -6133,7 +6240,7 @@ exports.TwitterApiPluginResponseOverride = TwitterApiPluginResponseOverride;
 
 /***/ }),
 
-/***/ 547:
+/***/ 6709:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -6153,12 +6260,12 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-__exportStar(__nccwpck_require__(3924), exports);
+__exportStar(__nccwpck_require__(6151), exports);
 
 
 /***/ }),
 
-/***/ 6296:
+/***/ 7852:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -6168,7 +6275,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ 9740:
+/***/ 2152:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -6178,7 +6285,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ 6430:
+/***/ 7000:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -6195,7 +6302,7 @@ var EDirectMessageEventTypeV1;
 
 /***/ }),
 
-/***/ 1575:
+/***/ 6410:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -6205,7 +6312,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ 712:
+/***/ 3942:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -6215,7 +6322,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ 5401:
+/***/ 3074:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -6235,20 +6342,20 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-__exportStar(__nccwpck_require__(2362), exports);
-__exportStar(__nccwpck_require__(3863), exports);
-__exportStar(__nccwpck_require__(1575), exports);
-__exportStar(__nccwpck_require__(9045), exports);
-__exportStar(__nccwpck_require__(9740), exports);
-__exportStar(__nccwpck_require__(712), exports);
-__exportStar(__nccwpck_require__(9622), exports);
-__exportStar(__nccwpck_require__(6430), exports);
-__exportStar(__nccwpck_require__(3268), exports);
+__exportStar(__nccwpck_require__(6366), exports);
+__exportStar(__nccwpck_require__(9567), exports);
+__exportStar(__nccwpck_require__(6410), exports);
+__exportStar(__nccwpck_require__(6874), exports);
+__exportStar(__nccwpck_require__(2152), exports);
+__exportStar(__nccwpck_require__(3942), exports);
+__exportStar(__nccwpck_require__(2470), exports);
+__exportStar(__nccwpck_require__(7000), exports);
+__exportStar(__nccwpck_require__(3468), exports);
 
 
 /***/ }),
 
-/***/ 3268:
+/***/ 3468:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -6258,7 +6365,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ 2362:
+/***/ 6366:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -6268,7 +6375,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ 9622:
+/***/ 2470:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -6278,7 +6385,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ 3863:
+/***/ 9567:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -6298,7 +6405,7 @@ var EUploadMimeType;
 
 /***/ }),
 
-/***/ 9045:
+/***/ 6874:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -6308,7 +6415,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ 7109:
+/***/ 9385:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -6328,17 +6435,17 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-__exportStar(__nccwpck_require__(3026), exports);
-__exportStar(__nccwpck_require__(7295), exports);
-__exportStar(__nccwpck_require__(5894), exports);
-__exportStar(__nccwpck_require__(4292), exports);
-__exportStar(__nccwpck_require__(7323), exports);
-__exportStar(__nccwpck_require__(970), exports);
+__exportStar(__nccwpck_require__(313), exports);
+__exportStar(__nccwpck_require__(137), exports);
+__exportStar(__nccwpck_require__(2270), exports);
+__exportStar(__nccwpck_require__(6375), exports);
+__exportStar(__nccwpck_require__(3623), exports);
+__exportStar(__nccwpck_require__(499), exports);
 
 
 /***/ }),
 
-/***/ 970:
+/***/ 499:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -6348,7 +6455,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ 7323:
+/***/ 3623:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -6358,7 +6465,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ 3026:
+/***/ 313:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -6371,7 +6478,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ 5894:
+/***/ 2270:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -6381,18 +6488,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ 7295:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-;
-
-
-/***/ }),
-
-/***/ 4292:
+/***/ 137:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -6402,7 +6498,17 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ 7030:
+/***/ 6375:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+
+
+/***/ }),
+
+/***/ 845:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -6412,10 +6518,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TwitterApiv1 = void 0;
-const globals_1 = __nccwpck_require__(3444);
-const dm_paginator_v1_1 = __nccwpck_require__(823);
-const types_1 = __nccwpck_require__(1638);
-const client_v1_write_1 = __importDefault(__nccwpck_require__(6685));
+const globals_1 = __nccwpck_require__(3031);
+const dm_paginator_v1_1 = __nccwpck_require__(2456);
+const types_1 = __nccwpck_require__(4000);
+const client_v1_write_1 = __importDefault(__nccwpck_require__(7028));
 /**
  * Twitter v1.1 API client with read/write/DMs rights.
  */
@@ -6627,7 +6733,7 @@ class TwitterApiv1 extends client_v1_write_1.default {
             if (!attachment) {
                 throw new Error('The given direct message doesn\'t contain any attachment');
             }
-            urlOrDm = attachment.media_url_https;
+            urlOrDm = attachment.media.media_url_https;
         }
         const data = await this.get(urlOrDm, undefined, { forceParseMode: 'buffer', prefix: '' });
         if (!data.length) {
@@ -6642,7 +6748,7 @@ exports["default"] = TwitterApiv1;
 
 /***/ }),
 
-/***/ 4273:
+/***/ 6017:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -6651,16 +6757,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const client_subclient_1 = __importDefault(__nccwpck_require__(3810));
-const globals_1 = __nccwpck_require__(3444);
-const helpers_1 = __nccwpck_require__(1120);
-const client_v1_1 = __importDefault(__nccwpck_require__(7030));
-const tweet_paginator_v1_1 = __nccwpck_require__(9848);
-const mutes_paginator_v1_1 = __nccwpck_require__(7277);
-const followers_paginator_v1_1 = __nccwpck_require__(4509);
-const friends_paginator_v1_1 = __nccwpck_require__(5905);
-const user_paginator_v1_1 = __nccwpck_require__(8985);
-const list_paginator_v1_1 = __nccwpck_require__(5631);
+const client_subclient_1 = __importDefault(__nccwpck_require__(294));
+const globals_1 = __nccwpck_require__(3031);
+const helpers_1 = __nccwpck_require__(8169);
+const client_v1_1 = __importDefault(__nccwpck_require__(845));
+const tweet_paginator_v1_1 = __nccwpck_require__(2843);
+const mutes_paginator_v1_1 = __nccwpck_require__(6219);
+const followers_paginator_v1_1 = __nccwpck_require__(9407);
+const friends_paginator_v1_1 = __nccwpck_require__(275);
+const user_paginator_v1_1 = __nccwpck_require__(6060);
+const list_paginator_v1_1 = __nccwpck_require__(5269);
 /**
  * Base Twitter v1 client with only read right.
  */
@@ -7268,7 +7374,7 @@ exports["default"] = TwitterApiv1ReadOnly;
 
 /***/ }),
 
-/***/ 6685:
+/***/ 7028:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -7300,12 +7406,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const globals_1 = __nccwpck_require__(3444);
-const client_v1_read_1 = __importDefault(__nccwpck_require__(4273));
-const types_1 = __nccwpck_require__(1638);
+const globals_1 = __nccwpck_require__(3031);
+const client_v1_read_1 = __importDefault(__nccwpck_require__(6017));
+const types_1 = __nccwpck_require__(4000);
 const fs = __importStar(__nccwpck_require__(7147));
-const media_helpers_v1_1 = __nccwpck_require__(8738);
-const helpers_1 = __nccwpck_require__(1120);
+const media_helpers_v1_1 = __nccwpck_require__(7361);
+const helpers_1 = __nccwpck_require__(8169);
 const UPLOAD_ENDPOINT = 'media/upload.json';
 /**
  * Base Twitter v1 client with read/write rights.
@@ -7718,7 +7824,7 @@ exports["default"] = TwitterApiv1ReadWrite;
 
 /***/ }),
 
-/***/ 8738:
+/***/ 7361:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -7749,8 +7855,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.readNextPartOf = exports.sleepSecs = exports.getMediaCategoryByMime = exports.getMimeType = exports.getFileSizeFromFileHandle = exports.getFileHandle = exports.readFileIntoBuffer = void 0;
 const fs = __importStar(__nccwpck_require__(7147));
-const helpers_1 = __nccwpck_require__(1120);
-const types_1 = __nccwpck_require__(1638);
+const helpers_1 = __nccwpck_require__(8169);
+const types_1 = __nccwpck_require__(4000);
 async function readFileIntoBuffer(file) {
     const handle = await getFileHandle(file);
     if (typeof handle === 'number') {
@@ -7838,8 +7944,8 @@ function getMimeByName(name) {
     (0, helpers_1.safeDeprecationWarning)({
         instance: 'TwitterApiv1ReadWrite',
         method: 'uploadMedia',
-        problem: `options.mimeType is missing and filename couldn't help to resolve MIME type, so it will fallback to image/jpeg`,
-        resolution: `If you except to give filenames without extensions, please specify explicitlty the MIME type using options.mimeType`,
+        problem: 'options.mimeType is missing and filename couldn\'t help to resolve MIME type, so it will fallback to image/jpeg',
+        resolution: 'If you except to give filenames without extensions, please specify explicitlty the MIME type using options.mimeType',
     });
     return types_1.EUploadMimeType.Jpeg;
 }
@@ -7847,9 +7953,9 @@ function getMimeByType(type) {
     (0, helpers_1.safeDeprecationWarning)({
         instance: 'TwitterApiv1ReadWrite',
         method: 'uploadMedia',
-        problem: `you're using options.type`,
-        resolution: `Remove options.type argument and migrate to options.mimeType which takes the real MIME type. ` +
-            `If you're using type=longmp4, add options.longVideo alongside of mimeType=EUploadMimeType.Mp4`,
+        problem: 'you\'re using options.type',
+        resolution: 'Remove options.type argument and migrate to options.mimeType which takes the real MIME type. ' +
+            'If you\'re using type=longmp4, add options.longVideo alongside of mimeType=EUploadMimeType.Mp4',
     });
     if (type === 'gif')
         return types_1.EUploadMimeType.Gif;
@@ -7909,7 +8015,7 @@ exports.readNextPartOf = readNextPartOf;
 
 /***/ }),
 
-/***/ 1204:
+/***/ 3692:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -7919,8 +8025,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TwitterApiv2Labs = void 0;
-const globals_1 = __nccwpck_require__(3444);
-const client_v2_labs_write_1 = __importDefault(__nccwpck_require__(8191));
+const globals_1 = __nccwpck_require__(3031);
+const client_v2_labs_write_1 = __importDefault(__nccwpck_require__(4499));
 /**
  * Twitter v2 labs client with all rights (read/write/DMs)
  */
@@ -7942,7 +8048,7 @@ exports["default"] = TwitterApiv2Labs;
 
 /***/ }),
 
-/***/ 5248:
+/***/ 3420:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -7951,8 +8057,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const client_subclient_1 = __importDefault(__nccwpck_require__(3810));
-const globals_1 = __nccwpck_require__(3444);
+const client_subclient_1 = __importDefault(__nccwpck_require__(294));
+const globals_1 = __nccwpck_require__(3031);
 /**
  * Base Twitter v2 labs client with only read right.
  */
@@ -7967,7 +8073,7 @@ exports["default"] = TwitterApiv2LabsReadOnly;
 
 /***/ }),
 
-/***/ 8191:
+/***/ 4499:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -7976,8 +8082,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const globals_1 = __nccwpck_require__(3444);
-const client_v2_labs_read_1 = __importDefault(__nccwpck_require__(5248));
+const globals_1 = __nccwpck_require__(3031);
+const client_v2_labs_read_1 = __importDefault(__nccwpck_require__(3420));
 /**
  * Base Twitter v2 labs client with read/write rights.
  */
@@ -7998,7 +8104,7 @@ exports["default"] = TwitterApiv2LabsReadWrite;
 
 /***/ }),
 
-/***/ 4692:
+/***/ 2105:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -8008,9 +8114,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TwitterApiv2 = void 0;
-const globals_1 = __nccwpck_require__(3444);
-const client_v2_write_1 = __importDefault(__nccwpck_require__(5587));
-const client_v2_labs_1 = __importDefault(__nccwpck_require__(1204));
+const globals_1 = __nccwpck_require__(3031);
+const client_v2_write_1 = __importDefault(__nccwpck_require__(7128));
+const client_v2_labs_1 = __importDefault(__nccwpck_require__(3692));
 /**
  * Twitter v2 client with all rights (read/write/DMs)
  */
@@ -8018,6 +8124,7 @@ class TwitterApiv2 extends client_v2_write_1.default {
     constructor() {
         super(...arguments);
         this._prefix = globals_1.API_V2_PREFIX;
+        /** API endpoints */
     }
     /* Sub-clients */
     /**
@@ -8041,7 +8148,7 @@ exports["default"] = TwitterApiv2;
 
 /***/ }),
 
-/***/ 7318:
+/***/ 6695:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -8050,12 +8157,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const client_subclient_1 = __importDefault(__nccwpck_require__(3810));
-const globals_1 = __nccwpck_require__(3444);
-const paginators_1 = __nccwpck_require__(5814);
-const client_v2_labs_read_1 = __importDefault(__nccwpck_require__(5248));
-const user_paginator_v2_1 = __nccwpck_require__(2178);
-const helpers_1 = __nccwpck_require__(1120);
+const client_subclient_1 = __importDefault(__nccwpck_require__(294));
+const globals_1 = __nccwpck_require__(3031);
+const paginators_1 = __nccwpck_require__(2411);
+const client_v2_labs_read_1 = __importDefault(__nccwpck_require__(3420));
+const user_paginator_v2_1 = __nccwpck_require__(5966);
+const helpers_1 = __nccwpck_require__(8169);
+const dm_paginator_v2_1 = __nccwpck_require__(1583);
 /**
  * Base Twitter v2 client with only read right.
  */
@@ -8074,9 +8182,9 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
         return this._labs = new client_v2_labs_read_1.default(this);
     }
     async search(queryOrOptions, options = {}) {
-        const query = typeof queryOrOptions === 'string' ? queryOrOptions : undefined;
-        const realOptions = typeof queryOrOptions === 'object' && queryOrOptions !== null ? queryOrOptions : options;
-        const queryParams = { ...realOptions, query };
+        const queryParams = typeof queryOrOptions === 'string' ?
+            { ...options, query: queryOrOptions } :
+            { ...queryOrOptions };
         const initialRq = await this.get('tweets/search/recent', queryParams, { fullResponse: true });
         return new paginators_1.TweetSearchRecentV2Paginator({
             realData: initialRq.data,
@@ -8487,6 +8595,63 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
             sharedParams: params,
         });
     }
+    /* Direct messages */
+    /**
+     * Returns a list of Direct Messages for the authenticated user, both sent and received.
+     * Direct Message events are returned in reverse chronological order.
+     * Supports retrieving events from the previous 30 days.
+     *
+     * OAuth 2 scopes: `dm.read`, `tweet.read`, `user.read`
+     *
+     * https://developer.twitter.com/en/docs/twitter-api/direct-messages/lookup/api-reference/get-dm_events
+     */
+    async listDmEvents(options = {}) {
+        const initialRq = await this.get('dm_events', options, { fullResponse: true });
+        return new dm_paginator_v2_1.FullDMTimelineV2Paginator({
+            realData: initialRq.data,
+            rateLimit: initialRq.rateLimit,
+            instance: this,
+            queryParams: { ...options },
+        });
+    }
+    /**
+     * Returns a list of Direct Messages (DM) events within a 1-1 conversation with the user specified in the participant_id path parameter.
+     * Messages are returned in reverse chronological order.
+     *
+     * OAuth 2 scopes: `dm.read`, `tweet.read`, `user.read`
+     *
+     * https://developer.twitter.com/en/docs/twitter-api/direct-messages/lookup/api-reference/get-dm_conversations-dm_conversation_id-dm_events
+     */
+    async listDmEventsWithParticipant(participantId, options = {}) {
+        const params = { participant_id: participantId };
+        const initialRq = await this.get('dm_conversations/with/:participant_id/dm_events', options, { fullResponse: true, params });
+        return new dm_paginator_v2_1.OneToOneDMTimelineV2Paginator({
+            realData: initialRq.data,
+            rateLimit: initialRq.rateLimit,
+            instance: this,
+            queryParams: { ...options },
+            sharedParams: params,
+        });
+    }
+    /**
+     * Returns a list of Direct Messages within a conversation specified in the dm_conversation_id path parameter.
+     * Messages are returned in reverse chronological order.
+     *
+     * OAuth 2 scopes: `dm.read`, `tweet.read`, `user.read`
+     *
+     * https://developer.twitter.com/en/docs/twitter-api/direct-messages/lookup/api-reference/get-dm_conversations-dm_conversation_id-dm_events
+     */
+    async listDmEventsOfConversation(dmConversationId, options = {}) {
+        const params = { dm_conversation_id: dmConversationId };
+        const initialRq = await this.get('dm_conversations/:dm_conversation_id/dm_events', options, { fullResponse: true, params });
+        return new dm_paginator_v2_1.ConversationDMTimelineV2Paginator({
+            realData: initialRq.data,
+            rateLimit: initialRq.rateLimit,
+            instance: this,
+            queryParams: { ...options },
+            sharedParams: params,
+        });
+    }
     /* Spaces */
     /**
      * Get a single space by ID.
@@ -8535,6 +8700,15 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     spaceBuyers(spaceId, options = {}) {
         return this.get('spaces/:id/buyers', options, { params: { id: spaceId } });
     }
+    /**
+     * Returns Tweets shared in the requested Spaces.
+     * https://developer.twitter.com/en/docs/twitter-api/spaces/lookup/api-reference/get-spaces-id-tweets
+     *
+     * OAuth2 scope: `users.read`, `tweet.read`, `space.read`
+     */
+    spaceTweets(spaceId, options = {}) {
+        return this.get('spaces/:id/tweets', options, { params: { id: spaceId } });
+    }
     searchStream({ autoConnect, ...options } = {}) {
         return this.getStream('tweets/search/stream', options, { payloadIsError: helpers_1.isTweetStreamV2ErrorPayload, autoConnect });
     }
@@ -8550,6 +8724,9 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     sampleStream({ autoConnect, ...options } = {}) {
         return this.getStream('tweets/sample/stream', options, { payloadIsError: helpers_1.isTweetStreamV2ErrorPayload, autoConnect });
+    }
+    sample10Stream({ autoConnect, ...options } = {}) {
+        return this.getStream('tweets/sample10/stream', options, { payloadIsError: helpers_1.isTweetStreamV2ErrorPayload, autoConnect });
     }
     /* Batch compliance */
     /**
@@ -8617,7 +8794,7 @@ exports["default"] = TwitterApiv2ReadOnly;
 
 /***/ }),
 
-/***/ 5587:
+/***/ 7128:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -8626,9 +8803,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const globals_1 = __nccwpck_require__(3444);
-const client_v2_read_1 = __importDefault(__nccwpck_require__(7318));
-const client_v2_labs_write_1 = __importDefault(__nccwpck_require__(8191));
+const globals_1 = __nccwpck_require__(3031);
+const client_v2_read_1 = __importDefault(__nccwpck_require__(6695));
+const client_v2_labs_write_1 = __importDefault(__nccwpck_require__(4499));
 /**
  * Base Twitter v2 client with read/write rights.
  */
@@ -8915,13 +9092,36 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     unpinList(loggedUserId, listId) {
         return this.delete('users/:id/pinned_lists/:list_id', undefined, { params: { id: loggedUserId, list_id: listId } });
     }
+    /* Direct messages */
+    /**
+     * Creates a Direct Message on behalf of an authenticated user, and adds it to the specified conversation.
+     * https://developer.twitter.com/en/docs/twitter-api/direct-messages/manage/api-reference/post-dm_conversations-dm_conversation_id-messages
+     */
+    sendDmInConversation(conversationId, message) {
+        return this.post('dm_conversations/:dm_conversation_id/messages', message, { params: { dm_conversation_id: conversationId } });
+    }
+    /**
+     * Creates a one-to-one Direct Message and adds it to the one-to-one conversation.
+     * This method either creates a new one-to-one conversation or retrieves the current conversation and adds the Direct Message to it.
+     * https://developer.twitter.com/en/docs/twitter-api/direct-messages/manage/api-reference/post-dm_conversations-with-participant_id-messages
+     */
+    sendDmToParticipant(participantId, message) {
+        return this.post('dm_conversations/with/:participant_id/messages', message, { params: { participant_id: participantId } });
+    }
+    /**
+     * Creates a new group conversation and adds a Direct Message to it on behalf of an authenticated user.
+     * https://developer.twitter.com/en/docs/twitter-api/direct-messages/manage/api-reference/post-dm_conversations
+     */
+    createDmConversation(options) {
+        return this.post('dm_conversations', options);
+    }
 }
 exports["default"] = TwitterApiv2ReadWrite;
 
 
 /***/ }),
 
-/***/ 876:
+/***/ 5045:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -9943,9 +10143,13 @@ var core = __nccwpck_require__(2186);
 ;// CONCATENATED MODULE: ./src/action.js
 
 const action_core = __nccwpck_require__(2186)
-const { TwitterApi } = __nccwpck_require__(9360)
+const { TwitterApi } = __nccwpck_require__(5395)
+const toolkit = __nccwpck_require__(2020)
 
 async function run() {
+  toolkit.logActionRefWarning()
+  toolkit.logRepoWarning()
+
   action_core.info(`
   *** ACTION RUN - START ***
   `)
