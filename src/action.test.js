@@ -13,6 +13,7 @@ const ACTION_INPUTS = {
 
 jest.mock('@actions/core')
 jest.mock('twitter-api-v2')
+jest.mock('actions-toolkit')
 
 describe('action', () => {
   beforeEach(() => {
