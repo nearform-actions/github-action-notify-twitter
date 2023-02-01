@@ -1795,13 +1795,18 @@ function logActionRefWarning() {
  * Displays warning message if the repository is under the nearform organisation
  */
 function logRepoWarning() {
-  const repoName = process.env.GITHUB_ACTION_REPOSITORY
-  const repoOrg = repoName.split('/')[0]
+  const actionRepo = process.env.GITHUB_ACTION_REPOSITORY
+  const [repoOrg, repoName] = actionRepo.split('/')
+  const newOrg = 'nearform-actions'
 
-  if (repoOrg != 'nearform-actions') {
+  if (repoOrg != newOrg) {
     core.warning(
-      `'${repoOrg}' is no longer a valid organisation for this action.` +
-        `Please update it to be under the 'nearform-actions' organisation.`
+      `The '${repoName}' action, no longer exists under the '${repoOrg}' organisation.\n` +
+        `Please update it to '${newOrg}', you can do this\n` +
+        `by updating your Github Workflow file from:\n\n` +
+        `    uses: '${repoOrg}/${repoName}'\n\n` +
+        `to:\n\n` +
+        `    uses: '${newOrg}/${repoName}'\n\n`
     )
   }
 }
@@ -2333,9 +2338,9 @@ function sortObject(data) {
         .map(key => ({ key, value: data[key] }));
 }
 function deParam(string) {
-    const splitted = string.split('&');
+    const split = string.split('&');
     const data = {};
-    for (const coupleKeyValue of splitted) {
+    for (const coupleKeyValue of split) {
         const [key, value = ''] = coupleKeyValue.split('=');
         // check if the key already exists
         // this can occur if the QS part of the url contains duplicate keys like this: ?formkey=formvalue1&formkey=formvalue2
@@ -3686,7 +3691,7 @@ class TwitterApiReadOnly extends client_base_1.default {
      * Generate the OAuth request token link for user-based OAuth 1.0 auth.
      *
      * ```ts
-     * // Instanciate TwitterApi with consumer keys
+     * // Instantiate TwitterApi with consumer keys
      * const client = new TwitterApi({ appKey: 'consumer_key', appSecret: 'consumer_secret' });
      *
      * const tokenRequest = await client.generateAuthLink('oob-or-your-callback-url');
@@ -3720,7 +3725,7 @@ class TwitterApiReadOnly extends client_base_1.default {
      * Obtain access to user-based OAuth 1.0 auth.
      *
      * After user is redirect from your callback, use obtained oauth_token and oauth_verifier to
-     * instanciate the new TwitterApi instance.
+     * instantiate the new TwitterApi instance.
      *
      * ```ts
      * // Use the saved oauth_token_secret associated to oauth_token returned by callback
@@ -3759,7 +3764,7 @@ class TwitterApiReadOnly extends client_base_1.default {
     /**
      * Enable application-only authentication.
      *
-     * To make the request, instanciate TwitterApi with consumer and secret.
+     * To make the request, instantiate TwitterApi with consumer and secret.
      *
      * ```ts
      * const requestClient = new TwitterApi({ appKey: 'consumer', appSecret: 'secret' });
@@ -3788,7 +3793,7 @@ class TwitterApiReadOnly extends client_base_1.default {
      * See https://developer.twitter.com/en/docs/authentication/oauth-2-0/user-access-token for details.
      *
      * ```ts
-     * // Instanciate TwitterApi with client ID
+     * // Instantiate TwitterApi with client ID
      * const client = new TwitterApi({ clientId: 'yourClientId' });
      *
      * // Generate a link to callback URL that will gives a token with tweet+user read access
@@ -3842,7 +3847,7 @@ class TwitterApiReadOnly extends client_base_1.default {
      * Obtain access to user-based OAuth 2.0 auth.
      *
      * After user is redirect from your callback, use obtained code to
-     * instanciate the new TwitterApi instance.
+     * instantiate the new TwitterApi instance.
      *
      * You need to obtain `codeVerifier` from a call to `.generateOAuth2AuthLink`.
      *
@@ -4205,7 +4210,7 @@ class TwitterPaginator {
         yield* this.getItemArray();
     }
     /**
-     * Iterate over items "undefinitely" (until rate limit is hit / they're no more items available)
+     * Iterate over items "indefinitely" (until rate limit is hit / they're no more items available)
      * This will **mutate the current instance** and fill data, metas, etc. inside this instance.
      *
      * If you need to handle concurrent requests, or you need to rely on immutability, please use `.fetchAndIterate()` instead.
@@ -4226,7 +4231,7 @@ class TwitterPaginator {
         }
     }
     /**
-     * Iterate over items "undefinitely" without modifying the current instance (until rate limit is hit / they're no more items available)
+     * Iterate over items "indefinitely" without modifying the current instance (until rate limit is hit / they're no more items available)
      *
      * This will **NOT** mutate the current instance, meaning that current instance will not inherit from `includes` and `meta` (v2 API only).
      * Use `Symbol.asyncIterator` (`for-await of`) to directly access items with current instance mutation.
@@ -4833,10 +4838,10 @@ class TweetTimelineV1Paginator extends TwitterPaginator_1.default {
         }
     }
     getNextQueryParams(maxResults) {
-        const lastestId = BigInt(this._realData[this._realData.length - 1].id_str);
+        const latestId = BigInt(this._realData[this._realData.length - 1].id_str);
         return {
             ...this.injectQueryParams(maxResults),
-            max_id: (lastestId - BigInt(1)).toString(),
+            max_id: (latestId - BigInt(1)).toString(),
         };
     }
     getPageLengthFromRequest(result) {
@@ -5528,9 +5533,9 @@ const TweetStreamParser_1 = __importStar(__nccwpck_require__(7937));
 // In seconds
 const basicRetriesAttempt = [5, 15, 30, 60, 90, 120, 180, 300, 600, 900];
 // Default retry function
-const basicReconnectRetry = tryOccurence => tryOccurence > basicRetriesAttempt.length
+const basicReconnectRetry = tryOccurrence => tryOccurrence > basicRetriesAttempt.length
     ? 901000
-    : basicRetriesAttempt[tryOccurence - 1] * 1000;
+    : basicRetriesAttempt[tryOccurrence - 1] * 1000;
 class TweetStream extends events_1.EventEmitter {
     constructor(requestData, connection) {
         super();
@@ -5635,12 +5640,12 @@ class TweetStream extends events_1.EventEmitter {
         this.unbindTimeouts();
         if (this.res) {
             this.res.removeAllListeners();
-            // Close response silentely
+            // Close response silently
             this.res.destroy();
         }
         if (this.req) {
             this.req.removeAllListeners();
-            // Close connection silentely
+            // Close connection silently
             this.req.destroy();
         }
     }
@@ -5736,7 +5741,7 @@ class TweetStream extends events_1.EventEmitter {
             this.connectionProcessRunning = false;
         }
     }
-    async onConnectionError(retryOccurence = 0) {
+    async onConnectionError(retryOccurrence = 0) {
         this.unbindTimeouts();
         // Close the request if necessary
         this.closeWithoutEmit();
@@ -5745,30 +5750,30 @@ class TweetStream extends events_1.EventEmitter {
             this.emit(types_1.ETwitterStreamEvent.ConnectionClosed);
             return;
         }
-        if (retryOccurence >= this.autoReconnectRetries) {
+        if (retryOccurrence >= this.autoReconnectRetries) {
             this.emit(types_1.ETwitterStreamEvent.ReconnectLimitExceeded);
             this.emit(types_1.ETwitterStreamEvent.ConnectionClosed);
             return;
         }
         // If all other conditions fails, do a reconnect attempt
         try {
-            this.emit(types_1.ETwitterStreamEvent.ReconnectAttempt, retryOccurence);
+            this.emit(types_1.ETwitterStreamEvent.ReconnectAttempt, retryOccurrence);
             await this.reconnect();
         }
         catch (e) {
-            this.emit(types_1.ETwitterStreamEvent.ReconnectError, retryOccurence);
+            this.emit(types_1.ETwitterStreamEvent.ReconnectError, retryOccurrence);
             this.emit(types_1.ETwitterStreamEvent.Error, {
                 type: types_1.ETwitterStreamEvent.ReconnectError,
                 error: e,
-                message: `Reconnect error - ${retryOccurence + 1} attempts made yet.`,
+                message: `Reconnect error - ${retryOccurrence + 1} attempts made yet.`,
             });
-            this.makeAutoReconnectRetry(retryOccurence, e);
+            this.makeAutoReconnectRetry(retryOccurrence, e);
         }
     }
-    makeAutoReconnectRetry(retryOccurence, error) {
-        const nextRetry = this.nextRetryTimeout(retryOccurence + 1, error);
+    makeAutoReconnectRetry(retryOccurrence, error) {
+        const nextRetry = this.nextRetryTimeout(retryOccurrence + 1, error);
         this.retryTimeout = setTimeout(() => {
-            this.onConnectionError(retryOccurence + 1);
+            this.onConnectionError(retryOccurrence + 1);
         }, nextRetry);
     }
     async *[Symbol.asyncIterator]() {
@@ -6162,7 +6167,7 @@ var EApiV1ErrorCode;
     EApiV1ErrorCode[EApiV1ErrorCode["MustAllowDMFromAnyone"] = 214] = "MustAllowDMFromAnyone";
     EApiV1ErrorCode[EApiV1ErrorCode["CannotSendDMToThisUser"] = 349] = "CannotSendDMToThisUser";
     EApiV1ErrorCode[EApiV1ErrorCode["DMTextTooLong"] = 354] = "DMTextTooLong";
-    // Appication misconfiguration
+    // Application misconfiguration
     EApiV1ErrorCode[EApiV1ErrorCode["SubscriptionAlreadyExists"] = 355] = "SubscriptionAlreadyExists";
     EApiV1ErrorCode[EApiV1ErrorCode["CallbackUrlNotApproved"] = 415] = "CallbackUrlNotApproved";
     EApiV1ErrorCode[EApiV1ErrorCode["SuspendedApplication"] = 416] = "SuspendedApplication";
@@ -8991,7 +8996,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
      * The user (in the path) must match the user context authorizing the request.
      * https://developer.twitter.com/en/docs/twitter-api/users/blocks/api-reference/post-users-user_id-blocking
      *
-     * **Note**: You must specify the currently logged user ID ; you can obtain it through v1.1 API.
+     * **Note**: You must specify the currently logged user ID; you can obtain it through v1.1 API.
      */
     block(loggedUserId, targetUserId) {
         return this.post('users/:id/blocking', { target_user_id: targetUserId }, { params: { id: loggedUserId } });
