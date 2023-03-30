@@ -17,15 +17,19 @@ on:
 
 jobs:
   release:
+    permissions:
+      pull-requests: write
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version-file: .nvmrc
-      - uses: nearform/optic-release-automation-action@v4
+      - uses: nearform-actions/optic-release-automation-action@v4
         with:
           semver: ${{ github.event.inputs.semver }}
           sync-semver-tags: true
           commit-message: 'chore: release {version}'
           build-command: npm ci
+
