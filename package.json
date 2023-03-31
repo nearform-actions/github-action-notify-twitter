@@ -11,15 +11,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nearform/github-action-notify-twitter.git"
+    "url": "git+https://github.com/nearform-actions/github-action-notify-twitter.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/nearform/github-action-notify-twitter/issues"
+    "url": "https://github.com/nearform-actions/github-action-notify-twitter/issues"
   },
-  "homepage": "https://github.com/nearform/github-action-notify-twitter#readme",
+  "homepage": "https://github.com/nearform-actions/github-action-notify-twitter#readme",
   "devDependencies": {
     "@babel/preset-env": "^7.21.4",
     "@commitlint/cli": "^17.5.1",
