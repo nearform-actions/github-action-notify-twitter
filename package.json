@@ -1,5 +1,5 @@
 {
-  "name": "github-action-github-action-notify-twitter",
+  "name": "github-action-notify-twitter",
   "version": "1.0.22",
   "description": "GitHub action that can send a custom message to a Twitter account",
   "main": "dist/index.js",
