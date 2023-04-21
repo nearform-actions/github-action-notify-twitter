@@ -4,6 +4,21 @@
 
 GitHub action that can send a custom message to a Twitter account.
 
+## Usage
+
+Configure this action in your workflows providing the following inputs described below. The Twitter tokens can be obtained from the Twitter Developer Portal under your project.
+
+## Inputs
+
+| input                         | required | description |
+|-------------------------------|----------|-------------|
+| `message`                     | yes      | Message to post to Twitter. |
+| `twitter-app-key`             | yes      | Consumer API key, available in the "Keys and tokens" section of your application in the Twitter Developer site. |
+| `twitter-app-secret`          | yes      | Consumer API secret key, available in the "Keys and tokens" section of your application in the Twitter Developer site. |
+| `twitter-access-token`        | yes      | Application access token, available in the "Keys and tokens" section of your application in the Twitter Developer site. |
+| `twitter-access-token-secret` | yes      | Application access token secret, available in the "Keys and tokens" section of your application in the Twitter Developer site. |
+
+
 ## Example usage
 
 The example below runs when the release is published and also allows to trigger the action manually.
@@ -30,14 +45,3 @@ jobs:
           twitter-access-token-secret: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
 
 ```
-
-## Usage
-
-Configure this action in your workflows providing the following inputs described below:
-- you need to specify the message that is going to be sent to Twitter (remember that message is limited to 280 characters!)
-- App Key
-- App Secret
-- Access Token
-- Access Token Secret
-
-The Twitter tokens can be obtained from the Twitter Developer Portal under your project.
