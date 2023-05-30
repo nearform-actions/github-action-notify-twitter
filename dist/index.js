@@ -6421,6 +6421,7 @@ var EUploadMimeType;
 (function (EUploadMimeType) {
     EUploadMimeType["Jpeg"] = "image/jpeg";
     EUploadMimeType["Mp4"] = "video/mp4";
+    EUploadMimeType["Mov"] = "video/quicktime";
     EUploadMimeType["Gif"] = "image/gif";
     EUploadMimeType["Png"] = "image/png";
     EUploadMimeType["Srt"] = "text/plain";
@@ -7431,12 +7432,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const globals_1 = __nccwpck_require__(3031);
-const client_v1_read_1 = __importDefault(__nccwpck_require__(6017));
-const types_1 = __nccwpck_require__(4000);
 const fs = __importStar(__nccwpck_require__(7147));
-const media_helpers_v1_1 = __nccwpck_require__(7361);
+const globals_1 = __nccwpck_require__(3031);
 const helpers_1 = __nccwpck_require__(8169);
+const types_1 = __nccwpck_require__(4000);
+const client_v1_read_1 = __importDefault(__nccwpck_require__(6017));
+const media_helpers_v1_1 = __nccwpck_require__(7361);
 const UPLOAD_ENDPOINT = 'media/upload.json';
 /**
  * Base Twitter v1 client with read/write rights.
@@ -7677,13 +7678,13 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
         }, { prefix: globals_1.API_V1_1_UPLOAD_PREFIX, forceBodyMode: 'json' });
     }
     /**
-     * Upload a media (JPG/PNG/GIF/MP4/WEBP) or subtitle (SRT) to Twitter and return the media_id to use in tweet/DM send.
+     * Upload a media (JPG/PNG/GIF/MP4/MOV/WEBP) or subtitle (SRT) to Twitter and return the media_id to use in tweet/DM send.
      *
      * @param file If `string`, filename is supposed.
      * A `Buffer` is a raw file.
      * `fs.promises.FileHandle` or `number` are file pointers.
      *
-     * @param options.type File type (Enum 'jpg' | 'longmp4' | 'mp4' | 'png' | 'gif' | 'srt' | 'webp').
+     * @param options.type File type (Enum 'jpg' | 'longmp4' | 'mp4' | 'mov | 'png' | 'gif' | 'srt' | 'webp').
      * If filename is given, it could be guessed with file extension, otherwise this parameter is mandatory.
      * If type is not part of the enum, it will be used as mime type.
      *
@@ -7964,6 +7965,8 @@ function getMimeByName(name) {
         return types_1.EUploadMimeType.Gif;
     if (name.endsWith('.mpeg4') || name.endsWith('.mp4'))
         return types_1.EUploadMimeType.Mp4;
+    if (name.endsWith('.mov') || name.endsWith('.mov'))
+        return types_1.EUploadMimeType.Mov;
     if (name.endsWith('.srt'))
         return types_1.EUploadMimeType.Srt;
     (0, helpers_1.safeDeprecationWarning)({
@@ -7994,10 +7997,12 @@ function getMimeByType(type) {
         return types_1.EUploadMimeType.Srt;
     if (type === 'mp4' || type === 'longmp4')
         return types_1.EUploadMimeType.Mp4;
+    if (type === 'mov')
+        return types_1.EUploadMimeType.Mov;
     return type;
 }
 function getMediaCategoryByMime(name, target) {
-    if (name === types_1.EUploadMimeType.Mp4)
+    if (name === types_1.EUploadMimeType.Mp4 || name === types_1.EUploadMimeType.Mov)
         return target === 'tweet' ? 'TweetVideo' : 'DmVideo';
     if (name === types_1.EUploadMimeType.Gif)
         return target === 'tweet' ? 'TweetGif' : 'DmGif';
