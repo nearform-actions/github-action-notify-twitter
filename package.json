@@ -24,7 +24,7 @@
     "@babel/preset-env": "^7.23.2",
     "@commitlint/cli": "^17.8.0",
     "@commitlint/config-conventional": "^17.8.0",
-    "@vercel/ncc": "^0.38.0",
+    "@vercel/ncc": "^0.38.1",
     "eslint": "^8.51.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-jest": "^27.4.2",
