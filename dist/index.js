@@ -9191,29 +9191,7 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
             subtitle_info: { subtitles: languages.map(lang => ({ language_code: lang })) },
         }, { prefix: globals_1.API_V1_1_UPLOAD_PREFIX, forceBodyMode: 'json' });
     }
-    /**
-     * Upload a media (JPG/PNG/GIF/MP4/MOV/WEBP) or subtitle (SRT) to Twitter and return the media_id to use in tweet/DM send.
-     *
-     * @param file If `string`, filename is supposed.
-     * A `Buffer` is a raw file.
-     * `fs.promises.FileHandle` or `number` are file pointers.
-     *
-     * @param options.type File type (Enum 'jpg' | 'longmp4' | 'mp4' | 'mov | 'png' | 'gif' | 'srt' | 'webp').
-     * If filename is given, it could be guessed with file extension, otherwise this parameter is mandatory.
-     * If type is not part of the enum, it will be used as mime type.
-     *
-     * Type `longmp4` is **required** is you try to upload a video higher than 140 seconds.
-     *
-     * @param options.chunkLength Maximum chunk length sent to Twitter. Default goes to 1 MB.
-     *
-     * @param options.additionalOwners Other user IDs allowed to use the returned media_id. Default goes to none.
-     *
-     * @param options.maxConcurrentUploads Maximum uploaded chunks in the same time. Default goes to 3.
-     *
-     * @param options.target Target type `tweet` or `dm`. Defaults to `tweet`.
-     * You must specify it if you send a media to use in DMs.
-     */
-    async uploadMedia(file, options = {}) {
+    async uploadMedia(file, options = {}, returnFullMediaData = false) {
         var _a;
         const chunkLength = (_a = options.chunkLength) !== null && _a !== void 0 ? _a : (1024 * 1024);
         const { fileHandle, mediaCategory, fileSize, mimeType } = await this.getUploadMediaRequirements(file, options);
@@ -9240,7 +9218,12 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
                 await this.awaitForMediaProcessingCompletion(fullMediaData);
             }
             // Video is ready, return media_id
-            return fullMediaData.media_id_string;
+            if (returnFullMediaData) {
+                return fullMediaData;
+            }
+            else {
+                return fullMediaData.media_id_string;
+            }
         }
         finally {
             // Close file if any
