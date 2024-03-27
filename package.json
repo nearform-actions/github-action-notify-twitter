@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint .",
     "test": "jest",
-    "prepare": "husky install",
+    "prepare": "husky",
     "build": "ncc build src --license licenses.txt"
   },
   "repository": {
