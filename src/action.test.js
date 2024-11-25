@@ -96,8 +96,10 @@ describe('action', () => {
   it('tweet with media and alt text was sent successfully', async () => {
     const MEDIA_ACTION_INPUTS = {
       ...ACTION_INPUTS,
-      'media-alt-text': 'alt text',
-      media: './image.png'
+      media: `./image.png,
+        ./image.png`,
+      'media-alt-text': `alt text1
+        alt text2`
     }
     getInput.mockImplementation(inputName => MEDIA_ACTION_INPUTS[inputName])
     TwitterApi.mockImplementation(() => {
@@ -113,7 +115,6 @@ describe('action', () => {
         }
       }
     })
-
     await run()
 
     expect(setFailed).not.toHaveBeenCalled()
@@ -147,8 +148,8 @@ describe('action', () => {
   it('tweet with media and error on createMediaMetadata was sent successfully', async () => {
     const MEDIA_ACTION_INPUTS = {
       ...ACTION_INPUTS,
-      'media-alt-text': 'alt text',
-      media: './image.png'
+      media: './image.png',
+      'media-alt-text': 'alt text'
     }
     getInput.mockImplementation(inputName => MEDIA_ACTION_INPUTS[inputName])
     TwitterApi.mockImplementation(() => {
@@ -176,8 +177,8 @@ describe('action', () => {
   it('sending tweet with media failed', async () => {
     const MEDIA_ACTION_INPUTS = {
       ...ACTION_INPUTS,
-      'media-alt-text': 'alt text',
-      media: './image.png'
+      media: './image.png',
+      'media-alt-text': 'alt text'
     }
     getInput.mockImplementation(inputName => MEDIA_ACTION_INPUTS[inputName])
     TwitterApi.mockImplementation(() => {
@@ -203,5 +204,48 @@ describe('action', () => {
     expect(setFailed).toHaveBeenCalledWith(
       'Action failed with error. Error: Something went wrong, upload fail'
     )
+  })
+
+  it('fail the action when media are more then 4 elements', async () => {
+    const MEDIA_ACTION_INPUTS = {
+      ...ACTION_INPUTS,
+      media: `./image.png,
+        ./image.png,
+        ./image.png,
+        ./image.png,
+        ./image.png`
+    }
+    getInput.mockImplementation(inputName => MEDIA_ACTION_INPUTS[inputName])
+    await run()
+
+    expect(setFailed).toHaveBeenCalledWith(
+      'Too many media elements. The maximum number is 4.'
+    )
+  })
+
+  it('tweet with multiple media and multiple alt text was sent successfully (different number of element)', async () => {
+    const MEDIA_ACTION_INPUTS = {
+      ...ACTION_INPUTS,
+      media: `./image.png,
+        ./image.png`,
+      'media-alt-text': `alt text`
+    }
+    getInput.mockImplementation(inputName => MEDIA_ACTION_INPUTS[inputName])
+    TwitterApi.mockImplementation(() => {
+      return {
+        readWrite: {
+          v2: {
+            tweet: async message => message || null
+          },
+          v1: {
+            uploadMedia: jest.fn(async () => 'id1'),
+            createMediaMetadata: async () => null
+          }
+        }
+      }
+    })
+    await run()
+
+    expect(setFailed).not.toHaveBeenCalled()
   })
 })

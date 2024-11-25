@@ -17,8 +17,8 @@ Configure this action in your workflows providing the following inputs described
 | `twitter-app-secret`          | yes      | Consumer API secret key, available in the "Keys and tokens" section of your application in the Twitter Developer site. |
 | `twitter-access-token`        | yes      | Application access token, available in the "Keys and tokens" section of your application in the Twitter Developer site. |
 | `twitter-access-token-secret` | yes      | Application access token secret, available in the "Keys and tokens" section of your application in the Twitter Developer site. |
-| `media` | no      | File path of the image to attach to the post |
-| `media-alt-text` | no      | Image alternative text (alt text) that describe the meaning and the context of the image  |
+| `media` | no      | A list of paths for media objects (image, video or animated GIF) to use in the post|
+| `media-alt-text` | no      | A list of image alternative text (alt text) that describe the meaning and the context of the image  |
 
 
 ## Example usage
@@ -48,8 +48,9 @@ jobs:
 
 ```
 
-You can add media (image, GIF, or video) to your post using the `media` parameter. This refers to the path to an image within the repository.
-For images and GIFs, you can also add an alternative text using the `media-alt-text` parameter.
+You can add media (image, GIF or video) to your post using the `media` parameter. This refers to the path of an image within the repository.
+The maximum number of media that can be added to a post is 4.
+For images and GIFs, you can also add an alt text using the `media-alt-text` parameter. This parameter is also a list and maintains the structure of the `media` parameter. So if you want to add an alt text only to the second content you have to write it in the second position of the list leaving the previous ones empty.
 
 ```yml
 name: Notify twitter
@@ -71,8 +72,14 @@ jobs:
           twitter-app-secret: ${{ secrets.TWITTER_APP_SECRET }}
           twitter-access-token: ${{ secrets.TWITTER_ACCESS_TOKEN }}
           twitter-access-token-secret: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
-          media: './repo-image.png'
-          media-alt-text: 'Alternative text for the image...'
+          media: |
+            ./video.mp4
+            ./twitter-x.png
+            ./twitter-x.png
+          media-alt-text: |
+            
+            alt icon 1
+            alt icon 2
 ```
 
 

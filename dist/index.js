@@ -34680,6 +34680,7 @@ async function run() {
   *** ACTION RUN - START ***
   `)
   const MAX_MESSAGE_LENGTH = 280
+  const MAX_MEDIA_ELEMENT = 4
   const message = action_core.getInput('message', { required: true })
   const appKey = action_core.getInput('twitter-app-key', { required: true })
   const appSecret = action_core.getInput('twitter-app-secret', { required: true })
@@ -34687,12 +34688,31 @@ async function run() {
   const accessSecret = action_core.getInput('twitter-access-token-secret', {
     required: true
   })
-  const mediaFilePath = action_core.getInput('media', { required: false })
-  const mediaAltText = action_core.getInput('media-alt-text', { required: false })
+  const media = action_core
+    .getInput('media', { required: false })
+    ?.split('\n')
+    ?.map(input => input.trim())
+  const mediaAltText = action_core
+    .getInput('media-alt-text', {
+      required: false,
+      trimWhitespace: false
+    })
+    ?.split('\n')
+    ?.map(input => input.trim())
 
   if (message.length > MAX_MESSAGE_LENGTH) {
     action_core.setFailed(
       'The message is too long. The message may contain up to 280 characters.'
+    )
+    action_core.info(`
+    *** ACTION RUN - END ***
+    `)
+    return
+  }
+
+  if (media?.length > MAX_MEDIA_ELEMENT) {
+    action_core.setFailed(
+      `Too many media elements. The maximum number is ${MAX_MEDIA_ELEMENT}.`
     )
     action_core.info(`
     *** ACTION RUN - END ***
@@ -34711,22 +34731,35 @@ async function run() {
 
   let tweetOpts = {}
 
-  if (mediaFilePath) {
+  if (media?.length) {
     try {
-      action_core.info(`Twitter upload media: ${mediaFilePath}`)
-      const mediaId = await rwClient.v1.uploadMedia(mediaFilePath)
-      action_core.info(
-        `Twitter createMediaMetadata - mediaId: ${mediaId}; alt_text: ${
-          mediaAltText || ''
-        }`
-      )
-      tweetOpts.media = { media_ids: [mediaId] }
+      action_core.info(`Twitter upload media: ${media.join('; ')}`)
 
-      if (mediaAltText) {
+      const mediaIds = await Promise.all(
+        media.map(media => rwClient.v1.uploadMedia(media))
+      )
+
+      action_core.info(
+        `Twitter upload completed - mediaId: 
+        ${mediaIds.join('; ')}`
+      )
+      tweetOpts.media = { media_ids: mediaIds }
+
+      if (mediaAltText?.length) {
         try {
-          await rwClient.v1.createMediaMetadata(mediaId, {
-            alt_text: { text: mediaAltText }
-          })
+          await Promise.all(
+            mediaIds.map((mediaId, index) => {
+              action_core.info(
+                `Twitter createMediaMetadata - mediaId: 
+                ${mediaId} ; alt-text: ${mediaAltText[index]}`
+              )
+              if (!mediaAltText?.[index]?.trim()) return Promise.resolve()
+              action_core.info(`Twitter createMediaMetadata for mediaId: ${mediaId}`)
+              return rwClient.v1.createMediaMetadata(mediaId, {
+                alt_text: { text: mediaAltText[index] }
+              })
+            })
+          )
         } catch (err) {
           action_core.warning(`Twitter createMediaMetadata - Failed`)
         }
