@@ -47,3 +47,32 @@ jobs:
           twitter-access-token-secret: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
 
 ```
+
+You can add media (image, GIF, or video) to your post using the `media` parameter. This refers to the path to an image within the repository.
+For images and GIFs, you can also add an alternative text using the `media-alt-text` parameter.
+
+```yml
+name: Notify twitter
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: nearform-actions/github-action-notify-twitter@master
+        with:
+          message: |
+            ${{ github.event.repository.name }} ${{ github.event.release.tag_name }} has been released. Check out the release notes: ${{ github.event.release.html_url }}
+          twitter-app-key: ${{ secrets.TWITTER_APP_KEY }}
+          twitter-app-secret: ${{ secrets.TWITTER_APP_SECRET }}
+          twitter-access-token: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          twitter-access-token-secret: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+          media: './repo-image.png'
+          media-alt-text: 'Alternative text for the image...'
+```
+
+
