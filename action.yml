@@ -29,6 +29,14 @@ inputs:
       Application access token secret, available in the "Keys and tokens"
       section of your application in the Twitter Developer site.
     required: true
+  media:
+    description: >
+      A media object (single photo, video or animated GIF) to use in the post
+    required: false
+  media-alt-text:
+    description: >
+      Image alternative text (alt text) that describe the meaning and the context of the image
+    required: false
 
 runs:
   using: 'node20'

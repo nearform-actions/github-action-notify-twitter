@@ -18,6 +18,8 @@ export async function run() {
   const accessSecret = core.getInput('twitter-access-token-secret', {
     required: true
   })
+  const mediaFilePath = core.getInput('media', { required: false })
+  const mediaAltText = core.getInput('media-alt-text', { required: false })
 
   if (message.length > MAX_MESSAGE_LENGTH) {
     core.setFailed(
@@ -38,9 +40,42 @@ export async function run() {
 
   const rwClient = client.readWrite
 
+  let tweetOpts = {}
+
+  if (mediaFilePath) {
+    try {
+      core.info(`Twitter upload media: ${mediaFilePath}`)
+      const mediaId = await rwClient.v1.uploadMedia(mediaFilePath)
+      core.info(
+        `Twitter createMediaMetadata - mediaId: ${mediaId}; alt_text: ${
+          mediaAltText || ''
+        }`
+      )
+      tweetOpts.media = { media_ids: [mediaId] }
+
+      if (mediaAltText) {
+        try {
+          await rwClient.v1.createMediaMetadata(mediaId, {
+            alt_text: { text: mediaAltText }
+          })
+        } catch (err) {
+          core.warning(`Twitter createMediaMetadata - Failed`)
+        }
+      }
+    } catch (err) {
+      core.setFailed(
+        `Action failed with error. ${err} ${err.data ?? ''}`.trim()
+      )
+      core.info(`
+        *** ACTION RUN - END ***
+        `)
+      return
+    }
+  }
+
   try {
     core.info(`Twitter message: ${message}`)
-    await rwClient.v2.tweet(message)
+    await rwClient.v2.tweet(message, tweetOpts)
   } catch (err) {
     core.setFailed(`Action failed with error. ${err} ${err.data ?? ''}`.trim())
   } finally {

@@ -17,6 +17,8 @@ Configure this action in your workflows providing the following inputs described
 | `twitter-app-secret`          | yes      | Consumer API secret key, available in the "Keys and tokens" section of your application in the Twitter Developer site. |
 | `twitter-access-token`        | yes      | Application access token, available in the "Keys and tokens" section of your application in the Twitter Developer site. |
 | `twitter-access-token-secret` | yes      | Application access token secret, available in the "Keys and tokens" section of your application in the Twitter Developer site. |
+| `media` | no      | File path of the image to attach to the post |
+| `media-alt-text` | no      | Image alternative text (alt text) that describe the meaning and the context of the image  |
 
 
 ## Example usage

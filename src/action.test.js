@@ -1,5 +1,5 @@
 'use strict'
-const { getInput, setFailed, info } = require('@actions/core')
+const { getInput, setFailed, info, warning } = require('@actions/core')
 const { TwitterApi } = require('twitter-api-v2')
 const { run } = require('./action')
 
@@ -19,6 +19,7 @@ describe('action', () => {
   beforeEach(() => {
     setFailed.mockImplementation(message => message)
     info.mockImplementation(message => message)
+    warning.mockImplementation(message => message)
   })
 
   afterEach(() => {
@@ -89,6 +90,118 @@ describe('action', () => {
 
     expect(setFailed).toHaveBeenCalledWith(
       'The message is too long. The message may contain up to 280 characters.'
+    )
+  })
+
+  it('tweet with media and alt text was sent successfully', async () => {
+    const MEDIA_ACTION_INPUTS = {
+      ...ACTION_INPUTS,
+      'media-alt-text': 'alt text',
+      media: './image.png'
+    }
+    getInput.mockImplementation(inputName => MEDIA_ACTION_INPUTS[inputName])
+    TwitterApi.mockImplementation(() => {
+      return {
+        readWrite: {
+          v2: {
+            tweet: async message => message || null
+          },
+          v1: {
+            uploadMedia: async () => 'id1',
+            createMediaMetadata: async () => null
+          }
+        }
+      }
+    })
+
+    await run()
+
+    expect(setFailed).not.toHaveBeenCalled()
+  })
+
+  it('tweet with media (without alt text) was sent successfully', async () => {
+    const MEDIA_ACTION_INPUTS = {
+      ...ACTION_INPUTS,
+      media: './image.png'
+    }
+    getInput.mockImplementation(inputName => MEDIA_ACTION_INPUTS[inputName])
+    TwitterApi.mockImplementation(() => {
+      return {
+        readWrite: {
+          v2: {
+            tweet: async message => message || null
+          },
+          v1: {
+            uploadMedia: async () => 'id1',
+            createMediaMetadata: async () => null
+          }
+        }
+      }
+    })
+
+    await run()
+
+    expect(setFailed).not.toHaveBeenCalled()
+  })
+
+  it('tweet with media and error on createMediaMetadata was sent successfully', async () => {
+    const MEDIA_ACTION_INPUTS = {
+      ...ACTION_INPUTS,
+      'media-alt-text': 'alt text',
+      media: './image.png'
+    }
+    getInput.mockImplementation(inputName => MEDIA_ACTION_INPUTS[inputName])
+    TwitterApi.mockImplementation(() => {
+      return {
+        readWrite: {
+          v2: {
+            tweet: async message => message || null
+          },
+          v1: {
+            uploadMedia: async () => 'id1',
+            createMediaMetadata: async () => {
+              throw Error('Something went wrong, upload fail')
+            }
+          }
+        }
+      }
+    })
+
+    await run()
+
+    expect(setFailed).not.toHaveBeenCalled()
+    expect(warning).toHaveBeenCalled()
+  })
+
+  it('sending tweet with media failed', async () => {
+    const MEDIA_ACTION_INPUTS = {
+      ...ACTION_INPUTS,
+      'media-alt-text': 'alt text',
+      media: './image.png'
+    }
+    getInput.mockImplementation(inputName => MEDIA_ACTION_INPUTS[inputName])
+    TwitterApi.mockImplementation(() => {
+      return {
+        readWrite: {
+          v2: {
+            tweet: async () => {
+              throw Error('Something went wrong')
+            }
+          },
+          v1: {
+            uploadMedia: async () => {
+              throw Error('Something went wrong, upload fail')
+            },
+            createMediaMetadata: async () => null
+          }
+        }
+      }
+    })
+
+    await run()
+
+    expect(setFailed).toHaveBeenCalledWith(
+      'Action failed with error. Error: Something went wrong, upload fail'
     )
   })
 })
