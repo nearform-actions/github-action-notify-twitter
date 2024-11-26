@@ -18,7 +18,7 @@ Configure this action in your workflows providing the following inputs described
 | `twitter-access-token`        | yes      | Application access token, available in the "Keys and tokens" section of your application in the Twitter Developer site. |
 | `twitter-access-token-secret` | yes      | Application access token secret, available in the "Keys and tokens" section of your application in the Twitter Developer site. |
 | `media`                       | no       | A list of paths for media objects (image, video or animated GIF) to use in the post. |
-| `media-alt-text`              | no      | A list of image alternative text (alt text) that describe the meaning and the context of the image.  |
+| `media-alt-text`              | no       | A list of image alternative text (alt text) that describe the meaning and the context of the image.  |
 
 
 ## Example usage
