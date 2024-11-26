@@ -34692,6 +34692,7 @@ async function run() {
     .getInput('media', { required: false })
     ?.split('\n')
     ?.map(input => input.trim())
+    ?.filter(Boolean)
   const mediaAltText = action_core
     .getInput('media-alt-text', {
       required: false,

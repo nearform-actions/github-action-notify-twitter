@@ -23,6 +23,7 @@ export async function run() {
     .getInput('media', { required: false })
     ?.split('\n')
     ?.map(input => input.trim())
+    ?.filter(Boolean)
   const mediaAltText = core
     .getInput('media-alt-text', {
       required: false,
