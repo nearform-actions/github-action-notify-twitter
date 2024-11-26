@@ -27,7 +27,7 @@ describe('action', () => {
   })
 
   it('tweet was sent successfully', async () => {
-    getInput.mockImplementation(inputName => ACTION_INPUTS[inputName])
+    getInput.mockImplementation(inputName => ACTION_INPUTS[inputName] ?? '')
     TwitterApi.mockImplementation(() => {
       return {
         readWrite: {
@@ -44,7 +44,7 @@ describe('action', () => {
   })
 
   it('sending tweet failed', async () => {
-    getInput.mockImplementation(inputName => ACTION_INPUTS[inputName])
+    getInput.mockImplementation(inputName => ACTION_INPUTS[inputName] ?? '')
     TwitterApi.mockImplementation(() => {
       return {
         readWrite: {
@@ -74,7 +74,7 @@ describe('action', () => {
       'twitter-access-token-secret': 'access-token-secret'
     }
     getInput.mockImplementation(
-      inputName => MESSAGE_TOO_LONG_ACTION_INPUTS[inputName]
+      inputName => MESSAGE_TOO_LONG_ACTION_INPUTS[inputName] ?? ''
     )
     TwitterApi.mockImplementation(() => {
       return {
@@ -101,7 +101,9 @@ describe('action', () => {
       'media-alt-text': `alt text1
         alt text2`
     }
-    getInput.mockImplementation(inputName => MEDIA_ACTION_INPUTS[inputName])
+    getInput.mockImplementation(
+      inputName => MEDIA_ACTION_INPUTS[inputName] ?? ''
+    )
     TwitterApi.mockImplementation(() => {
       return {
         readWrite: {
@@ -125,7 +127,9 @@ describe('action', () => {
       ...ACTION_INPUTS,
       media: './image.png'
     }
-    getInput.mockImplementation(inputName => MEDIA_ACTION_INPUTS[inputName])
+    getInput.mockImplementation(
+      inputName => MEDIA_ACTION_INPUTS[inputName] ?? ''
+    )
     TwitterApi.mockImplementation(() => {
       return {
         readWrite: {
@@ -151,7 +155,9 @@ describe('action', () => {
       media: './image.png',
       'media-alt-text': 'alt text'
     }
-    getInput.mockImplementation(inputName => MEDIA_ACTION_INPUTS[inputName])
+    getInput.mockImplementation(
+      inputName => MEDIA_ACTION_INPUTS[inputName] ?? ''
+    )
     TwitterApi.mockImplementation(() => {
       return {
         readWrite: {
@@ -180,7 +186,9 @@ describe('action', () => {
       media: './image.png',
       'media-alt-text': 'alt text'
     }
-    getInput.mockImplementation(inputName => MEDIA_ACTION_INPUTS[inputName])
+    getInput.mockImplementation(
+      inputName => MEDIA_ACTION_INPUTS[inputName] ?? ''
+    )
     TwitterApi.mockImplementation(() => {
       return {
         readWrite: {
@@ -215,7 +223,9 @@ describe('action', () => {
         ./image.png,
         ./image.png`
     }
-    getInput.mockImplementation(inputName => MEDIA_ACTION_INPUTS[inputName])
+    getInput.mockImplementation(
+      inputName => MEDIA_ACTION_INPUTS[inputName] ?? ''
+    )
     await run()
 
     expect(setFailed).toHaveBeenCalledWith(
@@ -230,7 +240,9 @@ describe('action', () => {
         ./image.png`,
       'media-alt-text': `alt text`
     }
-    getInput.mockImplementation(inputName => MEDIA_ACTION_INPUTS[inputName])
+    getInput.mockImplementation(
+      inputName => MEDIA_ACTION_INPUTS[inputName] ?? ''
+    )
     TwitterApi.mockImplementation(() => {
       return {
         readWrite: {

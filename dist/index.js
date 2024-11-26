@@ -34690,16 +34690,16 @@ async function run() {
   })
   const media = action_core
     .getInput('media', { required: false })
-    ?.split('\n')
-    ?.map(input => input.trim())
-    ?.filter(Boolean)
+    .split('\n')
+    .map(input => input.trim())
+    .filter(Boolean)
   const mediaAltText = action_core
     .getInput('media-alt-text', {
       required: false,
       trimWhitespace: false
     })
-    ?.split('\n')
-    ?.map(input => input.trim())
+    .split('\n')
+    .map(input => input.trim())
 
   if (message.length > MAX_MESSAGE_LENGTH) {
     action_core.setFailed(
@@ -34711,7 +34711,7 @@ async function run() {
     return
   }
 
-  if (media?.length > MAX_MEDIA_ELEMENT) {
+  if (media.length > MAX_MEDIA_ELEMENT) {
     action_core.setFailed(
       `Too many media elements. The maximum number is ${MAX_MEDIA_ELEMENT}.`
     )
@@ -34732,51 +34732,17 @@ async function run() {
 
   let tweetOpts = {}
 
-  if (media?.length) {
-    try {
-      action_core.info(`Twitter upload media: ${media.join('; ')}`)
-
-      const mediaIds = await Promise.all(
-        media.map(media => rwClient.v1.uploadMedia(media))
-      )
-
-      action_core.info(
-        `Twitter upload completed - mediaId: 
-        ${mediaIds.join('; ')}`
-      )
-      tweetOpts.media = { media_ids: mediaIds }
-
-      if (mediaAltText?.length) {
-        try {
-          await Promise.all(
-            mediaIds.map((mediaId, index) => {
-              action_core.info(
-                `Twitter createMediaMetadata - mediaId: 
-                ${mediaId} ; alt-text: ${mediaAltText[index]}`
-              )
-              if (!mediaAltText?.[index]?.trim()) return Promise.resolve()
-              return rwClient.v1.createMediaMetadata(mediaId, {
-                alt_text: { text: mediaAltText[index] }
-              })
-            })
-          )
-        } catch (err) {
-          action_core.warning(
-            `Twitter createMediaMetadata - Failed. ${err} ${
-              err.data ?? ''
-            }`.trim()
-          )
-        }
-      }
-    } catch (err) {
-      action_core.setFailed(
-        `Action failed with error. ${err} ${err.data ?? ''}`.trim()
-      )
-      action_core.info(`
-        *** ACTION RUN - END ***
-        `)
-      return
+  try {
+    const media_ids = await uploadMedia(rwClient, media, mediaAltText)
+    if (media_ids?.length) {
+      tweetOpts.media = { media_ids }
     }
+  } catch (err) {
+    action_core.setFailed(`Action failed with error. ${err} ${err.data ?? ''}`.trim())
+    action_core.info(`
+      *** ACTION RUN - END ***
+      `)
+    return
   }
 
   try {
@@ -34788,6 +34754,44 @@ async function run() {
     action_core.info(`
       *** ACTION RUN - END ***
       `)
+  }
+}
+
+async function uploadMedia(client, media, mediaAltText) {
+  if (media?.length) {
+    action_core.info(`Twitter upload media: ${media.join('; ')}`)
+
+    const mediaIds = await Promise.all(
+      media.map(media => client.v1.uploadMedia(media))
+    )
+    action_core.info(`Twitter upload completed - mediaId: ${mediaIds.join('; ')}`)
+
+    if (mediaAltText?.length) {
+      try {
+        await Promise.all(
+          mediaIds.map((mediaId, index) => {
+            action_core.info(
+              `Twitter createMediaMetadata - mediaId: 
+            ${mediaId} ; alt-text: ${mediaAltText[index]}`
+            )
+            if (!mediaAltText?.[index]?.trim()) return Promise.resolve()
+            return client.v1.createMediaMetadata(mediaId, {
+              alt_text: { text: mediaAltText[index] }
+            })
+          })
+        )
+      } catch (err) {
+        action_core.warning(
+          `Twitter createMediaMetadata - Failed. ${err} ${
+            err.data ?? ''
+          }`.trim()
+        )
+      }
+    }
+    return mediaIds
+  } else {
+    action_core.info(`Twitter no media to upload`)
+    return null
   }
 }
 
