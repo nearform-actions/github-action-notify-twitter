@@ -34754,7 +34754,6 @@ async function run() {
                 ${mediaId} ; alt-text: ${mediaAltText[index]}`
               )
               if (!mediaAltText?.[index]?.trim()) return Promise.resolve()
-              action_core.info(`Twitter createMediaMetadata for mediaId: ${mediaId}`)
               return rwClient.v1.createMediaMetadata(mediaId, {
                 alt_text: { text: mediaAltText[index] }
               })
