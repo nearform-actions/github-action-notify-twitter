@@ -34761,7 +34761,11 @@ async function run() {
             })
           )
         } catch (err) {
-          action_core.warning(`Twitter createMediaMetadata - Failed`)
+          action_core.warning(
+            `Twitter createMediaMetadata - Failed. ${err} ${
+              err.data ?? ''
+            }`.trim()
+          )
         }
       }
     } catch (err) {
