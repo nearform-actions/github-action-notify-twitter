@@ -8,7 +8,11 @@
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -21,7 +25,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -83,13 +87,13 @@ class Command {
     }
 }
 function escapeData(s) {
-    return utils_1.toCommandValue(s)
+    return (0, utils_1.toCommandValue)(s)
         .replace(/%/g, '%25')
         .replace(/\r/g, '%0D')
         .replace(/\n/g, '%0A');
 }
 function escapeProperty(s) {
-    return utils_1.toCommandValue(s)
+    return (0, utils_1.toCommandValue)(s)
         .replace(/%/g, '%25')
         .replace(/\r/g, '%0D')
         .replace(/\n/g, '%0A')
@@ -107,7 +111,11 @@ function escapeProperty(s) {
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -120,7 +128,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -134,7 +142,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getIDToken = exports.getState = exports.saveState = exports.group = exports.endGroup = exports.startGroup = exports.info = exports.notice = exports.warning = exports.error = exports.debug = exports.isDebug = exports.setFailed = exports.setCommandEcho = exports.setOutput = exports.getBooleanInput = exports.getMultilineInput = exports.getInput = exports.addPath = exports.setSecret = exports.exportVariable = exports.ExitCode = void 0;
+exports.platform = exports.toPlatformPath = exports.toWin32Path = exports.toPosixPath = exports.markdownSummary = exports.summary = exports.getIDToken = exports.getState = exports.saveState = exports.group = exports.endGroup = exports.startGroup = exports.info = exports.notice = exports.warning = exports.error = exports.debug = exports.isDebug = exports.setFailed = exports.setCommandEcho = exports.setOutput = exports.getBooleanInput = exports.getMultilineInput = exports.getInput = exports.addPath = exports.setSecret = exports.exportVariable = exports.ExitCode = void 0;
 const command_1 = __nccwpck_require__(4914);
 const file_command_1 = __nccwpck_require__(4753);
 const utils_1 = __nccwpck_require__(302);
@@ -154,7 +162,7 @@ var ExitCode;
      * A code indicating that the action was a failure
      */
     ExitCode[ExitCode["Failure"] = 1] = "Failure";
-})(ExitCode = exports.ExitCode || (exports.ExitCode = {}));
+})(ExitCode || (exports.ExitCode = ExitCode = {}));
 //-----------------------------------------------------------------------
 // Variables
 //-----------------------------------------------------------------------
@@ -165,13 +173,13 @@ var ExitCode;
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function exportVariable(name, val) {
-    const convertedVal = utils_1.toCommandValue(val);
+    const convertedVal = (0, utils_1.toCommandValue)(val);
     process.env[name] = convertedVal;
     const filePath = process.env['GITHUB_ENV'] || '';
     if (filePath) {
-        return file_command_1.issueFileCommand('ENV', file_command_1.prepareKeyValueMessage(name, val));
+        return (0, file_command_1.issueFileCommand)('ENV', (0, file_command_1.prepareKeyValueMessage)(name, val));
     }
-    command_1.issueCommand('set-env', { name }, convertedVal);
+    (0, command_1.issueCommand)('set-env', { name }, convertedVal);
 }
 exports.exportVariable = exportVariable;
 /**
@@ -179,7 +187,7 @@ exports.exportVariable = exportVariable;
  * @param secret value of the secret
  */
 function setSecret(secret) {
-    command_1.issueCommand('add-mask', {}, secret);
+    (0, command_1.issueCommand)('add-mask', {}, secret);
 }
 exports.setSecret = setSecret;
 /**
@@ -189,10 +197,10 @@ exports.setSecret = setSecret;
 function addPath(inputPath) {
     const filePath = process.env['GITHUB_PATH'] || '';
     if (filePath) {
-        file_command_1.issueFileCommand('PATH', inputPath);
+        (0, file_command_1.issueFileCommand)('PATH', inputPath);
     }
     else {
-        command_1.issueCommand('add-path', {}, inputPath);
+        (0, command_1.issueCommand)('add-path', {}, inputPath);
     }
     process.env['PATH'] = `${inputPath}${path.delimiter}${process.env['PATH']}`;
 }
@@ -267,10 +275,10 @@ exports.getBooleanInput = getBooleanInput;
 function setOutput(name, value) {
     const filePath = process.env['GITHUB_OUTPUT'] || '';
     if (filePath) {
-        return file_command_1.issueFileCommand('OUTPUT', file_command_1.prepareKeyValueMessage(name, value));
+        return (0, file_command_1.issueFileCommand)('OUTPUT', (0, file_command_1.prepareKeyValueMessage)(name, value));
     }
     process.stdout.write(os.EOL);
-    command_1.issueCommand('set-output', { name }, utils_1.toCommandValue(value));
+    (0, command_1.issueCommand)('set-output', { name }, (0, utils_1.toCommandValue)(value));
 }
 exports.setOutput = setOutput;
 /**
@@ -279,7 +287,7 @@ exports.setOutput = setOutput;
  *
  */
 function setCommandEcho(enabled) {
-    command_1.issue('echo', enabled ? 'on' : 'off');
+    (0, command_1.issue)('echo', enabled ? 'on' : 'off');
 }
 exports.setCommandEcho = setCommandEcho;
 //-----------------------------------------------------------------------
@@ -310,7 +318,7 @@ exports.isDebug = isDebug;
  * @param message debug message
  */
 function debug(message) {
-    command_1.issueCommand('debug', {}, message);
+    (0, command_1.issueCommand)('debug', {}, message);
 }
 exports.debug = debug;
 /**
@@ -319,7 +327,7 @@ exports.debug = debug;
  * @param properties optional properties to add to the annotation.
  */
 function error(message, properties = {}) {
-    command_1.issueCommand('error', utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
+    (0, command_1.issueCommand)('error', (0, utils_1.toCommandProperties)(properties), message instanceof Error ? message.toString() : message);
 }
 exports.error = error;
 /**
@@ -328,7 +336,7 @@ exports.error = error;
  * @param properties optional properties to add to the annotation.
  */
 function warning(message, properties = {}) {
-    command_1.issueCommand('warning', utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
+    (0, command_1.issueCommand)('warning', (0, utils_1.toCommandProperties)(properties), message instanceof Error ? message.toString() : message);
 }
 exports.warning = warning;
 /**
@@ -337,7 +345,7 @@ exports.warning = warning;
  * @param properties optional properties to add to the annotation.
  */
 function notice(message, properties = {}) {
-    command_1.issueCommand('notice', utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
+    (0, command_1.issueCommand)('notice', (0, utils_1.toCommandProperties)(properties), message instanceof Error ? message.toString() : message);
 }
 exports.notice = notice;
 /**
@@ -356,14 +364,14 @@ exports.info = info;
  * @param name The name of the output group
  */
 function startGroup(name) {
-    command_1.issue('group', name);
+    (0, command_1.issue)('group', name);
 }
 exports.startGroup = startGroup;
 /**
  * End an output group.
  */
 function endGroup() {
-    command_1.issue('endgroup');
+    (0, command_1.issue)('endgroup');
 }
 exports.endGroup = endGroup;
 /**
@@ -401,9 +409,9 @@ exports.group = group;
 function saveState(name, value) {
     const filePath = process.env['GITHUB_STATE'] || '';
     if (filePath) {
-        return file_command_1.issueFileCommand('STATE', file_command_1.prepareKeyValueMessage(name, value));
+        return (0, file_command_1.issueFileCommand)('STATE', (0, file_command_1.prepareKeyValueMessage)(name, value));
     }
-    command_1.issueCommand('save-state', { name }, utils_1.toCommandValue(value));
+    (0, command_1.issueCommand)('save-state', { name }, (0, utils_1.toCommandValue)(value));
 }
 exports.saveState = saveState;
 /**
@@ -439,6 +447,10 @@ var path_utils_1 = __nccwpck_require__(1976);
 Object.defineProperty(exports, "toPosixPath", ({ enumerable: true, get: function () { return path_utils_1.toPosixPath; } }));
 Object.defineProperty(exports, "toWin32Path", ({ enumerable: true, get: function () { return path_utils_1.toWin32Path; } }));
 Object.defineProperty(exports, "toPlatformPath", ({ enumerable: true, get: function () { return path_utils_1.toPlatformPath; } }));
+/**
+ * Platform utilities exports
+ */
+exports.platform = __importStar(__nccwpck_require__(8968));
 //# sourceMappingURL=core.js.map
 
 /***/ }),
@@ -451,7 +463,11 @@ Object.defineProperty(exports, "toPlatformPath", ({ enumerable: true, get: funct
 // For internal use, subject to change.
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -464,7 +480,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -472,9 +488,9 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.prepareKeyValueMessage = exports.issueFileCommand = void 0;
 // We use any as a valid input type
 /* eslint-disable @typescript-eslint/no-explicit-any */
+const crypto = __importStar(__nccwpck_require__(6982));
 const fs = __importStar(__nccwpck_require__(9896));
 const os = __importStar(__nccwpck_require__(857));
-const uuid_1 = __nccwpck_require__(2048);
 const utils_1 = __nccwpck_require__(302);
 function issueFileCommand(command, message) {
     const filePath = process.env[`GITHUB_${command}`];
@@ -484,14 +500,14 @@ function issueFileCommand(command, message) {
     if (!fs.existsSync(filePath)) {
         throw new Error(`Missing file at path: ${filePath}`);
     }
-    fs.appendFileSync(filePath, `${utils_1.toCommandValue(message)}${os.EOL}`, {
+    fs.appendFileSync(filePath, `${(0, utils_1.toCommandValue)(message)}${os.EOL}`, {
         encoding: 'utf8'
     });
 }
 exports.issueFileCommand = issueFileCommand;
 function prepareKeyValueMessage(key, value) {
-    const delimiter = `ghadelimiter_${uuid_1.v4()}`;
-    const convertedValue = utils_1.toCommandValue(value);
+    const delimiter = `ghadelimiter_${crypto.randomUUID()}`;
+    const convertedValue = (0, utils_1.toCommandValue)(value);
     // These should realistically never happen, but just in case someone finds a
     // way to exploit uuid generation let's not allow keys or values that contain
     // the delimiter.
@@ -576,9 +592,9 @@ class OidcClient {
                     const encodedAudience = encodeURIComponent(audience);
                     id_token_url = `${id_token_url}&audience=${encodedAudience}`;
                 }
-                core_1.debug(`ID token url is ${id_token_url}`);
+                (0, core_1.debug)(`ID token url is ${id_token_url}`);
                 const id_token = yield OidcClient.getCall(id_token_url);
-                core_1.setSecret(id_token);
+                (0, core_1.setSecret)(id_token);
                 return id_token;
             }
             catch (error) {
@@ -599,7 +615,11 @@ exports.OidcClient = OidcClient;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -612,7 +632,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -654,6 +674,107 @@ function toPlatformPath(pth) {
 }
 exports.toPlatformPath = toPlatformPath;
 //# sourceMappingURL=path-utils.js.map
+
+/***/ }),
+
+/***/ 8968:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getDetails = exports.isLinux = exports.isMacOS = exports.isWindows = exports.arch = exports.platform = void 0;
+const os_1 = __importDefault(__nccwpck_require__(857));
+const exec = __importStar(__nccwpck_require__(5236));
+const getWindowsInfo = () => __awaiter(void 0, void 0, void 0, function* () {
+    const { stdout: version } = yield exec.getExecOutput('powershell -command "(Get-CimInstance -ClassName Win32_OperatingSystem).Version"', undefined, {
+        silent: true
+    });
+    const { stdout: name } = yield exec.getExecOutput('powershell -command "(Get-CimInstance -ClassName Win32_OperatingSystem).Caption"', undefined, {
+        silent: true
+    });
+    return {
+        name: name.trim(),
+        version: version.trim()
+    };
+});
+const getMacOsInfo = () => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b, _c, _d;
+    const { stdout } = yield exec.getExecOutput('sw_vers', undefined, {
+        silent: true
+    });
+    const version = (_b = (_a = stdout.match(/ProductVersion:\s*(.+)/)) === null || _a === void 0 ? void 0 : _a[1]) !== null && _b !== void 0 ? _b : '';
+    const name = (_d = (_c = stdout.match(/ProductName:\s*(.+)/)) === null || _c === void 0 ? void 0 : _c[1]) !== null && _d !== void 0 ? _d : '';
+    return {
+        name,
+        version
+    };
+});
+const getLinuxInfo = () => __awaiter(void 0, void 0, void 0, function* () {
+    const { stdout } = yield exec.getExecOutput('lsb_release', ['-i', '-r', '-s'], {
+        silent: true
+    });
+    const [name, version] = stdout.trim().split('\n');
+    return {
+        name,
+        version
+    };
+});
+exports.platform = os_1.default.platform();
+exports.arch = os_1.default.arch();
+exports.isWindows = exports.platform === 'win32';
+exports.isMacOS = exports.platform === 'darwin';
+exports.isLinux = exports.platform === 'linux';
+function getDetails() {
+    return __awaiter(this, void 0, void 0, function* () {
+        return Object.assign(Object.assign({}, (yield (exports.isWindows
+            ? getWindowsInfo()
+            : exports.isMacOS
+                ? getMacOsInfo()
+                : getLinuxInfo()))), { platform: exports.platform,
+            arch: exports.arch,
+            isWindows: exports.isWindows,
+            isMacOS: exports.isMacOS,
+            isLinux: exports.isLinux });
+    });
+}
+exports.getDetails = getDetails;
+//# sourceMappingURL=platform.js.map
 
 /***/ }),
 
@@ -991,6 +1112,741 @@ function toCommandProperties(annotationProperties) {
 }
 exports.toCommandProperties = toCommandProperties;
 //# sourceMappingURL=utils.js.map
+
+/***/ }),
+
+/***/ 5236:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getExecOutput = exports.exec = void 0;
+const string_decoder_1 = __nccwpck_require__(3193);
+const tr = __importStar(__nccwpck_require__(6665));
+/**
+ * Exec a command.
+ * Output will be streamed to the live console.
+ * Returns promise with return code
+ *
+ * @param     commandLine        command to execute (can include additional args). Must be correctly escaped.
+ * @param     args               optional arguments for tool. Escaping is handled by the lib.
+ * @param     options            optional exec options.  See ExecOptions
+ * @returns   Promise<number>    exit code
+ */
+function exec(commandLine, args, options) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const commandArgs = tr.argStringToArray(commandLine);
+        if (commandArgs.length === 0) {
+            throw new Error(`Parameter 'commandLine' cannot be null or empty.`);
+        }
+        // Path to tool to execute should be first arg
+        const toolPath = commandArgs[0];
+        args = commandArgs.slice(1).concat(args || []);
+        const runner = new tr.ToolRunner(toolPath, args, options);
+        return runner.exec();
+    });
+}
+exports.exec = exec;
+/**
+ * Exec a command and get the output.
+ * Output will be streamed to the live console.
+ * Returns promise with the exit code and collected stdout and stderr
+ *
+ * @param     commandLine           command to execute (can include additional args). Must be correctly escaped.
+ * @param     args                  optional arguments for tool. Escaping is handled by the lib.
+ * @param     options               optional exec options.  See ExecOptions
+ * @returns   Promise<ExecOutput>   exit code, stdout, and stderr
+ */
+function getExecOutput(commandLine, args, options) {
+    var _a, _b;
+    return __awaiter(this, void 0, void 0, function* () {
+        let stdout = '';
+        let stderr = '';
+        //Using string decoder covers the case where a mult-byte character is split
+        const stdoutDecoder = new string_decoder_1.StringDecoder('utf8');
+        const stderrDecoder = new string_decoder_1.StringDecoder('utf8');
+        const originalStdoutListener = (_a = options === null || options === void 0 ? void 0 : options.listeners) === null || _a === void 0 ? void 0 : _a.stdout;
+        const originalStdErrListener = (_b = options === null || options === void 0 ? void 0 : options.listeners) === null || _b === void 0 ? void 0 : _b.stderr;
+        const stdErrListener = (data) => {
+            stderr += stderrDecoder.write(data);
+            if (originalStdErrListener) {
+                originalStdErrListener(data);
+            }
+        };
+        const stdOutListener = (data) => {
+            stdout += stdoutDecoder.write(data);
+            if (originalStdoutListener) {
+                originalStdoutListener(data);
+            }
+        };
+        const listeners = Object.assign(Object.assign({}, options === null || options === void 0 ? void 0 : options.listeners), { stdout: stdOutListener, stderr: stdErrListener });
+        const exitCode = yield exec(commandLine, args, Object.assign(Object.assign({}, options), { listeners }));
+        //flush any remaining characters
+        stdout += stdoutDecoder.end();
+        stderr += stderrDecoder.end();
+        return {
+            exitCode,
+            stdout,
+            stderr
+        };
+    });
+}
+exports.getExecOutput = getExecOutput;
+//# sourceMappingURL=exec.js.map
+
+/***/ }),
+
+/***/ 6665:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.argStringToArray = exports.ToolRunner = void 0;
+const os = __importStar(__nccwpck_require__(857));
+const events = __importStar(__nccwpck_require__(4434));
+const child = __importStar(__nccwpck_require__(5317));
+const path = __importStar(__nccwpck_require__(6928));
+const io = __importStar(__nccwpck_require__(4994));
+const ioUtil = __importStar(__nccwpck_require__(5207));
+const timers_1 = __nccwpck_require__(3557);
+/* eslint-disable @typescript-eslint/unbound-method */
+const IS_WINDOWS = process.platform === 'win32';
+/*
+ * Class for running command line tools. Handles quoting and arg parsing in a platform agnostic way.
+ */
+class ToolRunner extends events.EventEmitter {
+    constructor(toolPath, args, options) {
+        super();
+        if (!toolPath) {
+            throw new Error("Parameter 'toolPath' cannot be null or empty.");
+        }
+        this.toolPath = toolPath;
+        this.args = args || [];
+        this.options = options || {};
+    }
+    _debug(message) {
+        if (this.options.listeners && this.options.listeners.debug) {
+            this.options.listeners.debug(message);
+        }
+    }
+    _getCommandString(options, noPrefix) {
+        const toolPath = this._getSpawnFileName();
+        const args = this._getSpawnArgs(options);
+        let cmd = noPrefix ? '' : '[command]'; // omit prefix when piped to a second tool
+        if (IS_WINDOWS) {
+            // Windows + cmd file
+            if (this._isCmdFile()) {
+                cmd += toolPath;
+                for (const a of args) {
+                    cmd += ` ${a}`;
+                }
+            }
+            // Windows + verbatim
+            else if (options.windowsVerbatimArguments) {
+                cmd += `"${toolPath}"`;
+                for (const a of args) {
+                    cmd += ` ${a}`;
+                }
+            }
+            // Windows (regular)
+            else {
+                cmd += this._windowsQuoteCmdArg(toolPath);
+                for (const a of args) {
+                    cmd += ` ${this._windowsQuoteCmdArg(a)}`;
+                }
+            }
+        }
+        else {
+            // OSX/Linux - this can likely be improved with some form of quoting.
+            // creating processes on Unix is fundamentally different than Windows.
+            // on Unix, execvp() takes an arg array.
+            cmd += toolPath;
+            for (const a of args) {
+                cmd += ` ${a}`;
+            }
+        }
+        return cmd;
+    }
+    _processLineBuffer(data, strBuffer, onLine) {
+        try {
+            let s = strBuffer + data.toString();
+            let n = s.indexOf(os.EOL);
+            while (n > -1) {
+                const line = s.substring(0, n);
+                onLine(line);
+                // the rest of the string ...
+                s = s.substring(n + os.EOL.length);
+                n = s.indexOf(os.EOL);
+            }
+            return s;
+        }
+        catch (err) {
+            // streaming lines to console is best effort.  Don't fail a build.
+            this._debug(`error processing line. Failed with error ${err}`);
+            return '';
+        }
+    }
+    _getSpawnFileName() {
+        if (IS_WINDOWS) {
+            if (this._isCmdFile()) {
+                return process.env['COMSPEC'] || 'cmd.exe';
+            }
+        }
+        return this.toolPath;
+    }
+    _getSpawnArgs(options) {
+        if (IS_WINDOWS) {
+            if (this._isCmdFile()) {
+                let argline = `/D /S /C "${this._windowsQuoteCmdArg(this.toolPath)}`;
+                for (const a of this.args) {
+                    argline += ' ';
+                    argline += options.windowsVerbatimArguments
+                        ? a
+                        : this._windowsQuoteCmdArg(a);
+                }
+                argline += '"';
+                return [argline];
+            }
+        }
+        return this.args;
+    }
+    _endsWith(str, end) {
+        return str.endsWith(end);
+    }
+    _isCmdFile() {
+        const upperToolPath = this.toolPath.toUpperCase();
+        return (this._endsWith(upperToolPath, '.CMD') ||
+            this._endsWith(upperToolPath, '.BAT'));
+    }
+    _windowsQuoteCmdArg(arg) {
+        // for .exe, apply the normal quoting rules that libuv applies
+        if (!this._isCmdFile()) {
+            return this._uvQuoteCmdArg(arg);
+        }
+        // otherwise apply quoting rules specific to the cmd.exe command line parser.
+        // the libuv rules are generic and are not designed specifically for cmd.exe
+        // command line parser.
+        //
+        // for a detailed description of the cmd.exe command line parser, refer to
+        // http://stackoverflow.com/questions/4094699/how-does-the-windows-command-interpreter-cmd-exe-parse-scripts/7970912#7970912
+        // need quotes for empty arg
+        if (!arg) {
+            return '""';
+        }
+        // determine whether the arg needs to be quoted
+        const cmdSpecialChars = [
+            ' ',
+            '\t',
+            '&',
+            '(',
+            ')',
+            '[',
+            ']',
+            '{',
+            '}',
+            '^',
+            '=',
+            ';',
+            '!',
+            "'",
+            '+',
+            ',',
+            '`',
+            '~',
+            '|',
+            '<',
+            '>',
+            '"'
+        ];
+        let needsQuotes = false;
+        for (const char of arg) {
+            if (cmdSpecialChars.some(x => x === char)) {
+                needsQuotes = true;
+                break;
+            }
+        }
+        // short-circuit if quotes not needed
+        if (!needsQuotes) {
+            return arg;
+        }
+        // the following quoting rules are very similar to the rules that by libuv applies.
+        //
+        // 1) wrap the string in quotes
+        //
+        // 2) double-up quotes - i.e. " => ""
+        //
+        //    this is different from the libuv quoting rules. libuv replaces " with \", which unfortunately
+        //    doesn't work well with a cmd.exe command line.
+        //
+        //    note, replacing " with "" also works well if the arg is passed to a downstream .NET console app.
+        //    for example, the command line:
+        //          foo.exe "myarg:""my val"""
+        //    is parsed by a .NET console app into an arg array:
+        //          [ "myarg:\"my val\"" ]
+        //    which is the same end result when applying libuv quoting rules. although the actual
+        //    command line from libuv quoting rules would look like:
+        //          foo.exe "myarg:\"my val\""
+        //
+        // 3) double-up slashes that precede a quote,
+        //    e.g.  hello \world    => "hello \world"
+        //          hello\"world    => "hello\\""world"
+        //          hello\\"world   => "hello\\\\""world"
+        //          hello world\    => "hello world\\"
+        //
+        //    technically this is not required for a cmd.exe command line, or the batch argument parser.
+        //    the reasons for including this as a .cmd quoting rule are:
+        //
+        //    a) this is optimized for the scenario where the argument is passed from the .cmd file to an
+        //       external program. many programs (e.g. .NET console apps) rely on the slash-doubling rule.
+        //
+        //    b) it's what we've been doing previously (by deferring to node default behavior) and we
+        //       haven't heard any complaints about that aspect.
+        //
+        // note, a weakness of the quoting rules chosen here, is that % is not escaped. in fact, % cannot be
+        // escaped when used on the command line directly - even though within a .cmd file % can be escaped
+        // by using %%.
+        //
+        // the saving grace is, on the command line, %var% is left as-is if var is not defined. this contrasts
+        // the line parsing rules within a .cmd file, where if var is not defined it is replaced with nothing.
+        //
+        // one option that was explored was replacing % with ^% - i.e. %var% => ^%var^%. this hack would
+        // often work, since it is unlikely that var^ would exist, and the ^ character is removed when the
+        // variable is used. the problem, however, is that ^ is not removed when %* is used to pass the args
+        // to an external program.
+        //
+        // an unexplored potential solution for the % escaping problem, is to create a wrapper .cmd file.
+        // % can be escaped within a .cmd file.
+        let reverse = '"';
+        let quoteHit = true;
+        for (let i = arg.length; i > 0; i--) {
+            // walk the string in reverse
+            reverse += arg[i - 1];
+            if (quoteHit && arg[i - 1] === '\\') {
+                reverse += '\\'; // double the slash
+            }
+            else if (arg[i - 1] === '"') {
+                quoteHit = true;
+                reverse += '"'; // double the quote
+            }
+            else {
+                quoteHit = false;
+            }
+        }
+        reverse += '"';
+        return reverse
+            .split('')
+            .reverse()
+            .join('');
+    }
+    _uvQuoteCmdArg(arg) {
+        // Tool runner wraps child_process.spawn() and needs to apply the same quoting as
+        // Node in certain cases where the undocumented spawn option windowsVerbatimArguments
+        // is used.
+        //
+        // Since this function is a port of quote_cmd_arg from Node 4.x (technically, lib UV,
+        // see https://github.com/nodejs/node/blob/v4.x/deps/uv/src/win/process.c for details),
+        // pasting copyright notice from Node within this function:
+        //
+        //      Copyright Joyent, Inc. and other Node contributors. All rights reserved.
+        //
+        //      Permission is hereby granted, free of charge, to any person obtaining a copy
+        //      of this software and associated documentation files (the "Software"), to
+        //      deal in the Software without restriction, including without limitation the
+        //      rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+        //      sell copies of the Software, and to permit persons to whom the Software is
+        //      furnished to do so, subject to the following conditions:
+        //
+        //      The above copyright notice and this permission notice shall be included in
+        //      all copies or substantial portions of the Software.
+        //
+        //      THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        //      IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        //      FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        //      AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        //      LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+        //      FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+        //      IN THE SOFTWARE.
+        if (!arg) {
+            // Need double quotation for empty argument
+            return '""';
+        }
+        if (!arg.includes(' ') && !arg.includes('\t') && !arg.includes('"')) {
+            // No quotation needed
+            return arg;
+        }
+        if (!arg.includes('"') && !arg.includes('\\')) {
+            // No embedded double quotes or backslashes, so I can just wrap
+            // quote marks around the whole thing.
+            return `"${arg}"`;
+        }
+        // Expected input/output:
+        //   input : hello"world
+        //   output: "hello\"world"
+        //   input : hello""world
+        //   output: "hello\"\"world"
+        //   input : hello\world
+        //   output: hello\world
+        //   input : hello\\world
+        //   output: hello\\world
+        //   input : hello\"world
+        //   output: "hello\\\"world"
+        //   input : hello\\"world
+        //   output: "hello\\\\\"world"
+        //   input : hello world\
+        //   output: "hello world\\" - note the comment in libuv actually reads "hello world\"
+        //                             but it appears the comment is wrong, it should be "hello world\\"
+        let reverse = '"';
+        let quoteHit = true;
+        for (let i = arg.length; i > 0; i--) {
+            // walk the string in reverse
+            reverse += arg[i - 1];
+            if (quoteHit && arg[i - 1] === '\\') {
+                reverse += '\\';
+            }
+            else if (arg[i - 1] === '"') {
+                quoteHit = true;
+                reverse += '\\';
+            }
+            else {
+                quoteHit = false;
+            }
+        }
+        reverse += '"';
+        return reverse
+            .split('')
+            .reverse()
+            .join('');
+    }
+    _cloneExecOptions(options) {
+        options = options || {};
+        const result = {
+            cwd: options.cwd || process.cwd(),
+            env: options.env || process.env,
+            silent: options.silent || false,
+            windowsVerbatimArguments: options.windowsVerbatimArguments || false,
+            failOnStdErr: options.failOnStdErr || false,
+            ignoreReturnCode: options.ignoreReturnCode || false,
+            delay: options.delay || 10000
+        };
+        result.outStream = options.outStream || process.stdout;
+        result.errStream = options.errStream || process.stderr;
+        return result;
+    }
+    _getSpawnOptions(options, toolPath) {
+        options = options || {};
+        const result = {};
+        result.cwd = options.cwd;
+        result.env = options.env;
+        result['windowsVerbatimArguments'] =
+            options.windowsVerbatimArguments || this._isCmdFile();
+        if (options.windowsVerbatimArguments) {
+            result.argv0 = `"${toolPath}"`;
+        }
+        return result;
+    }
+    /**
+     * Exec a tool.
+     * Output will be streamed to the live console.
+     * Returns promise with return code
+     *
+     * @param     tool     path to tool to exec
+     * @param     options  optional exec options.  See ExecOptions
+     * @returns   number
+     */
+    exec() {
+        return __awaiter(this, void 0, void 0, function* () {
+            // root the tool path if it is unrooted and contains relative pathing
+            if (!ioUtil.isRooted(this.toolPath) &&
+                (this.toolPath.includes('/') ||
+                    (IS_WINDOWS && this.toolPath.includes('\\')))) {
+                // prefer options.cwd if it is specified, however options.cwd may also need to be rooted
+                this.toolPath = path.resolve(process.cwd(), this.options.cwd || process.cwd(), this.toolPath);
+            }
+            // if the tool is only a file name, then resolve it from the PATH
+            // otherwise verify it exists (add extension on Windows if necessary)
+            this.toolPath = yield io.which(this.toolPath, true);
+            return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+                this._debug(`exec tool: ${this.toolPath}`);
+                this._debug('arguments:');
+                for (const arg of this.args) {
+                    this._debug(`   ${arg}`);
+                }
+                const optionsNonNull = this._cloneExecOptions(this.options);
+                if (!optionsNonNull.silent && optionsNonNull.outStream) {
+                    optionsNonNull.outStream.write(this._getCommandString(optionsNonNull) + os.EOL);
+                }
+                const state = new ExecState(optionsNonNull, this.toolPath);
+                state.on('debug', (message) => {
+                    this._debug(message);
+                });
+                if (this.options.cwd && !(yield ioUtil.exists(this.options.cwd))) {
+                    return reject(new Error(`The cwd: ${this.options.cwd} does not exist!`));
+                }
+                const fileName = this._getSpawnFileName();
+                const cp = child.spawn(fileName, this._getSpawnArgs(optionsNonNull), this._getSpawnOptions(this.options, fileName));
+                let stdbuffer = '';
+                if (cp.stdout) {
+                    cp.stdout.on('data', (data) => {
+                        if (this.options.listeners && this.options.listeners.stdout) {
+                            this.options.listeners.stdout(data);
+                        }
+                        if (!optionsNonNull.silent && optionsNonNull.outStream) {
+                            optionsNonNull.outStream.write(data);
+                        }
+                        stdbuffer = this._processLineBuffer(data, stdbuffer, (line) => {
+                            if (this.options.listeners && this.options.listeners.stdline) {
+                                this.options.listeners.stdline(line);
+                            }
+                        });
+                    });
+                }
+                let errbuffer = '';
+                if (cp.stderr) {
+                    cp.stderr.on('data', (data) => {
+                        state.processStderr = true;
+                        if (this.options.listeners && this.options.listeners.stderr) {
+                            this.options.listeners.stderr(data);
+                        }
+                        if (!optionsNonNull.silent &&
+                            optionsNonNull.errStream &&
+                            optionsNonNull.outStream) {
+                            const s = optionsNonNull.failOnStdErr
+                                ? optionsNonNull.errStream
+                                : optionsNonNull.outStream;
+                            s.write(data);
+                        }
+                        errbuffer = this._processLineBuffer(data, errbuffer, (line) => {
+                            if (this.options.listeners && this.options.listeners.errline) {
+                                this.options.listeners.errline(line);
+                            }
+                        });
+                    });
+                }
+                cp.on('error', (err) => {
+                    state.processError = err.message;
+                    state.processExited = true;
+                    state.processClosed = true;
+                    state.CheckComplete();
+                });
+                cp.on('exit', (code) => {
+                    state.processExitCode = code;
+                    state.processExited = true;
+                    this._debug(`Exit code ${code} received from tool '${this.toolPath}'`);
+                    state.CheckComplete();
+                });
+                cp.on('close', (code) => {
+                    state.processExitCode = code;
+                    state.processExited = true;
+                    state.processClosed = true;
+                    this._debug(`STDIO streams have closed for tool '${this.toolPath}'`);
+                    state.CheckComplete();
+                });
+                state.on('done', (error, exitCode) => {
+                    if (stdbuffer.length > 0) {
+                        this.emit('stdline', stdbuffer);
+                    }
+                    if (errbuffer.length > 0) {
+                        this.emit('errline', errbuffer);
+                    }
+                    cp.removeAllListeners();
+                    if (error) {
+                        reject(error);
+                    }
+                    else {
+                        resolve(exitCode);
+                    }
+                });
+                if (this.options.input) {
+                    if (!cp.stdin) {
+                        throw new Error('child process missing stdin');
+                    }
+                    cp.stdin.end(this.options.input);
+                }
+            }));
+        });
+    }
+}
+exports.ToolRunner = ToolRunner;
+/**
+ * Convert an arg string to an array of args. Handles escaping
+ *
+ * @param    argString   string of arguments
+ * @returns  string[]    array of arguments
+ */
+function argStringToArray(argString) {
+    const args = [];
+    let inQuotes = false;
+    let escaped = false;
+    let arg = '';
+    function append(c) {
+        // we only escape double quotes.
+        if (escaped && c !== '"') {
+            arg += '\\';
+        }
+        arg += c;
+        escaped = false;
+    }
+    for (let i = 0; i < argString.length; i++) {
+        const c = argString.charAt(i);
+        if (c === '"') {
+            if (!escaped) {
+                inQuotes = !inQuotes;
+            }
+            else {
+                append(c);
+            }
+            continue;
+        }
+        if (c === '\\' && escaped) {
+            append(c);
+            continue;
+        }
+        if (c === '\\' && inQuotes) {
+            escaped = true;
+            continue;
+        }
+        if (c === ' ' && !inQuotes) {
+            if (arg.length > 0) {
+                args.push(arg);
+                arg = '';
+            }
+            continue;
+        }
+        append(c);
+    }
+    if (arg.length > 0) {
+        args.push(arg.trim());
+    }
+    return args;
+}
+exports.argStringToArray = argStringToArray;
+class ExecState extends events.EventEmitter {
+    constructor(options, toolPath) {
+        super();
+        this.processClosed = false; // tracks whether the process has exited and stdio is closed
+        this.processError = '';
+        this.processExitCode = 0;
+        this.processExited = false; // tracks whether the process has exited
+        this.processStderr = false; // tracks whether stderr was written to
+        this.delay = 10000; // 10 seconds
+        this.done = false;
+        this.timeout = null;
+        if (!toolPath) {
+            throw new Error('toolPath must not be empty');
+        }
+        this.options = options;
+        this.toolPath = toolPath;
+        if (options.delay) {
+            this.delay = options.delay;
+        }
+    }
+    CheckComplete() {
+        if (this.done) {
+            return;
+        }
+        if (this.processClosed) {
+            this._setResult();
+        }
+        else if (this.processExited) {
+            this.timeout = timers_1.setTimeout(ExecState.HandleTimeout, this.delay, this);
+        }
+    }
+    _debug(message) {
+        this.emit('debug', message);
+    }
+    _setResult() {
+        // determine whether there is an error
+        let error;
+        if (this.processExited) {
+            if (this.processError) {
+                error = new Error(`There was an error when attempting to execute the process '${this.toolPath}'. This may indicate the process failed to start. Error: ${this.processError}`);
+            }
+            else if (this.processExitCode !== 0 && !this.options.ignoreReturnCode) {
+                error = new Error(`The process '${this.toolPath}' failed with exit code ${this.processExitCode}`);
+            }
+            else if (this.processStderr && this.options.failOnStdErr) {
+                error = new Error(`The process '${this.toolPath}' failed because one or more lines were written to the STDERR stream`);
+            }
+        }
+        // clear the timeout
+        if (this.timeout) {
+            clearTimeout(this.timeout);
+            this.timeout = null;
+        }
+        this.done = true;
+        this.emit('done', error, this.processExitCode);
+    }
+    static HandleTimeout(state) {
+        if (state.done) {
+            return;
+        }
+        if (!state.processClosed && state.processExited) {
+            const message = `The STDIO streams did not close within ${state.delay /
+                1000} seconds of the exit event from process '${state.toolPath}'. This may indicate a child process inherited the STDIO streams and has not yet exited.`;
+            state._debug(message);
+        }
+        state._setResult();
+    }
+}
+//# sourceMappingURL=toolrunner.js.map
 
 /***/ }),
 
@@ -1831,6 +2687,502 @@ function isLoopbackAddress(host) {
         hostLower.startsWith('[0:0:0:0:0:0:0:1]'));
 }
 //# sourceMappingURL=proxy.js.map
+
+/***/ }),
+
+/***/ 5207:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getCmdPath = exports.tryGetExecutablePath = exports.isRooted = exports.isDirectory = exports.exists = exports.READONLY = exports.UV_FS_O_EXLOCK = exports.IS_WINDOWS = exports.unlink = exports.symlink = exports.stat = exports.rmdir = exports.rm = exports.rename = exports.readlink = exports.readdir = exports.open = exports.mkdir = exports.lstat = exports.copyFile = exports.chmod = void 0;
+const fs = __importStar(__nccwpck_require__(9896));
+const path = __importStar(__nccwpck_require__(6928));
+_a = fs.promises
+// export const {open} = 'fs'
+, exports.chmod = _a.chmod, exports.copyFile = _a.copyFile, exports.lstat = _a.lstat, exports.mkdir = _a.mkdir, exports.open = _a.open, exports.readdir = _a.readdir, exports.readlink = _a.readlink, exports.rename = _a.rename, exports.rm = _a.rm, exports.rmdir = _a.rmdir, exports.stat = _a.stat, exports.symlink = _a.symlink, exports.unlink = _a.unlink;
+// export const {open} = 'fs'
+exports.IS_WINDOWS = process.platform === 'win32';
+// See https://github.com/nodejs/node/blob/d0153aee367422d0858105abec186da4dff0a0c5/deps/uv/include/uv/win.h#L691
+exports.UV_FS_O_EXLOCK = 0x10000000;
+exports.READONLY = fs.constants.O_RDONLY;
+function exists(fsPath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            yield exports.stat(fsPath);
+        }
+        catch (err) {
+            if (err.code === 'ENOENT') {
+                return false;
+            }
+            throw err;
+        }
+        return true;
+    });
+}
+exports.exists = exists;
+function isDirectory(fsPath, useStat = false) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const stats = useStat ? yield exports.stat(fsPath) : yield exports.lstat(fsPath);
+        return stats.isDirectory();
+    });
+}
+exports.isDirectory = isDirectory;
+/**
+ * On OSX/Linux, true if path starts with '/'. On Windows, true for paths like:
+ * \, \hello, \\hello\share, C:, and C:\hello (and corresponding alternate separator cases).
+ */
+function isRooted(p) {
+    p = normalizeSeparators(p);
+    if (!p) {
+        throw new Error('isRooted() parameter "p" cannot be empty');
+    }
+    if (exports.IS_WINDOWS) {
+        return (p.startsWith('\\') || /^[A-Z]:/i.test(p) // e.g. \ or \hello or \\hello
+        ); // e.g. C: or C:\hello
+    }
+    return p.startsWith('/');
+}
+exports.isRooted = isRooted;
+/**
+ * Best effort attempt to determine whether a file exists and is executable.
+ * @param filePath    file path to check
+ * @param extensions  additional file extensions to try
+ * @return if file exists and is executable, returns the file path. otherwise empty string.
+ */
+function tryGetExecutablePath(filePath, extensions) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let stats = undefined;
+        try {
+            // test file exists
+            stats = yield exports.stat(filePath);
+        }
+        catch (err) {
+            if (err.code !== 'ENOENT') {
+                // eslint-disable-next-line no-console
+                console.log(`Unexpected error attempting to determine if executable file exists '${filePath}': ${err}`);
+            }
+        }
+        if (stats && stats.isFile()) {
+            if (exports.IS_WINDOWS) {
+                // on Windows, test for valid extension
+                const upperExt = path.extname(filePath).toUpperCase();
+                if (extensions.some(validExt => validExt.toUpperCase() === upperExt)) {
+                    return filePath;
+                }
+            }
+            else {
+                if (isUnixExecutable(stats)) {
+                    return filePath;
+                }
+            }
+        }
+        // try each extension
+        const originalFilePath = filePath;
+        for (const extension of extensions) {
+            filePath = originalFilePath + extension;
+            stats = undefined;
+            try {
+                stats = yield exports.stat(filePath);
+            }
+            catch (err) {
+                if (err.code !== 'ENOENT') {
+                    // eslint-disable-next-line no-console
+                    console.log(`Unexpected error attempting to determine if executable file exists '${filePath}': ${err}`);
+                }
+            }
+            if (stats && stats.isFile()) {
+                if (exports.IS_WINDOWS) {
+                    // preserve the case of the actual file (since an extension was appended)
+                    try {
+                        const directory = path.dirname(filePath);
+                        const upperName = path.basename(filePath).toUpperCase();
+                        for (const actualName of yield exports.readdir(directory)) {
+                            if (upperName === actualName.toUpperCase()) {
+                                filePath = path.join(directory, actualName);
+                                break;
+                            }
+                        }
+                    }
+                    catch (err) {
+                        // eslint-disable-next-line no-console
+                        console.log(`Unexpected error attempting to determine the actual case of the file '${filePath}': ${err}`);
+                    }
+                    return filePath;
+                }
+                else {
+                    if (isUnixExecutable(stats)) {
+                        return filePath;
+                    }
+                }
+            }
+        }
+        return '';
+    });
+}
+exports.tryGetExecutablePath = tryGetExecutablePath;
+function normalizeSeparators(p) {
+    p = p || '';
+    if (exports.IS_WINDOWS) {
+        // convert slashes on Windows
+        p = p.replace(/\//g, '\\');
+        // remove redundant slashes
+        return p.replace(/\\\\+/g, '\\');
+    }
+    // remove redundant slashes
+    return p.replace(/\/\/+/g, '/');
+}
+// on Mac/Linux, test the execute bit
+//     R   W  X  R  W X R W X
+//   256 128 64 32 16 8 4 2 1
+function isUnixExecutable(stats) {
+    return ((stats.mode & 1) > 0 ||
+        ((stats.mode & 8) > 0 && stats.gid === process.getgid()) ||
+        ((stats.mode & 64) > 0 && stats.uid === process.getuid()));
+}
+// Get the path of cmd.exe in windows
+function getCmdPath() {
+    var _a;
+    return (_a = process.env['COMSPEC']) !== null && _a !== void 0 ? _a : `cmd.exe`;
+}
+exports.getCmdPath = getCmdPath;
+//# sourceMappingURL=io-util.js.map
+
+/***/ }),
+
+/***/ 4994:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.findInPath = exports.which = exports.mkdirP = exports.rmRF = exports.mv = exports.cp = void 0;
+const assert_1 = __nccwpck_require__(2613);
+const path = __importStar(__nccwpck_require__(6928));
+const ioUtil = __importStar(__nccwpck_require__(5207));
+/**
+ * Copies a file or folder.
+ * Based off of shelljs - https://github.com/shelljs/shelljs/blob/9237f66c52e5daa40458f94f9565e18e8132f5a6/src/cp.js
+ *
+ * @param     source    source path
+ * @param     dest      destination path
+ * @param     options   optional. See CopyOptions.
+ */
+function cp(source, dest, options = {}) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const { force, recursive, copySourceDirectory } = readCopyOptions(options);
+        const destStat = (yield ioUtil.exists(dest)) ? yield ioUtil.stat(dest) : null;
+        // Dest is an existing file, but not forcing
+        if (destStat && destStat.isFile() && !force) {
+            return;
+        }
+        // If dest is an existing directory, should copy inside.
+        const newDest = destStat && destStat.isDirectory() && copySourceDirectory
+            ? path.join(dest, path.basename(source))
+            : dest;
+        if (!(yield ioUtil.exists(source))) {
+            throw new Error(`no such file or directory: ${source}`);
+        }
+        const sourceStat = yield ioUtil.stat(source);
+        if (sourceStat.isDirectory()) {
+            if (!recursive) {
+                throw new Error(`Failed to copy. ${source} is a directory, but tried to copy without recursive flag.`);
+            }
+            else {
+                yield cpDirRecursive(source, newDest, 0, force);
+            }
+        }
+        else {
+            if (path.relative(source, newDest) === '') {
+                // a file cannot be copied to itself
+                throw new Error(`'${newDest}' and '${source}' are the same file`);
+            }
+            yield copyFile(source, newDest, force);
+        }
+    });
+}
+exports.cp = cp;
+/**
+ * Moves a path.
+ *
+ * @param     source    source path
+ * @param     dest      destination path
+ * @param     options   optional. See MoveOptions.
+ */
+function mv(source, dest, options = {}) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (yield ioUtil.exists(dest)) {
+            let destExists = true;
+            if (yield ioUtil.isDirectory(dest)) {
+                // If dest is directory copy src into dest
+                dest = path.join(dest, path.basename(source));
+                destExists = yield ioUtil.exists(dest);
+            }
+            if (destExists) {
+                if (options.force == null || options.force) {
+                    yield rmRF(dest);
+                }
+                else {
+                    throw new Error('Destination already exists');
+                }
+            }
+        }
+        yield mkdirP(path.dirname(dest));
+        yield ioUtil.rename(source, dest);
+    });
+}
+exports.mv = mv;
+/**
+ * Remove a path recursively with force
+ *
+ * @param inputPath path to remove
+ */
+function rmRF(inputPath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (ioUtil.IS_WINDOWS) {
+            // Check for invalid characters
+            // https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file
+            if (/[*"<>|]/.test(inputPath)) {
+                throw new Error('File path must not contain `*`, `"`, `<`, `>` or `|` on Windows');
+            }
+        }
+        try {
+            // note if path does not exist, error is silent
+            yield ioUtil.rm(inputPath, {
+                force: true,
+                maxRetries: 3,
+                recursive: true,
+                retryDelay: 300
+            });
+        }
+        catch (err) {
+            throw new Error(`File was unable to be removed ${err}`);
+        }
+    });
+}
+exports.rmRF = rmRF;
+/**
+ * Make a directory.  Creates the full path with folders in between
+ * Will throw if it fails
+ *
+ * @param   fsPath        path to create
+ * @returns Promise<void>
+ */
+function mkdirP(fsPath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        assert_1.ok(fsPath, 'a path argument must be provided');
+        yield ioUtil.mkdir(fsPath, { recursive: true });
+    });
+}
+exports.mkdirP = mkdirP;
+/**
+ * Returns path of a tool had the tool actually been invoked.  Resolves via paths.
+ * If you check and the tool does not exist, it will throw.
+ *
+ * @param     tool              name of the tool
+ * @param     check             whether to check if tool exists
+ * @returns   Promise<string>   path to tool
+ */
+function which(tool, check) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!tool) {
+            throw new Error("parameter 'tool' is required");
+        }
+        // recursive when check=true
+        if (check) {
+            const result = yield which(tool, false);
+            if (!result) {
+                if (ioUtil.IS_WINDOWS) {
+                    throw new Error(`Unable to locate executable file: ${tool}. Please verify either the file path exists or the file can be found within a directory specified by the PATH environment variable. Also verify the file has a valid extension for an executable file.`);
+                }
+                else {
+                    throw new Error(`Unable to locate executable file: ${tool}. Please verify either the file path exists or the file can be found within a directory specified by the PATH environment variable. Also check the file mode to verify the file is executable.`);
+                }
+            }
+            return result;
+        }
+        const matches = yield findInPath(tool);
+        if (matches && matches.length > 0) {
+            return matches[0];
+        }
+        return '';
+    });
+}
+exports.which = which;
+/**
+ * Returns a list of all occurrences of the given tool on the system path.
+ *
+ * @returns   Promise<string[]>  the paths of the tool
+ */
+function findInPath(tool) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!tool) {
+            throw new Error("parameter 'tool' is required");
+        }
+        // build the list of extensions to try
+        const extensions = [];
+        if (ioUtil.IS_WINDOWS && process.env['PATHEXT']) {
+            for (const extension of process.env['PATHEXT'].split(path.delimiter)) {
+                if (extension) {
+                    extensions.push(extension);
+                }
+            }
+        }
+        // if it's rooted, return it if exists. otherwise return empty.
+        if (ioUtil.isRooted(tool)) {
+            const filePath = yield ioUtil.tryGetExecutablePath(tool, extensions);
+            if (filePath) {
+                return [filePath];
+            }
+            return [];
+        }
+        // if any path separators, return empty
+        if (tool.includes(path.sep)) {
+            return [];
+        }
+        // build the list of directories
+        //
+        // Note, technically "where" checks the current directory on Windows. From a toolkit perspective,
+        // it feels like we should not do this. Checking the current directory seems like more of a use
+        // case of a shell, and the which() function exposed by the toolkit should strive for consistency
+        // across platforms.
+        const directories = [];
+        if (process.env.PATH) {
+            for (const p of process.env.PATH.split(path.delimiter)) {
+                if (p) {
+                    directories.push(p);
+                }
+            }
+        }
+        // find all matches
+        const matches = [];
+        for (const directory of directories) {
+            const filePath = yield ioUtil.tryGetExecutablePath(path.join(directory, tool), extensions);
+            if (filePath) {
+                matches.push(filePath);
+            }
+        }
+        return matches;
+    });
+}
+exports.findInPath = findInPath;
+function readCopyOptions(options) {
+    const force = options.force == null ? true : options.force;
+    const recursive = Boolean(options.recursive);
+    const copySourceDirectory = options.copySourceDirectory == null
+        ? true
+        : Boolean(options.copySourceDirectory);
+    return { force, recursive, copySourceDirectory };
+}
+function cpDirRecursive(sourceDir, destDir, currentDepth, force) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // Ensure there is not a run away recursive copy
+        if (currentDepth >= 255)
+            return;
+        currentDepth++;
+        yield mkdirP(destDir);
+        const files = yield ioUtil.readdir(sourceDir);
+        for (const fileName of files) {
+            const srcFile = `${sourceDir}/${fileName}`;
+            const destFile = `${destDir}/${fileName}`;
+            const srcFileStat = yield ioUtil.lstat(srcFile);
+            if (srcFileStat.isDirectory()) {
+                // Recurse
+                yield cpDirRecursive(srcFile, destFile, currentDepth, force);
+            }
+            else {
+                yield copyFile(srcFile, destFile, force);
+            }
+        }
+        // Change the mode for the newly created directory
+        yield ioUtil.chmod(destDir, (yield ioUtil.stat(sourceDir)).mode);
+    });
+}
+// Buffered file copy
+function copyFile(srcFile, destFile, force) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if ((yield ioUtil.lstat(srcFile)).isSymbolicLink()) {
+            // unlink/re-link it
+            try {
+                yield ioUtil.lstat(destFile);
+                yield ioUtil.unlink(destFile);
+            }
+            catch (e) {
+                // Try to override file permission
+                if (e.code === 'EPERM') {
+                    yield ioUtil.chmod(destFile, '0666');
+                    yield ioUtil.unlink(destFile);
+                }
+                // other errors = it doesn't exist, no work to do
+            }
+            // Copy over symlink
+            const symlinkFull = yield ioUtil.readlink(srcFile);
+            yield ioUtil.symlink(symlinkFull, destFile, ioUtil.IS_WINDOWS ? 'junction' : null);
+        }
+        else if (!(yield ioUtil.exists(destFile)) || force) {
+            yield ioUtil.copyFile(srcFile, destFile);
+        }
+    });
+}
+//# sourceMappingURL=io.js.map
 
 /***/ }),
 
@@ -4015,7 +5367,7 @@ class RequestHandlerHelper {
         return !this.requestData.compression || this.requestData.compression === 'identity';
     }
     isFormEncodedEndpoint() {
-        return this.requestData.url.href.startsWith('https://api.twitter.com/oauth/');
+        return this.requestData.url.href.startsWith('https://api.x.com/oauth/');
     }
     /* Error helpers */
     createRequestError(error) {
@@ -4746,7 +6098,7 @@ class RequestParamHelpers {
             // Twitter API v2 has JSON-encoded requests for everything else
             return 'json';
         }
-        if (url.hostname === 'upload.twitter.com') {
+        if (url.hostname === 'upload.x.com') {
             if (url.pathname === '/1.1/media/upload.json') {
                 return 'form-data';
             }
@@ -4845,7 +6197,7 @@ class RequestParamHelpers {
     }
     /**
      * Replace URL parameters available in pathname, like `:id`, with data given in `parameters`:
-     * `https://twitter.com/:id.json` + `{ id: '20' }` => `https://twitter.com/20.json`
+     * `https://x.com/:id.json` + `{ id: '20' }` => `https://x.com/20.json`
      */
     static applyRequestParametersToUrl(url, parameters) {
         url.pathname = url.pathname.replace(/:([A-Z_-]+)/ig, (fullMatch, paramName) => {
@@ -5235,8 +6587,8 @@ class TwitterApiReadOnly extends client_base_1.default {
      * ```
      */
     async generateAuthLink(oauth_callback = 'oob', { authAccessType, linkMode = 'authenticate', forceLogin, screenName, } = {}) {
-        const oauthResult = await this.post('https://api.twitter.com/oauth/request_token', { oauth_callback, x_auth_access_type: authAccessType });
-        let url = `https://api.twitter.com/oauth/${linkMode}?oauth_token=${encodeURIComponent(oauthResult.oauth_token)}`;
+        const oauthResult = await this.post('https://api.x.com/oauth/request_token', { oauth_callback, x_auth_access_type: authAccessType });
+        let url = `https://api.x.com/oauth/${linkMode}?oauth_token=${encodeURIComponent(oauthResult.oauth_token)}`;
         if (forceLogin !== undefined) {
             url += `&force_login=${encodeURIComponent(forceLogin)}`;
         }
@@ -5280,7 +6632,7 @@ class TwitterApiReadOnly extends client_base_1.default {
         const tokens = this.getActiveTokens();
         if (tokens.type !== 'oauth-1.0a')
             throw new Error('You must setup TwitterApi instance with consumer keys to accept OAuth 1.0 login');
-        const oauth_result = await this.post('https://api.twitter.com/oauth/access_token', { oauth_token: tokens.accessToken, oauth_verifier });
+        const oauth_result = await this.post('https://api.x.com/oauth/access_token', { oauth_token: tokens.accessToken, oauth_verifier });
         const client = new _1.default({
             appKey: tokens.appKey,
             appSecret: tokens.appSecret,
@@ -5313,7 +6665,7 @@ class TwitterApiReadOnly extends client_base_1.default {
             throw new Error('You must setup TwitterApi instance with consumer keys to accept app-only login');
         // Create a client with Basic authentication
         const basicClient = new _1.default({ username: tokens.appKey, password: tokens.appSecret }, this._requestMaker.clientSettings);
-        const res = await basicClient.post('https://api.twitter.com/oauth2/token', { grant_type: 'client_credentials' });
+        const res = await basicClient.post('https://api.x.com/oauth2/token', { grant_type: 'client_credentials' });
         // New object with Bearer token
         return new _1.default(res.access_token, this._requestMaker.clientSettings);
     }
@@ -5324,7 +6676,7 @@ class TwitterApiReadOnly extends client_base_1.default {
      * - **You can only use v2 API endpoints with this authentication method.**
      * - **You need to specify which scope you want to have when you create your auth link. Make sure it matches your needs.**
      *
-     * See https://developer.twitter.com/en/docs/authentication/oauth-2-0/user-access-token for details.
+     * See https://developer.x.com/en/docs/authentication/oauth-2-0/user-access-token for details.
      *
      * ```ts
      * // Instantiate TwitterApi with client ID
@@ -5351,7 +6703,7 @@ class TwitterApiReadOnly extends client_base_1.default {
         const codeChallenge = oauth2_helper_1.OAuth2Helper.getCodeChallengeFromVerifier(codeVerifier);
         const rawScope = (_b = options.scope) !== null && _b !== void 0 ? _b : '';
         const scope = Array.isArray(rawScope) ? rawScope.join(' ') : rawScope;
-        const url = new URL('https://twitter.com/i/oauth2/authorize');
+        const url = new URL('https://x.com/i/oauth2/authorize');
         const query = {
             response_type: 'code',
             client_id: this._requestMaker.clientId,
@@ -5406,7 +6758,7 @@ class TwitterApiReadOnly extends client_base_1.default {
             throw new Error('Twitter API instance is not initialized with client ID. ' +
                 'Please build an instance with: new TwitterApi({ clientId: \'<yourClientId>\' })');
         }
-        const accessTokenResult = await this.post('https://api.twitter.com/2/oauth2/token', {
+        const accessTokenResult = await this.post('https://api.x.com/2/oauth2/token', {
             code,
             code_verifier: codeVerifier,
             redirect_uri: redirectUri,
@@ -5431,7 +6783,7 @@ class TwitterApiReadOnly extends client_base_1.default {
             throw new Error('Twitter API instance is not initialized with client ID. ' +
                 'Please build an instance with: new TwitterApi({ clientId: \'<yourClientId>\' })');
         }
-        const accessTokenResult = await this.post('https://api.twitter.com/2/oauth2/token', {
+        const accessTokenResult = await this.post('https://api.x.com/2/oauth2/token', {
             refresh_token: refreshToken,
             grant_type: 'refresh_token',
             client_id: this._requestMaker.clientId,
@@ -5450,7 +6802,7 @@ class TwitterApiReadOnly extends client_base_1.default {
             throw new Error('Twitter API instance is not initialized with client ID. ' +
                 'Please build an instance with: new TwitterApi({ clientId: \'<yourClientId>\' })');
         }
-        return await this.post('https://api.twitter.com/2/oauth2/revoke', {
+        return await this.post('https://api.x.com/2/oauth2/revoke', {
             client_id: this._requestMaker.clientId,
             client_secret: this._requestMaker.clientSecret,
             token,
@@ -5520,11 +6872,11 @@ exports["default"] = TwitterApiReadWrite;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.API_V1_1_STREAM_PREFIX = exports.API_V1_1_UPLOAD_PREFIX = exports.API_V1_1_PREFIX = exports.API_V2_LABS_PREFIX = exports.API_V2_PREFIX = void 0;
-exports.API_V2_PREFIX = 'https://api.twitter.com/2/';
-exports.API_V2_LABS_PREFIX = 'https://api.twitter.com/labs/2/';
-exports.API_V1_1_PREFIX = 'https://api.twitter.com/1.1/';
-exports.API_V1_1_UPLOAD_PREFIX = 'https://upload.twitter.com/1.1/';
-exports.API_V1_1_STREAM_PREFIX = 'https://stream.twitter.com/1.1/';
+exports.API_V2_PREFIX = 'https://api.x.com/2/';
+exports.API_V2_LABS_PREFIX = 'https://api.x.com/labs/2/';
+exports.API_V1_1_PREFIX = 'https://api.x.com/1.1/';
+exports.API_V1_1_UPLOAD_PREFIX = 'https://upload.x.com/1.1/';
+exports.API_V1_1_STREAM_PREFIX = 'https://stream.x.com/1.1/';
 
 
 /***/ }),
@@ -7710,22 +9062,22 @@ var EApiV1ErrorCode;
 var EApiV2ErrorCode;
 (function (EApiV2ErrorCode) {
     // Request errors
-    EApiV2ErrorCode["InvalidRequest"] = "https://api.twitter.com/2/problems/invalid-request";
-    EApiV2ErrorCode["ClientForbidden"] = "https://api.twitter.com/2/problems/client-forbidden";
-    EApiV2ErrorCode["UnsupportedAuthentication"] = "https://api.twitter.com/2/problems/unsupported-authentication";
+    EApiV2ErrorCode["InvalidRequest"] = "https://developer.x.com/en/support/x-api/error-troubleshooting#invalid-request";
+    EApiV2ErrorCode["ClientForbidden"] = "https://developer.x.com/en/support/x-api/error-troubleshooting#client-forbidden";
+    EApiV2ErrorCode["UnsupportedAuthentication"] = "https://developer.x.com/en/support/x-api/error-troubleshooting#unsupported-authentication";
     // Stream rules errors
-    EApiV2ErrorCode["InvalidRules"] = "https://api.twitter.com/2/problems/invalid-rules";
-    EApiV2ErrorCode["TooManyRules"] = "https://api.twitter.com/2/problems/rule-cap";
-    EApiV2ErrorCode["DuplicatedRules"] = "https://api.twitter.com/2/problems/duplicate-rules";
+    EApiV2ErrorCode["InvalidRules"] = "https://developer.x.com/en/support/x-api/error-troubleshooting#invalid-rules";
+    EApiV2ErrorCode["TooManyRules"] = "https://developer.x.com/en/support/x-api/error-troubleshooting#rule-cap";
+    EApiV2ErrorCode["DuplicatedRules"] = "https://developer.x.com/en/support/x-api/error-troubleshooting#duplicate-rules";
     // Twitter errors
-    EApiV2ErrorCode["RateLimitExceeded"] = "https://api.twitter.com/2/problems/usage-capped";
-    EApiV2ErrorCode["ConnectionError"] = "https://api.twitter.com/2/problems/streaming-connection";
-    EApiV2ErrorCode["ClientDisconnected"] = "https://api.twitter.com/2/problems/client-disconnected";
-    EApiV2ErrorCode["TwitterDisconnectedYou"] = "https://api.twitter.com/2/problems/operational-disconnect";
+    EApiV2ErrorCode["RateLimitExceeded"] = "https://developer.x.com/en/support/x-api/error-troubleshooting#usage-capped";
+    EApiV2ErrorCode["ConnectionError"] = "https://developer.x.com/en/support/x-api/error-troubleshooting#streaming-connection";
+    EApiV2ErrorCode["ClientDisconnected"] = "https://developer.x.com/en/support/x-api/error-troubleshooting#client-disconnected";
+    EApiV2ErrorCode["TwitterDisconnectedYou"] = "https://developer.x.com/en/support/x-api/error-troubleshooting#operational-disconnect";
     // Resource errors
-    EApiV2ErrorCode["ResourceNotFound"] = "https://api.twitter.com/2/problems/resource-not-found";
-    EApiV2ErrorCode["ResourceUnauthorized"] = "https://api.twitter.com/2/problems/not-authorized-for-resource";
-    EApiV2ErrorCode["DisallowedResource"] = "https://api.twitter.com/2/problems/disallowed-resource";
+    EApiV2ErrorCode["ResourceNotFound"] = "https://developer.x.com/en/support/x-api/error-troubleshooting#resource-not-found";
+    EApiV2ErrorCode["ResourceUnauthorized"] = "https://developer.x.com/en/support/x-api/error-troubleshooting#not-authorized-for-resource";
+    EApiV2ErrorCode["DisallowedResource"] = "https://developer.x.com/en/support/x-api/error-troubleshooting#disallowed-resource";
 })(EApiV2ErrorCode = exports.EApiV2ErrorCode || (exports.EApiV2ErrorCode = {}));
 
 
@@ -8080,7 +9432,7 @@ class TwitterApiv1 extends client_v1_write_1.default {
     // Part: Sending and receiving events
     /**
      * Publishes a new message_create event resulting in a Direct Message sent to a specified user from the authenticating user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/sending-and-receiving/api-reference/new-event
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/sending-and-receiving/api-reference/new-event
      */
     sendDm({ recipient_id, custom_profile_id, ...params }) {
         const args = {
@@ -8102,7 +9454,7 @@ class TwitterApiv1 extends client_v1_write_1.default {
     /**
      * Returns a single Direct Message event by the given id.
      *
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/sending-and-receiving/api-reference/get-event
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/sending-and-receiving/api-reference/get-event
      */
     getDmEvent(id) {
         return this.get('direct_messages/events/show.json', { id });
@@ -8110,7 +9462,7 @@ class TwitterApiv1 extends client_v1_write_1.default {
     /**
      * Deletes the direct message specified in the required ID parameter.
      * The authenticating user must be the recipient of the specified direct message.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/sending-and-receiving/api-reference/delete-message-event
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/sending-and-receiving/api-reference/delete-message-event
      */
     deleteDm(id) {
         return this.delete('direct_messages/events/destroy.json', { id });
@@ -8119,7 +9471,7 @@ class TwitterApiv1 extends client_v1_write_1.default {
      * Returns all Direct Message events (both sent and received) within the last 30 days.
      * Sorted in reverse-chronological order.
      *
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/sending-and-receiving/api-reference/list-events
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/sending-and-receiving/api-reference/list-events
      */
     async listDmEvents(args = {}) {
         const queryParams = { ...args };
@@ -8134,7 +9486,7 @@ class TwitterApiv1 extends client_v1_write_1.default {
     // Part: Welcome messages (events)
     /**
      * Creates a new Welcome Message that will be stored and sent in the future from the authenticating user in defined circumstances.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/new-welcome-message
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/new-welcome-message
      */
     newWelcomeDm(name, data) {
         const args = {
@@ -8149,14 +9501,14 @@ class TwitterApiv1 extends client_v1_write_1.default {
     }
     /**
      * Returns a Welcome Message by the given id.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/get-welcome-message
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/get-welcome-message
      */
     getWelcomeDm(id) {
         return this.get('direct_messages/welcome_messages/show.json', { id });
     }
     /**
      * Deletes a Welcome Message by the given id.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/delete-welcome-message
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/delete-welcome-message
      */
     deleteWelcomeDm(id) {
         return this.delete('direct_messages/welcome_messages/destroy.json', { id });
@@ -8164,7 +9516,7 @@ class TwitterApiv1 extends client_v1_write_1.default {
     /**
      * Updates a Welcome Message by the given ID.
      * Updates to the welcome_message object are atomic.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/update-welcome-message
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/update-welcome-message
      */
     updateWelcomeDm(id, data) {
         const args = { message_data: data };
@@ -8177,7 +9529,7 @@ class TwitterApiv1 extends client_v1_write_1.default {
      * Returns all Direct Message events (both sent and received) within the last 30 days.
      * Sorted in reverse-chronological order.
      *
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/sending-and-receiving/api-reference/list-events
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/sending-and-receiving/api-reference/list-events
      */
     async listWelcomeDms(args = {}) {
         const queryParams = { ...args };
@@ -8192,7 +9544,7 @@ class TwitterApiv1 extends client_v1_write_1.default {
     // Part: Welcome message (rules)
     /**
      * Creates a new Welcome Message Rule that determines which Welcome Message will be shown in a given conversation.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/new-welcome-message-rule
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/new-welcome-message-rule
      */
     newWelcomeDmRule(welcomeMessageId) {
         return this.post('direct_messages/welcome_messages/rules/new.json', {
@@ -8203,21 +9555,21 @@ class TwitterApiv1 extends client_v1_write_1.default {
     }
     /**
      * Returns a Welcome Message Rule by the given id.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/get-welcome-message-rule
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/get-welcome-message-rule
      */
     getWelcomeDmRule(id) {
         return this.get('direct_messages/welcome_messages/rules/show.json', { id });
     }
     /**
      * Deletes a Welcome Message Rule by the given id.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/delete-welcome-message-rule
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/delete-welcome-message-rule
      */
     deleteWelcomeDmRule(id) {
         return this.delete('direct_messages/welcome_messages/rules/destroy.json', { id });
     }
     /**
      * Retrieves all welcome DM rules for this account.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/list-welcome-message-rules
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/list-welcome-message-rules
      */
     async listWelcomeDmRules(args = {}) {
         const queryParams = { ...args };
@@ -8245,7 +9597,7 @@ class TwitterApiv1 extends client_v1_write_1.default {
     // Part: Read indicator
     /**
      * Marks a message as read in the recipient’s Direct Message conversation view with the sender.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/typing-indicator-and-read-receipts/api-reference/new-read-receipt
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/typing-indicator-and-read-receipts/api-reference/new-read-receipt
      */
     markDmAsRead(lastEventId, recipientId) {
         return this.post('direct_messages/mark_read.json', {
@@ -8255,7 +9607,7 @@ class TwitterApiv1 extends client_v1_write_1.default {
     }
     /**
      * Displays a visual typing indicator in the recipient’s Direct Message conversation view with the sender.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/typing-indicator-and-read-receipts/api-reference/new-typing-indicator
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/typing-indicator-and-read-receipts/api-reference/new-typing-indicator
      */
     indicateDmTyping(recipientId) {
         return this.post('direct_messages/indicate_typing.json', {
@@ -8265,7 +9617,7 @@ class TwitterApiv1 extends client_v1_write_1.default {
     // Part: Images
     /**
      * Get a single image attached to a direct message. TwitterApi client must be logged with OAuth 1.0a.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/message-attachments/guides/retrieving-media
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/message-attachments/guides/retrieving-media
      */
     async downloadDmImage(urlOrDm) {
         if (typeof urlOrDm !== 'string') {
@@ -8318,7 +9670,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /* Tweets */
     /**
      * Returns a single Tweet, specified by the id parameter. The Tweet's author will also be embedded within the Tweet.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/get-statuses-show-id
+     * https://developer.x.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/get-statuses-show-id
      */
     singleTweet(tweetId, options = {}) {
         return this.get('statuses/show.json', { tweet_mode: 'extended', id: tweetId, ...options });
@@ -8329,19 +9681,19 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * Returns a single Tweet, specified by either a Tweet web URL or the Tweet ID, in an oEmbed-compatible format.
      * The returned HTML snippet will be automatically recognized as an Embedded Tweet when Twitter's widget JavaScript is included on the page.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/get-statuses-oembed
+     * https://developer.x.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/get-statuses-oembed
      */
     oembedTweet(tweetId, options = {}) {
         return this.get('oembed', {
-            url: `https://twitter.com/i/statuses/${tweetId}`,
+            url: `https://x.com/i/statuses/${tweetId}`,
             ...options,
-        }, { prefix: 'https://publish.twitter.com/' });
+        }, { prefix: 'https://publish.x.com/' });
     }
     /* Tweets timelines */
     /**
      * Returns a collection of the most recent Tweets and Retweets posted by the authenticating user and the users they follow.
      * The home timeline is central to how most users interact with the Twitter service.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/timelines/api-reference/get-statuses-home_timeline
+     * https://developer.x.com/en/docs/twitter-api/v1/tweets/timelines/api-reference/get-statuses-home_timeline
      */
     async homeTimeline(options = {}) {
         const queryParams = {
@@ -8358,8 +9710,8 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns the 20 most recent mentions (Tweets containing a users's @screen_name) for the authenticating user.
-     * The timeline returned is the equivalent of the one seen when you view your mentions on twitter.com.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/timelines/api-reference/get-statuses-mentions_timeline
+     * The timeline returned is the equivalent of the one seen when you view your mentions on x.com.
+     * https://developer.x.com/en/docs/twitter-api/v1/tweets/timelines/api-reference/get-statuses-mentions_timeline
      */
     async mentionTimeline(options = {}) {
         const queryParams = {
@@ -8377,7 +9729,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * Returns a collection of the most recent Tweets posted by the user indicated by the user_id parameters.
      * User timelines belonging to protected users may only be requested when the authenticated user either "owns" the timeline or is an approved follower of the owner.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/timelines/api-reference/get-statuses-user_timeline
+     * https://developer.x.com/en/docs/twitter-api/v1/tweets/timelines/api-reference/get-statuses-user_timeline
      */
     async userTimeline(userId, options = {}) {
         const queryParams = {
@@ -8396,7 +9748,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * Returns a collection of the most recent Tweets posted by the user indicated by the screen_name parameters.
      * User timelines belonging to protected users may only be requested when the authenticated user either "owns" the timeline or is an approved follower of the owner.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/timelines/api-reference/get-statuses-user_timeline
+     * https://developer.x.com/en/docs/twitter-api/v1/tweets/timelines/api-reference/get-statuses-user_timeline
      */
     async userTimelineByUsername(username, options = {}) {
         const queryParams = {
@@ -8415,7 +9767,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * Returns the most recent Tweets liked by the authenticating or specified user, 20 tweets by default.
      * Note: favorites are now known as likes.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/get-favorites-list
+     * https://developer.x.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/get-favorites-list
      */
     async favoriteTimeline(userId, options = {}) {
         const queryParams = {
@@ -8434,7 +9786,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * Returns the most recent Tweets liked by the authenticating or specified user, 20 tweets by default.
      * Note: favorites are now known as likes.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/get-favorites-list
+     * https://developer.x.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/get-favorites-list
      */
     async favoriteTimelineByUsername(username, options = {}) {
         const queryParams = {
@@ -8454,7 +9806,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * Returns a variety of information about the user specified by the required user_id or screen_name parameter.
      * The author's most recent Tweet will be returned inline when possible.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-users-show
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-users-show
      */
     user(user) {
         return this.get('users/show.json', { tweet_mode: 'extended', ...user });
@@ -8462,7 +9814,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * Returns fully-hydrated user objects for up to 100 users per request,
      * as specified by comma-separated values passed to the user_id and/or screen_name parameters.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-users-lookup
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-users-lookup
      */
     users(query) {
         return this.get('users/lookup.json', { tweet_mode: 'extended', ...query });
@@ -8471,14 +9823,14 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
      * Returns an HTTP 200 OK response code and a representation of the requesting user if authentication was successful;
      * returns a 401 status code and an error message if not.
      * Use this method to test if supplied user credentials are valid.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/get-account-verify_credentials
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/get-account-verify_credentials
      */
     verifyCredentials(options = {}) {
         return this.get('account/verify_credentials.json', options);
     }
     /**
      * Returns an array of user objects the authenticating user has muted.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/mute-block-report-users/api-reference/get-mutes-users-list
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/mute-block-report-users/api-reference/get-mutes-users-list
      */
     async listMutedUsers(options = {}) {
         const queryParams = {
@@ -8495,7 +9847,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns an array of numeric user ids the authenticating user has muted.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/mute-block-report-users/api-reference/get-mutes-users-ids
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/mute-block-report-users/api-reference/get-mutes-users-ids
      */
     async listMutedUserIds(options = {}) {
         const queryParams = {
@@ -8512,7 +9864,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns an array of user objects of friends of the specified user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friends-list
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friends-list
      */
     async userFriendList(options = {}) {
         const queryParams = {
@@ -8528,7 +9880,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns an array of user objects of followers of the specified user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-followers-list
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-followers-list
      */
     async userFollowerList(options = {}) {
         const queryParams = {
@@ -8544,7 +9896,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns an array of numeric user ids of followers of the specified user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-followers-ids
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-followers-ids
      */
     async userFollowerIds(options = {}) {
         const queryParams = {
@@ -8561,7 +9913,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns an array of numeric user ids of friends of the specified user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friends-ids
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friends-ids
      */
     async userFollowingIds(options = {}) {
         const queryParams = {
@@ -8578,7 +9930,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     }
     /**
      * Provides a simple, relevance-based search interface to public user accounts on Twitter.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-users-search
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-users-search
      */
     async searchUsers(query, options = {}) {
         const queryParams = {
@@ -8598,28 +9950,28 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /* Friendship API */
     /**
      * Returns detailed information about the relationship between two arbitrary users.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friendships-show
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friendships-show
      */
     friendship(sources) {
         return this.get('friendships/show.json', sources);
     }
     /**
      * Returns the relationships of the authenticating user to the comma-separated list of up to 100 screen_names or user_ids provided.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friendships-lookup
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friendships-lookup
      */
     friendships(friendships) {
         return this.get('friendships/lookup.json', friendships);
     }
     /**
      * Returns a collection of user_ids that the currently authenticated user does not want to receive retweets from.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friendships-no_retweets-ids
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friendships-no_retweets-ids
      */
     friendshipsNoRetweets() {
         return this.get('friendships/no_retweets/ids.json', { stringify_ids: true });
     }
     /**
      * Returns a collection of numeric IDs for every user who has a pending request to follow the authenticating user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friendships-incoming
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friendships-incoming
      */
     async friendshipsIncoming(options = {}) {
         const queryParams = {
@@ -8636,7 +9988,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns a collection of numeric IDs for every protected user for whom the authenticating user has a pending follow request.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friendships-outgoing
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friendships-outgoing
      */
     async friendshipsOutgoing(options = {}) {
         const queryParams = {
@@ -8654,7 +10006,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /* Account/user API */
     /**
      * Get current account settings for authenticating user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/get-account-settings
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/get-account-settings
      */
     accountSettings() {
         return this.get('account/settings.json');
@@ -8662,7 +10014,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * Returns a map of the available size variations of the specified user's profile banner.
      * If the user has not uploaded a profile banner, a HTTP 404 will be served instead.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/get-users-profile_banner
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/get-users-profile_banner
      */
     userProfileBannerSizes(params) {
         return this.get('users/profile_banner.json', params);
@@ -8670,7 +10022,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /* Lists */
     /**
      * Returns the specified list. Private lists will only be shown if the authenticated user owns the specified list.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-show
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-show
      */
     list(options) {
         return this.get('lists/show.json', { tweet_mode: 'extended', ...options });
@@ -8678,14 +10030,14 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * Returns all lists the authenticating or specified user subscribes to, including their own.
      * If no user is given, the authenticating user is used.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-list
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-list
      */
     lists(options = {}) {
         return this.get('lists/list.json', { tweet_mode: 'extended', ...options });
     }
     /**
      * Returns the members of the specified list. Private list members will only be shown if the authenticated user owns the specified list.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-members
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-members
      */
     async listMembers(options = {}) {
         const queryParams = {
@@ -8702,7 +10054,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     }
     /**
      * Check if the specified user is a member of the specified list.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-members-show
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-members-show
      */
     listGetMember(options) {
         return this.get('lists/members/show.json', { tweet_mode: 'extended', ...options });
@@ -8710,7 +10062,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * Returns the lists the specified user has been added to.
      * If user_id or screen_name are not provided, the memberships for the authenticating user are returned.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-memberships
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-memberships
      */
     async listMemberships(options = {}) {
         const queryParams = {
@@ -8727,7 +10079,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns the lists owned by the specified Twitter user. Private lists will only be shown if the authenticated user is also the owner of the lists.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-ownerships
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-ownerships
      */
     async listOwnerships(options = {}) {
         const queryParams = {
@@ -8744,7 +10096,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns a timeline of tweets authored by members of the specified list. Retweets are included by default.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-statuses
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-statuses
      */
     async listStatuses(options) {
         const queryParams = {
@@ -8761,7 +10113,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns the subscribers of the specified list. Private list subscribers will only be shown if the authenticated user owns the specified list.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-subscribers
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-subscribers
      */
     async listSubscribers(options = {}) {
         const queryParams = {
@@ -8778,7 +10130,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     }
     /**
      * Check if the specified user is a subscriber of the specified list. Returns the user if they are a subscriber.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-subscribers-show
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-subscribers-show
      */
     listGetSubscriber(options) {
         return this.get('lists/subscribers/show.json', { tweet_mode: 'extended', ...options });
@@ -8786,7 +10138,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * Obtain a collection of the lists the specified user is subscribed to, 20 lists per page by default.
      * Does not include the user's own lists.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-subscriptions
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-subscriptions
      */
     async listSubscriptions(options = {}) {
         const queryParams = {
@@ -8805,7 +10157,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * The STATUS command (this method) is used to periodically poll for updates of media processing operation.
      * After the STATUS command response returns succeeded, you can move on to the next step which is usually create Tweet with media_id.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/media/upload-media/api-reference/get-media-upload-status
+     * https://developer.x.com/en/docs/twitter-api/v1/media/upload-media/api-reference/get-media-upload-status
      */
     mediaInfo(mediaId) {
         return this.get('media/upload.json', {
@@ -8835,7 +10187,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
         return streamClient.getStream('statuses/sample.json', params, { autoConnect });
     }
     /**
-     * Create a client that is prefixed with `https//stream.twitter.com` instead of classic API URL.
+     * Create a client that is prefixed with `https//stream.x.com` instead of classic API URL.
      */
     get stream() {
         const copiedClient = new client_v1_1.default(this);
@@ -8846,7 +10198,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * Returns the top 50 trending topics for a specific id, if trending information is available for it.
      * Note: The id parameter for this endpoint is the "where on earth identifier" or WOEID, which is a legacy identifier created by Yahoo and has been deprecated.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/trends/trends-for-location/api-reference/get-trends-place
+     * https://developer.x.com/en/docs/twitter-api/v1/trends/trends-for-location/api-reference/get-trends-place
      */
     trendsByPlace(woeId, options = {}) {
         return this.get('trends/place.json', { id: woeId, ...options });
@@ -8855,14 +10207,14 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
      * Returns the locations that Twitter has trending topic information for.
      * The response is an array of "locations" that encode the location's WOEID
      * and some other human-readable information such as a canonical name and country the location belongs in.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/trends/locations-with-trending-topics/api-reference/get-trends-available
+     * https://developer.x.com/en/docs/twitter-api/v1/trends/locations-with-trending-topics/api-reference/get-trends-available
      */
     trendsAvailable() {
         return this.get('trends/available.json');
     }
     /**
      * Returns the locations that Twitter has trending topic information for, closest to a specified location.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/trends/locations-with-trending-topics/api-reference/get-trends-closest
+     * https://developer.x.com/en/docs/twitter-api/v1/trends/locations-with-trending-topics/api-reference/get-trends-closest
      */
     trendsClosest(lat, long) {
         return this.get('trends/closest.json', { lat, long });
@@ -8870,7 +10222,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /* Geo API */
     /**
      * Returns all the information about a known place.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/geo/place-information/api-reference/get-geo-id-place_id
+     * https://developer.x.com/en/docs/twitter-api/v1/geo/place-information/api-reference/get-geo-id-place_id
      */
     geoPlace(placeId) {
         return this.get('geo/id/:place_id.json', undefined, { params: { place_id: placeId } });
@@ -8878,7 +10230,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * Search for places that can be attached to a Tweet via POST statuses/update.
      * This request will return a list of all the valid places that can be used as the place_id when updating a status.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/geo/places-near-location/api-reference/get-geo-search
+     * https://developer.x.com/en/docs/twitter-api/v1/geo/places-near-location/api-reference/get-geo-search
      */
     geoSearch(options) {
         return this.get('geo/search.json', options);
@@ -8886,7 +10238,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * Given a latitude and a longitude, searches for up to 20 places that can be used as a place_id when updating a status.
      * This request is an informative call and will deliver generalized results about geography.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/geo/places-near-location/api-reference/get-geo-reverse_geocode
+     * https://developer.x.com/en/docs/twitter-api/v1/geo/places-near-location/api-reference/get-geo-reverse_geocode
      */
     geoReverseGeoCode(options) {
         return this.get('geo/reverse_geocode.json', options);
@@ -8896,14 +10248,14 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
      * Returns the current rate limits for methods belonging to the specified resource families.
      * Each API resource belongs to a "resource family" which is indicated in its method documentation.
      * The method's resource family can be determined from the first component of the path after the resource version.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/developer-utilities/rate-limit-status/api-reference/get-application-rate_limit_status
+     * https://developer.x.com/en/docs/twitter-api/v1/developer-utilities/rate-limit-status/api-reference/get-application-rate_limit_status
      */
     rateLimitStatuses(...resources) {
         return this.get('application/rate_limit_status.json', { resources });
     }
     /**
      * Returns the list of languages supported by Twitter along with the language code supported by Twitter.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/developer-utilities/supported-languages/api-reference/get-help-languages
+     * https://developer.x.com/en/docs/twitter-api/v1/developer-utilities/supported-languages/api-reference/get-help-languages
      */
     supportedLanguages() {
         return this.get('help/languages.json');
@@ -8970,7 +10322,7 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
     /* Tweet API */
     /**
      * Post a new tweet.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/post-statuses-update
+     * https://developer.x.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/post-statuses-update
      */
     tweet(status, payload = {}) {
         const queryParams = {
@@ -8982,15 +10334,15 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
     }
     /**
      * Quote an existing tweet.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/post-statuses-update
+     * https://developer.x.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/post-statuses-update
      */
     async quote(status, quotingStatusId, payload = {}) {
-        const url = 'https://twitter.com/i/statuses/' + quotingStatusId;
+        const url = 'https://x.com/i/statuses/' + quotingStatusId;
         return this.tweet(status, { ...payload, attachment_url: url });
     }
     /**
      * Post a series of tweets.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/post-statuses-update
+     * https://developer.x.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/post-statuses-update
      */
     async tweetThread(tweets) {
         const postedTweets = [];
@@ -9013,7 +10365,7 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
     }
     /**
      * Reply to an existing tweet. Shortcut to `.tweet` with tweaked parameters.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/post-statuses-update
+     * https://developer.x.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/post-statuses-update
      */
     reply(status, in_reply_to_status_id, payload = {}) {
         return this.tweet(status, {
@@ -9024,7 +10376,7 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
     }
     /**
      * Delete an existing tweet belonging to you.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/post-statuses-destroy-id
+     * https://developer.x.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/post-statuses-destroy-id
      */
     deleteTweet(tweetId) {
         return this.post('statuses/destroy/:id.json', { tweet_mode: 'extended' }, { params: { id: tweetId } });
@@ -9033,28 +10385,28 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
     /**
      * Report the specified user as a spam account to Twitter.
      * Additionally, optionally performs the equivalent of POST blocks/create on behalf of the authenticated user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/mute-block-report-users/api-reference/post-users-report_spam
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/mute-block-report-users/api-reference/post-users-report_spam
      */
     reportUserAsSpam(options) {
         return this.post('users/report_spam.json', { tweet_mode: 'extended', ...options });
     }
     /**
      * Turn on/off Retweets and device notifications from the specified user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/post-friendships-update
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/post-friendships-update
      */
     updateFriendship(options) {
         return this.post('friendships/update.json', options);
     }
     /**
      * Follow the specified user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/post-friendships-create
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/post-friendships-create
      */
     createFriendship(options) {
         return this.post('friendships/create.json', options);
     }
     /**
      * Unfollow the specified user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/post-friendships-destroy
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/post-friendships-destroy
      */
     destroyFriendship(options) {
         return this.post('friendships/destroy.json', options);
@@ -9062,21 +10414,21 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
     /* Account API */
     /**
      * Update current account settings for authenticating user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/get-account-settings
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/get-account-settings
      */
     updateAccountSettings(options) {
         return this.post('account/settings.json', options);
     }
     /**
      * Sets some values that users are able to set under the "Account" tab of their settings page.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/post-account-update_profile
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/post-account-update_profile
      */
     updateAccountProfile(options) {
         return this.post('account/update_profile.json', options);
     }
     /**
      * Uploads a profile banner on behalf of the authenticating user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/post-account-update_profile_banner
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/post-account-update_profile_banner
      */
     async updateAccountProfileBanner(file, options = {}) {
         const queryParams = {
@@ -9087,7 +10439,7 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
     }
     /**
      * Updates the authenticating user's profile image.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/post-account-update_profile_image
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/post-account-update_profile_image
      */
     async updateAccountProfileImage(file, options = {}) {
         const queryParams = {
@@ -9099,7 +10451,7 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
     }
     /**
      * Removes the uploaded profile banner for the authenticating user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/post-account-remove_profile_banner
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/post-account-remove_profile_banner
      */
     removeAccountProfileBanner() {
         return this.post('account/remove_profile_banner.json');
@@ -9107,21 +10459,21 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
     /* Lists */
     /**
      * Creates a new list for the authenticated user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-create
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-create
      */
     createList(options) {
         return this.post('lists/create.json', { tweet_mode: 'extended', ...options });
     }
     /**
      * Updates the specified list. The authenticated user must own the list to be able to update it.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-update
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-update
      */
     updateList(options) {
         return this.post('lists/update.json', { tweet_mode: 'extended', ...options });
     }
     /**
      * Deletes the specified list. The authenticated user must own the list to be able to destroy it.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-destroy
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-destroy
      */
     removeList(options) {
         return this.post('lists/destroy.json', { tweet_mode: 'extended', ...options });
@@ -9130,7 +10482,7 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
      * Adds multiple members to a list, by specifying a comma-separated list of member ids or screen names.
      * If you add a single `user_id` or `screen_name`, it will target `lists/members/create.json`, otherwise
      * it will target `lists/members/create_all.json`.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-members-create_all
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-members-create_all
      */
     addListMembers(options) {
         const hasMultiple = (options.user_id && (0, helpers_1.hasMultipleItems)(options.user_id)) || (options.screen_name && (0, helpers_1.hasMultipleItems)(options.screen_name));
@@ -9141,7 +10493,7 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
      * Removes multiple members to a list, by specifying a comma-separated list of member ids or screen names.
      * If you add a single `user_id` or `screen_name`, it will target `lists/members/destroy.json`, otherwise
      * it will target `lists/members/destroy_all.json`.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-members-destroy_all
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-members-destroy_all
      */
     removeListMembers(options) {
         const hasMultiple = (options.user_id && (0, helpers_1.hasMultipleItems)(options.user_id)) || (options.screen_name && (0, helpers_1.hasMultipleItems)(options.screen_name));
@@ -9150,14 +10502,14 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
     }
     /**
      * Subscribes the authenticated user to the specified list.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-subscribers-create
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-subscribers-create
      */
     subscribeToList(options) {
         return this.post('lists/subscribers/create.json', { tweet_mode: 'extended', ...options });
     }
     /**
      * Unsubscribes the authenticated user of the specified list.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-subscribers-destroy
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-subscribers-destroy
      */
     unsubscribeOfList(options) {
         return this.post('lists/subscribers/destroy.json', { tweet_mode: 'extended', ...options });
@@ -9166,7 +10518,7 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
     /**
      * This endpoint can be used to provide additional information about the uploaded media_id.
      * This feature is currently only supported for images and GIFs.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/media/upload-media/api-reference/post-media-metadata-create
+     * https://developer.x.com/en/docs/twitter-api/v1/media/upload-media/api-reference/post-media-metadata-create
      */
     createMediaMetadata(mediaId, metadata) {
         return this.post('media/metadata/create.json', { media_id: mediaId, ...metadata }, { prefix: globals_1.API_V1_1_UPLOAD_PREFIX, forceBodyMode: 'json' });
@@ -9175,14 +10527,14 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
      * Use this endpoint to associate uploaded subtitles to an uploaded video. You can associate subtitles to video before or after Tweeting.
      * **To obtain subtitle media ID, you must upload each subtitle file separately using `.uploadMedia()` method.**
      *
-     * https://developer.twitter.com/en/docs/twitter-api/v1/media/upload-media/api-reference/post-media-subtitles-create
+     * https://developer.x.com/en/docs/twitter-api/v1/media/upload-media/api-reference/post-media-subtitles-create
      */
     createMediaSubtitles(mediaId, subtitles) {
         return this.post('media/subtitles/create.json', { media_id: mediaId, media_category: 'TweetVideo', subtitle_info: { subtitles } }, { prefix: globals_1.API_V1_1_UPLOAD_PREFIX, forceBodyMode: 'json' });
     }
     /**
      * Use this endpoint to dissociate subtitles from a video and delete the subtitles. You can dissociate subtitles from a video before or after Tweeting.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/media/upload-media/api-reference/post-media-subtitles-delete
+     * https://developer.x.com/en/docs/twitter-api/v1/media/upload-media/api-reference/post-media-subtitles-delete
      */
     deleteMediaSubtitles(mediaId, ...languages) {
         return this.post('media/subtitles/delete.json', {
@@ -9727,7 +11079,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
      * since the first Tweet was created March 26, 2006.
      *
      * This endpoint is only available to those users who have been approved for the Academic Research product track.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/search/api-reference/get-tweets-search-all
+     * https://developer.x.com/en/docs/twitter-api/tweets/search/api-reference/get-tweets-search-all
      */
     async searchAll(query, options = {}) {
         const queryParams = { ...options, query };
@@ -9741,7 +11093,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns a variety of information about a single Tweet specified by the requested ID.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/lookup/api-reference/get-tweets-id
+     * https://developer.x.com/en/docs/twitter-api/tweets/lookup/api-reference/get-tweets-id
      *
      * OAuth2 scope: `users.read`, `tweet.read`
      */
@@ -9750,7 +11102,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns a variety of information about tweets specified by list of IDs.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/lookup/api-reference/get-tweets
+     * https://developer.x.com/en/docs/twitter-api/tweets/lookup/api-reference/get-tweets
      *
      * OAuth2 scope: `users.read`, `tweet.read`
      */
@@ -9760,7 +11112,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     /**
      * The recent Tweet counts endpoint returns count of Tweets from the last seven days that match a search query.
      * OAuth2 Bearer auth only.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/counts/api-reference/get-tweets-counts-recent
+     * https://developer.x.com/en/docs/twitter-api/tweets/counts/api-reference/get-tweets-counts-recent
      */
     tweetCountRecent(query, options = {}) {
         return this.get('tweets/counts/recent', { query, ...options });
@@ -9771,7 +11123,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
      * since the first Tweet was created March 26, 2006.
      * OAuth2 Bearer auth only.
      * **This endpoint has pagination, yet it is not supported by bundled paginators. Use `next_token` to fetch next page.**
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/counts/api-reference/get-tweets-counts-all
+     * https://developer.x.com/en/docs/twitter-api/tweets/counts/api-reference/get-tweets-counts-all
      */
     tweetCountAll(query, options = {}) {
         return this.get('tweets/counts/all', { query, ...options });
@@ -9813,7 +11165,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     /**
      * Allows you to retrieve a collection of the most recent Tweets and Retweets posted by you and users you follow, also known as home timeline.
      * This endpoint returns up to the last 3200 Tweets.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/timelines/api-reference/get-users-id-reverse-chronological
+     * https://developer.x.com/en/docs/twitter-api/tweets/timelines/api-reference/get-users-id-reverse-chronological
      *
      * OAuth 2 scopes: `tweet.read` `users.read`
      */
@@ -9835,7 +11187,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
      * Returns Tweets composed by a single user, specified by the requested user ID.
      * By default, the most recent ten Tweets are returned per request.
      * Using pagination, the most recent 3,200 Tweets can be retrieved.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/timelines/api-reference/get-users-id-tweets
+     * https://developer.x.com/en/docs/twitter-api/tweets/timelines/api-reference/get-users-id-tweets
      */
     async userTimeline(userId, options = {}) {
         const initialRq = await this.get('users/:id/tweets', options, {
@@ -9854,7 +11206,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
      * Returns Tweets mentioning a single user specified by the requested user ID.
      * By default, the most recent ten Tweets are returned per request.
      * Using pagination, up to the most recent 800 Tweets can be retrieved.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/timelines/api-reference/get-users-id-mentions
+     * https://developer.x.com/en/docs/twitter-api/tweets/timelines/api-reference/get-users-id-mentions
      */
     async userMentionTimeline(userId, options = {}) {
         const initialRq = await this.get('users/:id/mentions', options, {
@@ -9871,7 +11223,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns Quote Tweets for a Tweet specified by the requested Tweet ID.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/quote-tweets/api-reference/get-tweets-id-quote_tweets
+     * https://developer.x.com/en/docs/twitter-api/tweets/quote-tweets/api-reference/get-tweets-id-quote_tweets
      *
      * OAuth2 scopes: `users.read` `tweet.read`
      */
@@ -9891,7 +11243,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     /* Bookmarks */
     /**
      * Allows you to get information about a authenticated user’s 800 most recent bookmarked Tweets.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/bookmarks/api-reference/get-users-id-bookmarks
+     * https://developer.x.com/en/docs/twitter-api/tweets/bookmarks/api-reference/get-users-id-bookmarks
      *
      * OAuth2 scopes: `users.read` `tweet.read` `bookmark.read`
      */
@@ -9912,7 +11264,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     /* Users */
     /**
      * Returns information about an authorized user.
-     * https://developer.twitter.com/en/docs/twitter-api/users/lookup/api-reference/get-users-me
+     * https://developer.x.com/en/docs/twitter-api/users/lookup/api-reference/get-users-me
      *
      * OAuth2 scopes: `tweet.read` & `users.read`
      */
@@ -9921,14 +11273,14 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns a variety of information about a single user specified by the requested ID.
-     * https://developer.twitter.com/en/docs/twitter-api/users/lookup/api-reference/get-users-id
+     * https://developer.x.com/en/docs/twitter-api/users/lookup/api-reference/get-users-id
      */
     user(userId, options = {}) {
         return this.get('users/:id', options, { params: { id: userId } });
     }
     /**
      * Returns a variety of information about one or more users specified by the requested IDs.
-     * https://developer.twitter.com/en/docs/twitter-api/users/lookup/api-reference/get-users
+     * https://developer.x.com/en/docs/twitter-api/users/lookup/api-reference/get-users
      */
     users(userIds, options = {}) {
         const ids = Array.isArray(userIds) ? userIds.join(',') : userIds;
@@ -9936,14 +11288,14 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns a variety of information about a single user specified by their username.
-     * https://developer.twitter.com/en/docs/twitter-api/users/lookup/api-reference/get-users-by-username-username
+     * https://developer.x.com/en/docs/twitter-api/users/lookup/api-reference/get-users-by-username-username
      */
     userByUsername(username, options = {}) {
         return this.get('users/by/username/:username', options, { params: { username } });
     }
     /**
      * Returns a variety of information about one or more users specified by their usernames.
-     * https://developer.twitter.com/en/docs/twitter-api/users/lookup/api-reference/get-users-by
+     * https://developer.x.com/en/docs/twitter-api/users/lookup/api-reference/get-users-by
      *
      * OAuth2 scope: `users.read`, `tweet.read`
      */
@@ -9983,7 +11335,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Allows you to get information about a user’s liked Tweets.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/likes/api-reference/get-users-id-liked_tweets
+     * https://developer.x.com/en/docs/twitter-api/tweets/likes/api-reference/get-users-id-liked_tweets
      */
     async userLikedTweets(userId, options = {}) {
         const params = { id: userId };
@@ -9998,7 +11350,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns a list of users who are blocked by the authenticating user.
-     * https://developer.twitter.com/en/docs/twitter-api/users/blocks/api-reference/get-users-blocking
+     * https://developer.x.com/en/docs/twitter-api/users/blocks/api-reference/get-users-blocking
      */
     async userBlockingUsers(userId, options = {}) {
         const params = { id: userId };
@@ -10013,7 +11365,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns a list of users who are muted by the authenticating user.
-     * https://developer.twitter.com/en/docs/twitter-api/users/mutes/api-reference/get-users-muting
+     * https://developer.x.com/en/docs/twitter-api/users/mutes/api-reference/get-users-muting
      */
     async userMutingUsers(userId, options = {}) {
         const params = { id: userId };
@@ -10029,14 +11381,14 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     /* Lists */
     /**
      * Returns the details of a specified List.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/list-lookup/api-reference/get-lists-id
+     * https://developer.x.com/en/docs/twitter-api/lists/list-lookup/api-reference/get-lists-id
      */
     list(id, options = {}) {
         return this.get('lists/:id', options, { params: { id } });
     }
     /**
      * Returns all Lists owned by the specified user.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/list-lookup/api-reference/get-users-id-owned_lists
+     * https://developer.x.com/en/docs/twitter-api/lists/list-lookup/api-reference/get-users-id-owned_lists
      */
     async listsOwned(userId, options = {}) {
         const params = { id: userId };
@@ -10051,7 +11403,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns all Lists a specified user is a member of.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/list-members/api-reference/get-users-id-list_memberships
+     * https://developer.x.com/en/docs/twitter-api/lists/list-members/api-reference/get-users-id-list_memberships
      */
     async listMemberships(userId, options = {}) {
         const params = { id: userId };
@@ -10066,7 +11418,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns all Lists a specified user follows.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/list-follows/api-reference/get-users-id-followed_lists
+     * https://developer.x.com/en/docs/twitter-api/lists/list-follows/api-reference/get-users-id-followed_lists
      */
     async listFollowed(userId, options = {}) {
         const params = { id: userId };
@@ -10081,7 +11433,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns a list of Tweets from the specified List.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/list-tweets/api-reference/get-lists-id-tweets
+     * https://developer.x.com/en/docs/twitter-api/lists/list-tweets/api-reference/get-lists-id-tweets
      */
     async listTweets(listId, options = {}) {
         const params = { id: listId };
@@ -10096,7 +11448,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns a list of users who are members of the specified List.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/list-members/api-reference/get-lists-id-members
+     * https://developer.x.com/en/docs/twitter-api/lists/list-members/api-reference/get-lists-id-members
      */
     async listMembers(listId, options = {}) {
         const params = { id: listId };
@@ -10111,7 +11463,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns a list of users who are followers of the specified List.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/list-follows/api-reference/get-lists-id-followers
+     * https://developer.x.com/en/docs/twitter-api/lists/list-follows/api-reference/get-lists-id-followers
      */
     async listFollowers(listId, options = {}) {
         const params = { id: listId };
@@ -10132,7 +11484,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
      *
      * OAuth 2 scopes: `dm.read`, `tweet.read`, `user.read`
      *
-     * https://developer.twitter.com/en/docs/twitter-api/direct-messages/lookup/api-reference/get-dm_events
+     * https://developer.x.com/en/docs/twitter-api/direct-messages/lookup/api-reference/get-dm_events
      */
     async listDmEvents(options = {}) {
         const initialRq = await this.get('dm_events', options, { fullResponse: true });
@@ -10149,7 +11501,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
      *
      * OAuth 2 scopes: `dm.read`, `tweet.read`, `user.read`
      *
-     * https://developer.twitter.com/en/docs/twitter-api/direct-messages/lookup/api-reference/get-dm_conversations-dm_conversation_id-dm_events
+     * https://developer.x.com/en/docs/twitter-api/direct-messages/lookup/api-reference/get-dm_conversations-dm_conversation_id-dm_events
      */
     async listDmEventsWithParticipant(participantId, options = {}) {
         const params = { participant_id: participantId };
@@ -10168,7 +11520,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
      *
      * OAuth 2 scopes: `dm.read`, `tweet.read`, `user.read`
      *
-     * https://developer.twitter.com/en/docs/twitter-api/direct-messages/lookup/api-reference/get-dm_conversations-dm_conversation_id-dm_events
+     * https://developer.x.com/en/docs/twitter-api/direct-messages/lookup/api-reference/get-dm_conversations-dm_conversation_id-dm_events
      */
     async listDmEventsOfConversation(dmConversationId, options = {}) {
         const params = { dm_conversation_id: dmConversationId };
@@ -10184,7 +11536,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     /* Spaces */
     /**
      * Get a single space by ID.
-     * https://developer.twitter.com/en/docs/twitter-api/spaces/lookup/api-reference/get-spaces-id
+     * https://developer.x.com/en/docs/twitter-api/spaces/lookup/api-reference/get-spaces-id
      *
      * OAuth2 scopes: `tweet.read`, `users.read`, `space.read`.
      */
@@ -10193,7 +11545,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Get spaces using their IDs.
-     * https://developer.twitter.com/en/docs/twitter-api/spaces/lookup/api-reference/get-spaces
+     * https://developer.x.com/en/docs/twitter-api/spaces/lookup/api-reference/get-spaces
      *
      * OAuth2 scopes: `tweet.read`, `users.read`, `space.read`.
      */
@@ -10202,7 +11554,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Get spaces using their creator user ID(s). (no pagination available)
-     * https://developer.twitter.com/en/docs/twitter-api/spaces/lookup/api-reference/get-spaces-by-creator-ids
+     * https://developer.x.com/en/docs/twitter-api/spaces/lookup/api-reference/get-spaces-by-creator-ids
      *
      * OAuth2 scopes: `tweet.read`, `users.read`, `space.read`.
      */
@@ -10211,7 +11563,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Search through spaces using multiple params. (no pagination available)
-     * https://developer.twitter.com/en/docs/twitter-api/spaces/search/api-reference/get-spaces-search
+     * https://developer.x.com/en/docs/twitter-api/spaces/search/api-reference/get-spaces-search
      */
     searchSpaces(options) {
         return this.get('spaces/search', options);
@@ -10222,7 +11574,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     *
     * **OAuth 2.0 Access Token required**
     *
-    * https://developer.twitter.com/en/docs/twitter-api/spaces/lookup/api-reference/get-spaces-id-buyers
+    * https://developer.x.com/en/docs/twitter-api/spaces/lookup/api-reference/get-spaces-id-buyers
     *
     * OAuth2 scopes: `tweet.read`, `users.read`, `space.read`.
     */
@@ -10231,7 +11583,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns Tweets shared in the requested Spaces.
-     * https://developer.twitter.com/en/docs/twitter-api/spaces/lookup/api-reference/get-spaces-id-tweets
+     * https://developer.x.com/en/docs/twitter-api/spaces/lookup/api-reference/get-spaces-id-tweets
      *
      * OAuth2 scope: `users.read`, `tweet.read`, `space.read`
      */
@@ -10243,7 +11595,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Return a list of rules currently active on the streaming endpoint, either as a list or individually.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream-rules
+     * https://developer.x.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream-rules
      */
     streamRules(options = {}) {
         return this.get('tweets/search/stream/rules', options);
@@ -10260,14 +11612,14 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     /* Batch compliance */
     /**
      * Returns a list of recent compliance jobs.
-     * https://developer.twitter.com/en/docs/twitter-api/compliance/batch-compliance/api-reference/get-compliance-jobs
+     * https://developer.x.com/en/docs/twitter-api/compliance/batch-compliance/api-reference/get-compliance-jobs
      */
     complianceJobs(options) {
         return this.get('compliance/jobs', options);
     }
     /**
      * Get a single compliance job with the specified ID.
-     * https://developer.twitter.com/en/docs/twitter-api/compliance/batch-compliance/api-reference/get-compliance-jobs-id
+     * https://developer.x.com/en/docs/twitter-api/compliance/batch-compliance/api-reference/get-compliance-jobs-id
      */
     complianceJob(jobId) {
         return this.get('compliance/jobs/:id', undefined, { params: { id: jobId } });
@@ -10277,7 +11629,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
      * You can run one batch job at a time. Returns the created job, but **not the job result!**.
      *
      * You can obtain the result (**after job is completed**) with `.complianceJobResult`.
-     * https://developer.twitter.com/en/docs/twitter-api/compliance/batch-compliance/api-reference/post-compliance-jobs
+     * https://developer.x.com/en/docs/twitter-api/compliance/batch-compliance/api-reference/post-compliance-jobs
      */
     async sendComplianceJob(jobParams) {
         const job = await this.post('compliance/jobs', { type: jobParams.type, name: jobParams.name });
@@ -10295,7 +11647,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     /**
      * Get the result of a running or completed job, obtained through `.complianceJob`, `.complianceJobs` or `.sendComplianceJob`.
      * If job is still running (`in_progress`), it will await until job is completed. **This could be quite long!**
-     * https://developer.twitter.com/en/docs/twitter-api/compliance/batch-compliance/api-reference/post-compliance-jobs
+     * https://developer.x.com/en/docs/twitter-api/compliance/batch-compliance/api-reference/post-compliance-jobs
      */
     async complianceJobResult(job) {
         let runningJob = job;
@@ -10361,14 +11713,14 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     /* Tweets */
     /**
      * Hides or unhides a reply to a Tweet.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/hide-replies/api-reference/put-tweets-id-hidden
+     * https://developer.x.com/en/docs/twitter-api/tweets/hide-replies/api-reference/put-tweets-id-hidden
      */
     hideReply(tweetId, makeHidden) {
         return this.put('tweets/:id/hidden', { hidden: makeHidden }, { params: { id: tweetId } });
     }
     /**
      * Causes the user ID identified in the path parameter to Like the target Tweet.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/likes/api-reference/post-users-user_id-likes
+     * https://developer.x.com/en/docs/twitter-api/tweets/likes/api-reference/post-users-user_id-likes
      *
      * **Note**: You must specify the currently logged user ID ; you can obtain it through v1.1 API.
      */
@@ -10378,7 +11730,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     /**
      * Allows a user or authenticated user ID to unlike a Tweet.
      * The request succeeds with no action when the user sends a request to a user they're not liking the Tweet or have already unliked the Tweet.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/likes/api-reference/delete-users-id-likes-tweet_id
+     * https://developer.x.com/en/docs/twitter-api/tweets/likes/api-reference/delete-users-id-likes-tweet_id
      *
      * **Note**: You must specify the currently logged user ID ; you can obtain it through v1.1 API.
      */
@@ -10389,7 +11741,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     }
     /**
      * Causes the user ID identified in the path parameter to Retweet the target Tweet.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/retweets/api-reference/post-users-id-retweets
+     * https://developer.x.com/en/docs/twitter-api/tweets/retweets/api-reference/post-users-id-retweets
      *
      * **Note**: You must specify the currently logged user ID ; you can obtain it through v1.1 API.
      */
@@ -10399,7 +11751,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     /**
      * Allows a user or authenticated user ID to remove the Retweet of a Tweet.
      * The request succeeds with no action when the user sends a request to a user they're not Retweeting the Tweet or have already removed the Retweet of.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/retweets/api-reference/delete-users-id-retweets-tweet_id
+     * https://developer.x.com/en/docs/twitter-api/tweets/retweets/api-reference/delete-users-id-retweets-tweet_id
      *
      * **Note**: You must specify the currently logged user ID ; you can obtain it through v1.1 API.
      */
@@ -10419,7 +11771,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     }
     /**
      * Reply to a Tweet on behalf of an authenticated user.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/manage-tweets/api-reference/post-tweets
+     * https://developer.x.com/en/docs/twitter-api/tweets/manage-tweets/api-reference/post-tweets
      */
     reply(status, toTweetId, payload = {}) {
         var _a;
@@ -10428,14 +11780,14 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     }
     /**
      * Quote an existing Tweet on behalf of an authenticated user.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/manage-tweets/api-reference/post-tweets
+     * https://developer.x.com/en/docs/twitter-api/tweets/manage-tweets/api-reference/post-tweets
      */
     quote(status, quotedTweetId, payload = {}) {
         return this.tweet(status, { ...payload, quote_tweet_id: quotedTweetId });
     }
     /**
      * Post a series of tweets.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/manage-tweets/api-reference/post-tweets
+     * https://developer.x.com/en/docs/twitter-api/tweets/manage-tweets/api-reference/post-tweets
      */
     async tweetThread(tweets) {
         var _a, _b;
@@ -10459,7 +11811,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     }
     /**
      * Allows a user or authenticated user ID to delete a Tweet
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/manage-tweets/api-reference/delete-tweets-id
+     * https://developer.x.com/en/docs/twitter-api/tweets/manage-tweets/api-reference/delete-tweets-id
      */
     deleteTweet(tweetId) {
         return this.delete('tweets/:id', undefined, {
@@ -10471,7 +11823,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     /* Bookmarks */
     /**
      * Causes the user ID of an authenticated user identified in the path parameter to Bookmark the target Tweet provided in the request body.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/bookmarks/api-reference/post-users-id-bookmarks
+     * https://developer.x.com/en/docs/twitter-api/tweets/bookmarks/api-reference/post-users-id-bookmarks
      *
      * OAuth2 scopes: `users.read` `tweet.read` `bookmark.write`
      */
@@ -10481,7 +11833,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     }
     /**
      * Allows a user or authenticated user ID to remove a Bookmark of a Tweet.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/bookmarks/api-reference/delete-users-id-bookmarks-tweet_id
+     * https://developer.x.com/en/docs/twitter-api/tweets/bookmarks/api-reference/delete-users-id-bookmarks-tweet_id
      *
      * OAuth2 scopes: `users.read` `tweet.read` `bookmark.write`
      */
@@ -10493,7 +11845,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     /**
      * Allows a user ID to follow another user.
      * If the target user does not have public Tweets, this endpoint will send a follow request.
-     * https://developer.twitter.com/en/docs/twitter-api/users/follows/api-reference/post-users-source_user_id-following
+     * https://developer.x.com/en/docs/twitter-api/users/follows/api-reference/post-users-source_user_id-following
      *
      * OAuth2 scope: `follows.write`
      *
@@ -10504,7 +11856,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     }
     /**
      * Allows a user ID to unfollow another user.
-     * https://developer.twitter.com/en/docs/twitter-api/users/follows/api-reference/delete-users-source_id-following
+     * https://developer.x.com/en/docs/twitter-api/users/follows/api-reference/delete-users-source_id-following
      *
      * OAuth2 scope: `follows.write`
      *
@@ -10518,7 +11870,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     /**
      * Causes the user (in the path) to block the target user.
      * The user (in the path) must match the user context authorizing the request.
-     * https://developer.twitter.com/en/docs/twitter-api/users/blocks/api-reference/post-users-user_id-blocking
+     * https://developer.x.com/en/docs/twitter-api/users/blocks/api-reference/post-users-user_id-blocking
      *
      * **Note**: You must specify the currently logged user ID; you can obtain it through v1.1 API.
      */
@@ -10527,7 +11879,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     }
     /**
      * Allows a user or authenticated user ID to unblock another user.
-     * https://developer.twitter.com/en/docs/twitter-api/users/blocks/api-reference/delete-users-user_id-blocking
+     * https://developer.x.com/en/docs/twitter-api/users/blocks/api-reference/delete-users-user_id-blocking
      *
      * **Note**: You must specify the currently logged user ID ; you can obtain it through v1.1 API.
      */
@@ -10538,7 +11890,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     }
     /**
      * Allows an authenticated user ID to mute the target user.
-     * https://developer.twitter.com/en/docs/twitter-api/users/mutes/api-reference/post-users-user_id-muting
+     * https://developer.x.com/en/docs/twitter-api/users/mutes/api-reference/post-users-user_id-muting
      *
      * **Note**: You must specify the currently logged user ID ; you can obtain it through v1.1 API.
      */
@@ -10548,7 +11900,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     /**
      * Allows an authenticated user ID to unmute the target user.
      * The request succeeds with no action when the user sends a request to a user they're not muting or have already unmuted.
-     * https://developer.twitter.com/en/docs/twitter-api/users/mutes/api-reference/delete-users-user_id-muting
+     * https://developer.x.com/en/docs/twitter-api/users/mutes/api-reference/delete-users-user_id-muting
      *
      * **Note**: You must specify the currently logged user ID ; you can obtain it through v1.1 API.
      */
@@ -10560,63 +11912,63 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     /* Lists */
     /**
      * Creates a new list for the authenticated user.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/manage-lists/api-reference/post-lists
+     * https://developer.x.com/en/docs/twitter-api/lists/manage-lists/api-reference/post-lists
      */
     createList(options) {
         return this.post('lists', options);
     }
     /**
      * Updates the specified list. The authenticated user must own the list to be able to update it.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/manage-lists/api-reference/put-lists-id
+     * https://developer.x.com/en/docs/twitter-api/lists/manage-lists/api-reference/put-lists-id
      */
     updateList(listId, options = {}) {
         return this.put('lists/:id', options, { params: { id: listId } });
     }
     /**
      * Deletes the specified list. The authenticated user must own the list to be able to destroy it.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/manage-lists/api-reference/delete-lists-id
+     * https://developer.x.com/en/docs/twitter-api/lists/manage-lists/api-reference/delete-lists-id
      */
     removeList(listId) {
         return this.delete('lists/:id', undefined, { params: { id: listId } });
     }
     /**
      * Adds a member to a list.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/list-members/api-reference/post-lists-id-members
+     * https://developer.x.com/en/docs/twitter-api/lists/list-members/api-reference/post-lists-id-members
      */
     addListMember(listId, userId) {
         return this.post('lists/:id/members', { user_id: userId }, { params: { id: listId } });
     }
     /**
      * Remember a member to a list.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/list-members/api-reference/delete-lists-id-members-user_id
+     * https://developer.x.com/en/docs/twitter-api/lists/list-members/api-reference/delete-lists-id-members-user_id
      */
     removeListMember(listId, userId) {
         return this.delete('lists/:id/members/:user_id', undefined, { params: { id: listId, user_id: userId } });
     }
     /**
      * Subscribes the authenticated user to the specified list.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/manage-lists/api-reference/post-users-id-followed-lists
+     * https://developer.x.com/en/docs/twitter-api/lists/manage-lists/api-reference/post-users-id-followed-lists
      */
     subscribeToList(loggedUserId, listId) {
         return this.post('users/:id/followed_lists', { list_id: listId }, { params: { id: loggedUserId } });
     }
     /**
      * Unsubscribes the authenticated user to the specified list.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/manage-lists/api-reference/delete-users-id-followed-lists-list_id
+     * https://developer.x.com/en/docs/twitter-api/lists/manage-lists/api-reference/delete-users-id-followed-lists-list_id
      */
     unsubscribeOfList(loggedUserId, listId) {
         return this.delete('users/:id/followed_lists/:list_id', undefined, { params: { id: loggedUserId, list_id: listId } });
     }
     /**
      * Enables the authenticated user to pin a List.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/manage-lists/api-reference/post-users-id-pinned-lists
+     * https://developer.x.com/en/docs/twitter-api/lists/manage-lists/api-reference/post-users-id-pinned-lists
      */
     pinList(loggedUserId, listId) {
         return this.post('users/:id/pinned_lists', { list_id: listId }, { params: { id: loggedUserId } });
     }
     /**
      * Enables the authenticated user to unpin a List.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/manage-lists/api-reference/delete-users-id-pinned-lists-list_id
+     * https://developer.x.com/en/docs/twitter-api/lists/manage-lists/api-reference/delete-users-id-pinned-lists-list_id
      */
     unpinList(loggedUserId, listId) {
         return this.delete('users/:id/pinned_lists/:list_id', undefined, { params: { id: loggedUserId, list_id: listId } });
@@ -10624,7 +11976,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     /* Direct messages */
     /**
      * Creates a Direct Message on behalf of an authenticated user, and adds it to the specified conversation.
-     * https://developer.twitter.com/en/docs/twitter-api/direct-messages/manage/api-reference/post-dm_conversations-dm_conversation_id-messages
+     * https://developer.x.com/en/docs/twitter-api/direct-messages/manage/api-reference/post-dm_conversations-dm_conversation_id-messages
      */
     sendDmInConversation(conversationId, message) {
         return this.post('dm_conversations/:dm_conversation_id/messages', message, { params: { dm_conversation_id: conversationId } });
@@ -10632,14 +11984,14 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     /**
      * Creates a one-to-one Direct Message and adds it to the one-to-one conversation.
      * This method either creates a new one-to-one conversation or retrieves the current conversation and adds the Direct Message to it.
-     * https://developer.twitter.com/en/docs/twitter-api/direct-messages/manage/api-reference/post-dm_conversations-with-participant_id-messages
+     * https://developer.x.com/en/docs/twitter-api/direct-messages/manage/api-reference/post-dm_conversations-with-participant_id-messages
      */
     sendDmToParticipant(participantId, message) {
         return this.post('dm_conversations/with/:participant_id/messages', message, { params: { participant_id: participantId } });
     }
     /**
      * Creates a new group conversation and adds a Direct Message to it on behalf of an authenticated user.
-     * https://developer.twitter.com/en/docs/twitter-api/direct-messages/manage/api-reference/post-dm_conversations
+     * https://developer.x.com/en/docs/twitter-api/direct-messages/manage/api-reference/post-dm_conversations
      */
     createDmConversation(options) {
         return this.post('dm_conversations', options);
@@ -33029,652 +34381,6 @@ module.exports = {
 
 /***/ }),
 
-/***/ 2048:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-Object.defineProperty(exports, "v1", ({
-  enumerable: true,
-  get: function () {
-    return _v.default;
-  }
-}));
-Object.defineProperty(exports, "v3", ({
-  enumerable: true,
-  get: function () {
-    return _v2.default;
-  }
-}));
-Object.defineProperty(exports, "v4", ({
-  enumerable: true,
-  get: function () {
-    return _v3.default;
-  }
-}));
-Object.defineProperty(exports, "v5", ({
-  enumerable: true,
-  get: function () {
-    return _v4.default;
-  }
-}));
-Object.defineProperty(exports, "NIL", ({
-  enumerable: true,
-  get: function () {
-    return _nil.default;
-  }
-}));
-Object.defineProperty(exports, "version", ({
-  enumerable: true,
-  get: function () {
-    return _version.default;
-  }
-}));
-Object.defineProperty(exports, "validate", ({
-  enumerable: true,
-  get: function () {
-    return _validate.default;
-  }
-}));
-Object.defineProperty(exports, "stringify", ({
-  enumerable: true,
-  get: function () {
-    return _stringify.default;
-  }
-}));
-Object.defineProperty(exports, "parse", ({
-  enumerable: true,
-  get: function () {
-    return _parse.default;
-  }
-}));
-
-var _v = _interopRequireDefault(__nccwpck_require__(6415));
-
-var _v2 = _interopRequireDefault(__nccwpck_require__(1697));
-
-var _v3 = _interopRequireDefault(__nccwpck_require__(4676));
-
-var _v4 = _interopRequireDefault(__nccwpck_require__(9771));
-
-var _nil = _interopRequireDefault(__nccwpck_require__(7723));
-
-var _version = _interopRequireDefault(__nccwpck_require__(5868));
-
-var _validate = _interopRequireDefault(__nccwpck_require__(6200));
-
-var _stringify = _interopRequireDefault(__nccwpck_require__(7597));
-
-var _parse = _interopRequireDefault(__nccwpck_require__(7267));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/***/ }),
-
-/***/ 216:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports["default"] = void 0;
-
-var _crypto = _interopRequireDefault(__nccwpck_require__(6982));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function md5(bytes) {
-  if (Array.isArray(bytes)) {
-    bytes = Buffer.from(bytes);
-  } else if (typeof bytes === 'string') {
-    bytes = Buffer.from(bytes, 'utf8');
-  }
-
-  return _crypto.default.createHash('md5').update(bytes).digest();
-}
-
-var _default = md5;
-exports["default"] = _default;
-
-/***/ }),
-
-/***/ 7723:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports["default"] = void 0;
-var _default = '00000000-0000-0000-0000-000000000000';
-exports["default"] = _default;
-
-/***/ }),
-
-/***/ 7267:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports["default"] = void 0;
-
-var _validate = _interopRequireDefault(__nccwpck_require__(6200));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function parse(uuid) {
-  if (!(0, _validate.default)(uuid)) {
-    throw TypeError('Invalid UUID');
-  }
-
-  let v;
-  const arr = new Uint8Array(16); // Parse ########-....-....-....-............
-
-  arr[0] = (v = parseInt(uuid.slice(0, 8), 16)) >>> 24;
-  arr[1] = v >>> 16 & 0xff;
-  arr[2] = v >>> 8 & 0xff;
-  arr[3] = v & 0xff; // Parse ........-####-....-....-............
-
-  arr[4] = (v = parseInt(uuid.slice(9, 13), 16)) >>> 8;
-  arr[5] = v & 0xff; // Parse ........-....-####-....-............
-
-  arr[6] = (v = parseInt(uuid.slice(14, 18), 16)) >>> 8;
-  arr[7] = v & 0xff; // Parse ........-....-....-####-............
-
-  arr[8] = (v = parseInt(uuid.slice(19, 23), 16)) >>> 8;
-  arr[9] = v & 0xff; // Parse ........-....-....-....-############
-  // (Use "/" to avoid 32-bit truncation when bit-shifting high-order bytes)
-
-  arr[10] = (v = parseInt(uuid.slice(24, 36), 16)) / 0x10000000000 & 0xff;
-  arr[11] = v / 0x100000000 & 0xff;
-  arr[12] = v >>> 24 & 0xff;
-  arr[13] = v >>> 16 & 0xff;
-  arr[14] = v >>> 8 & 0xff;
-  arr[15] = v & 0xff;
-  return arr;
-}
-
-var _default = parse;
-exports["default"] = _default;
-
-/***/ }),
-
-/***/ 7879:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports["default"] = void 0;
-var _default = /^(?:[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|00000000-0000-0000-0000-000000000000)$/i;
-exports["default"] = _default;
-
-/***/ }),
-
-/***/ 2973:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports["default"] = rng;
-
-var _crypto = _interopRequireDefault(__nccwpck_require__(6982));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const rnds8Pool = new Uint8Array(256); // # of random values to pre-allocate
-
-let poolPtr = rnds8Pool.length;
-
-function rng() {
-  if (poolPtr > rnds8Pool.length - 16) {
-    _crypto.default.randomFillSync(rnds8Pool);
-
-    poolPtr = 0;
-  }
-
-  return rnds8Pool.slice(poolPtr, poolPtr += 16);
-}
-
-/***/ }),
-
-/***/ 507:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports["default"] = void 0;
-
-var _crypto = _interopRequireDefault(__nccwpck_require__(6982));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function sha1(bytes) {
-  if (Array.isArray(bytes)) {
-    bytes = Buffer.from(bytes);
-  } else if (typeof bytes === 'string') {
-    bytes = Buffer.from(bytes, 'utf8');
-  }
-
-  return _crypto.default.createHash('sha1').update(bytes).digest();
-}
-
-var _default = sha1;
-exports["default"] = _default;
-
-/***/ }),
-
-/***/ 7597:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports["default"] = void 0;
-
-var _validate = _interopRequireDefault(__nccwpck_require__(6200));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Convert array of 16 byte values to UUID string format of the form:
- * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
- */
-const byteToHex = [];
-
-for (let i = 0; i < 256; ++i) {
-  byteToHex.push((i + 0x100).toString(16).substr(1));
-}
-
-function stringify(arr, offset = 0) {
-  // Note: Be careful editing this code!  It's been tuned for performance
-  // and works in ways you may not expect. See https://github.com/uuidjs/uuid/pull/434
-  const uuid = (byteToHex[arr[offset + 0]] + byteToHex[arr[offset + 1]] + byteToHex[arr[offset + 2]] + byteToHex[arr[offset + 3]] + '-' + byteToHex[arr[offset + 4]] + byteToHex[arr[offset + 5]] + '-' + byteToHex[arr[offset + 6]] + byteToHex[arr[offset + 7]] + '-' + byteToHex[arr[offset + 8]] + byteToHex[arr[offset + 9]] + '-' + byteToHex[arr[offset + 10]] + byteToHex[arr[offset + 11]] + byteToHex[arr[offset + 12]] + byteToHex[arr[offset + 13]] + byteToHex[arr[offset + 14]] + byteToHex[arr[offset + 15]]).toLowerCase(); // Consistency check for valid UUID.  If this throws, it's likely due to one
-  // of the following:
-  // - One or more input array values don't map to a hex octet (leading to
-  // "undefined" in the uuid)
-  // - Invalid input values for the RFC `version` or `variant` fields
-
-  if (!(0, _validate.default)(uuid)) {
-    throw TypeError('Stringified UUID is invalid');
-  }
-
-  return uuid;
-}
-
-var _default = stringify;
-exports["default"] = _default;
-
-/***/ }),
-
-/***/ 6415:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports["default"] = void 0;
-
-var _rng = _interopRequireDefault(__nccwpck_require__(2973));
-
-var _stringify = _interopRequireDefault(__nccwpck_require__(7597));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// **`v1()` - Generate time-based UUID**
-//
-// Inspired by https://github.com/LiosK/UUID.js
-// and http://docs.python.org/library/uuid.html
-let _nodeId;
-
-let _clockseq; // Previous uuid creation time
-
-
-let _lastMSecs = 0;
-let _lastNSecs = 0; // See https://github.com/uuidjs/uuid for API details
-
-function v1(options, buf, offset) {
-  let i = buf && offset || 0;
-  const b = buf || new Array(16);
-  options = options || {};
-  let node = options.node || _nodeId;
-  let clockseq = options.clockseq !== undefined ? options.clockseq : _clockseq; // node and clockseq need to be initialized to random values if they're not
-  // specified.  We do this lazily to minimize issues related to insufficient
-  // system entropy.  See #189
-
-  if (node == null || clockseq == null) {
-    const seedBytes = options.random || (options.rng || _rng.default)();
-
-    if (node == null) {
-      // Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
-      node = _nodeId = [seedBytes[0] | 0x01, seedBytes[1], seedBytes[2], seedBytes[3], seedBytes[4], seedBytes[5]];
-    }
-
-    if (clockseq == null) {
-      // Per 4.2.2, randomize (14 bit) clockseq
-      clockseq = _clockseq = (seedBytes[6] << 8 | seedBytes[7]) & 0x3fff;
-    }
-  } // UUID timestamps are 100 nano-second units since the Gregorian epoch,
-  // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
-  // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
-  // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
-
-
-  let msecs = options.msecs !== undefined ? options.msecs : Date.now(); // Per 4.2.1.2, use count of uuid's generated during the current clock
-  // cycle to simulate higher resolution clock
-
-  let nsecs = options.nsecs !== undefined ? options.nsecs : _lastNSecs + 1; // Time since last uuid creation (in msecs)
-
-  const dt = msecs - _lastMSecs + (nsecs - _lastNSecs) / 10000; // Per 4.2.1.2, Bump clockseq on clock regression
-
-  if (dt < 0 && options.clockseq === undefined) {
-    clockseq = clockseq + 1 & 0x3fff;
-  } // Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
-  // time interval
-
-
-  if ((dt < 0 || msecs > _lastMSecs) && options.nsecs === undefined) {
-    nsecs = 0;
-  } // Per 4.2.1.2 Throw error if too many uuids are requested
-
-
-  if (nsecs >= 10000) {
-    throw new Error("uuid.v1(): Can't create more than 10M uuids/sec");
-  }
-
-  _lastMSecs = msecs;
-  _lastNSecs = nsecs;
-  _clockseq = clockseq; // Per 4.1.4 - Convert from unix epoch to Gregorian epoch
-
-  msecs += 12219292800000; // `time_low`
-
-  const tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000;
-  b[i++] = tl >>> 24 & 0xff;
-  b[i++] = tl >>> 16 & 0xff;
-  b[i++] = tl >>> 8 & 0xff;
-  b[i++] = tl & 0xff; // `time_mid`
-
-  const tmh = msecs / 0x100000000 * 10000 & 0xfffffff;
-  b[i++] = tmh >>> 8 & 0xff;
-  b[i++] = tmh & 0xff; // `time_high_and_version`
-
-  b[i++] = tmh >>> 24 & 0xf | 0x10; // include version
-
-  b[i++] = tmh >>> 16 & 0xff; // `clock_seq_hi_and_reserved` (Per 4.2.2 - include variant)
-
-  b[i++] = clockseq >>> 8 | 0x80; // `clock_seq_low`
-
-  b[i++] = clockseq & 0xff; // `node`
-
-  for (let n = 0; n < 6; ++n) {
-    b[i + n] = node[n];
-  }
-
-  return buf || (0, _stringify.default)(b);
-}
-
-var _default = v1;
-exports["default"] = _default;
-
-/***/ }),
-
-/***/ 1697:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports["default"] = void 0;
-
-var _v = _interopRequireDefault(__nccwpck_require__(2930));
-
-var _md = _interopRequireDefault(__nccwpck_require__(216));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const v3 = (0, _v.default)('v3', 0x30, _md.default);
-var _default = v3;
-exports["default"] = _default;
-
-/***/ }),
-
-/***/ 2930:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports["default"] = _default;
-exports.URL = exports.DNS = void 0;
-
-var _stringify = _interopRequireDefault(__nccwpck_require__(7597));
-
-var _parse = _interopRequireDefault(__nccwpck_require__(7267));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function stringToBytes(str) {
-  str = unescape(encodeURIComponent(str)); // UTF8 escape
-
-  const bytes = [];
-
-  for (let i = 0; i < str.length; ++i) {
-    bytes.push(str.charCodeAt(i));
-  }
-
-  return bytes;
-}
-
-const DNS = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
-exports.DNS = DNS;
-const URL = '6ba7b811-9dad-11d1-80b4-00c04fd430c8';
-exports.URL = URL;
-
-function _default(name, version, hashfunc) {
-  function generateUUID(value, namespace, buf, offset) {
-    if (typeof value === 'string') {
-      value = stringToBytes(value);
-    }
-
-    if (typeof namespace === 'string') {
-      namespace = (0, _parse.default)(namespace);
-    }
-
-    if (namespace.length !== 16) {
-      throw TypeError('Namespace must be array-like (16 iterable integer values, 0-255)');
-    } // Compute hash of namespace and value, Per 4.3
-    // Future: Use spread syntax when supported on all platforms, e.g. `bytes =
-    // hashfunc([...namespace, ... value])`
-
-
-    let bytes = new Uint8Array(16 + value.length);
-    bytes.set(namespace);
-    bytes.set(value, namespace.length);
-    bytes = hashfunc(bytes);
-    bytes[6] = bytes[6] & 0x0f | version;
-    bytes[8] = bytes[8] & 0x3f | 0x80;
-
-    if (buf) {
-      offset = offset || 0;
-
-      for (let i = 0; i < 16; ++i) {
-        buf[offset + i] = bytes[i];
-      }
-
-      return buf;
-    }
-
-    return (0, _stringify.default)(bytes);
-  } // Function#name is not settable on some platforms (#270)
-
-
-  try {
-    generateUUID.name = name; // eslint-disable-next-line no-empty
-  } catch (err) {} // For CommonJS default export support
-
-
-  generateUUID.DNS = DNS;
-  generateUUID.URL = URL;
-  return generateUUID;
-}
-
-/***/ }),
-
-/***/ 4676:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports["default"] = void 0;
-
-var _rng = _interopRequireDefault(__nccwpck_require__(2973));
-
-var _stringify = _interopRequireDefault(__nccwpck_require__(7597));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function v4(options, buf, offset) {
-  options = options || {};
-
-  const rnds = options.random || (options.rng || _rng.default)(); // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
-
-
-  rnds[6] = rnds[6] & 0x0f | 0x40;
-  rnds[8] = rnds[8] & 0x3f | 0x80; // Copy bytes to buffer, if provided
-
-  if (buf) {
-    offset = offset || 0;
-
-    for (let i = 0; i < 16; ++i) {
-      buf[offset + i] = rnds[i];
-    }
-
-    return buf;
-  }
-
-  return (0, _stringify.default)(rnds);
-}
-
-var _default = v4;
-exports["default"] = _default;
-
-/***/ }),
-
-/***/ 9771:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports["default"] = void 0;
-
-var _v = _interopRequireDefault(__nccwpck_require__(2930));
-
-var _sha = _interopRequireDefault(__nccwpck_require__(507));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const v5 = (0, _v.default)('v5', 0x50, _sha.default);
-var _default = v5;
-exports["default"] = _default;
-
-/***/ }),
-
-/***/ 6200:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports["default"] = void 0;
-
-var _regex = _interopRequireDefault(__nccwpck_require__(7879));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function validate(uuid) {
-  return typeof uuid === 'string' && _regex.default.test(uuid);
-}
-
-var _default = validate;
-exports["default"] = _default;
-
-/***/ }),
-
-/***/ 5868:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports["default"] = void 0;
-
-var _validate = _interopRequireDefault(__nccwpck_require__(6200));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function version(uuid) {
-  if (!(0, _validate.default)(uuid)) {
-    throw TypeError('Invalid UUID');
-  }
-
-  return parseInt(uuid.substr(14, 1), 16);
-}
-
-var _default = version;
-exports["default"] = _default;
-
-/***/ }),
-
 /***/ 2613:
 /***/ ((module) => {
 
@@ -33696,6 +34402,14 @@ module.exports = require("async_hooks");
 
 "use strict";
 module.exports = require("buffer");
+
+/***/ }),
+
+/***/ 5317:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("child_process");
 
 /***/ }),
 
@@ -33851,6 +34565,14 @@ module.exports = require("string_decoder");
 
 /***/ }),
 
+/***/ 3557:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("timers");
+
+/***/ }),
+
 /***/ 4756:
 /***/ ((module) => {
 
@@ -33965,6 +34687,18 @@ async function run() {
   const accessSecret = action_core.getInput('twitter-access-token-secret', {
     required: true
   })
+  const media = action_core
+    .getInput('media', { required: false })
+    .split('\n')
+    .map(input => input.trim())
+    .filter(Boolean)
+  const mediaAltText = action_core
+    .getInput('media-alt-text', {
+      required: false,
+      trimWhitespace: false
+    })
+    .split('\n')
+    .map(input => input.trim())
 
   if (message.length > MAX_MESSAGE_LENGTH) {
     action_core.setFailed(
@@ -33984,10 +34718,24 @@ async function run() {
   })
 
   const rwClient = client.readWrite
+  const tweetOpts = {}
+
+  try {
+    if (media.length) {
+      const media_ids = await uploadMedia(rwClient, media, mediaAltText)
+      tweetOpts.media = { media_ids }
+    }
+  } catch (err) {
+    action_core.setFailed(`Action failed with error. ${err} ${err.data ?? ''}`.trim())
+    action_core.info(`
+      *** ACTION RUN - END ***
+      `)
+    return
+  }
 
   try {
     action_core.info(`Twitter message: ${message}`)
-    await rwClient.v2.tweet(message)
+    await rwClient.v2.tweet(message, tweetOpts)
   } catch (err) {
     action_core.setFailed(`Action failed with error. ${err} ${err.data ?? ''}`.trim())
   } finally {
@@ -33995,6 +34743,37 @@ async function run() {
       *** ACTION RUN - END ***
       `)
   }
+}
+
+async function uploadMedia(client, media, mediaAltText) {
+  action_core.info(`Twitter upload media: ${media.join('; ')}`)
+
+  const mediaIds = await Promise.all(
+    media.map(media => client.v1.uploadMedia(media))
+  )
+  action_core.info(`Twitter upload completed - mediaIds: ${mediaIds.join('; ')}`)
+
+  if (mediaAltText?.length) {
+    try {
+      await Promise.all(
+        mediaIds.map((mediaId, index) => {
+          action_core.info(
+            `Twitter createMediaMetadata - mediaId: 
+            ${mediaId} ; alt-text: ${mediaAltText[index]}`
+          )
+          if (!mediaAltText?.[index]?.trim()) return Promise.resolve()
+          return client.v1.createMediaMetadata(mediaId, {
+            alt_text: { text: mediaAltText[index] }
+          })
+        })
+      )
+    } catch (err) {
+      action_core.warning(
+        `Twitter createMediaMetadata - Failed. ${err} ${err.data ?? ''}`.trim()
+      )
+    }
+  }
+  return mediaIds
 }
 
 ;// CONCATENATED MODULE: ./src/index.js

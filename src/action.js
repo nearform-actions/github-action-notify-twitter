@@ -18,6 +18,18 @@ export async function run() {
   const accessSecret = core.getInput('twitter-access-token-secret', {
     required: true
   })
+  const media = core
+    .getInput('media', { required: false })
+    .split('\n')
+    .map(input => input.trim())
+    .filter(Boolean)
+  const mediaAltText = core
+    .getInput('media-alt-text', {
+      required: false,
+      trimWhitespace: false
+    })
+    .split('\n')
+    .map(input => input.trim())
 
   if (message.length > MAX_MESSAGE_LENGTH) {
     core.setFailed(
@@ -37,10 +49,24 @@ export async function run() {
   })
 
   const rwClient = client.readWrite
+  const tweetOpts = {}
+
+  try {
+    if (media.length) {
+      const media_ids = await uploadMedia(rwClient, media, mediaAltText)
+      tweetOpts.media = { media_ids }
+    }
+  } catch (err) {
+    core.setFailed(`Action failed with error. ${err} ${err.data ?? ''}`.trim())
+    core.info(`
+      *** ACTION RUN - END ***
+      `)
+    return
+  }
 
   try {
     core.info(`Twitter message: ${message}`)
-    await rwClient.v2.tweet(message)
+    await rwClient.v2.tweet(message, tweetOpts)
   } catch (err) {
     core.setFailed(`Action failed with error. ${err} ${err.data ?? ''}`.trim())
   } finally {
@@ -48,4 +74,35 @@ export async function run() {
       *** ACTION RUN - END ***
       `)
   }
+}
+
+export async function uploadMedia(client, media, mediaAltText) {
+  core.info(`Twitter upload media: ${media.join('; ')}`)
+
+  const mediaIds = await Promise.all(
+    media.map(media => client.v1.uploadMedia(media))
+  )
+  core.info(`Twitter upload completed - mediaIds: ${mediaIds.join('; ')}`)
+
+  if (mediaAltText?.length) {
+    try {
+      await Promise.all(
+        mediaIds.map((mediaId, index) => {
+          core.info(
+            `Twitter createMediaMetadata - mediaId: 
+            ${mediaId} ; alt-text: ${mediaAltText[index]}`
+          )
+          if (!mediaAltText?.[index]?.trim()) return Promise.resolve()
+          return client.v1.createMediaMetadata(mediaId, {
+            alt_text: { text: mediaAltText[index] }
+          })
+        })
+      )
+    } catch (err) {
+      core.warning(
+        `Twitter createMediaMetadata - Failed. ${err} ${err.data ?? ''}`.trim()
+      )
+    }
+  }
+  return mediaIds
 }
