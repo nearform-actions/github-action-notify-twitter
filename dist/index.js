@@ -34680,7 +34680,6 @@ async function run() {
   *** ACTION RUN - START ***
   `)
   const MAX_MESSAGE_LENGTH = 280
-  const MAX_MEDIA_ELEMENT = 4
   const message = action_core.getInput('message', { required: true })
   const appKey = action_core.getInput('twitter-app-key', { required: true })
   const appSecret = action_core.getInput('twitter-app-secret', { required: true })
@@ -34704,16 +34703,6 @@ async function run() {
   if (message.length > MAX_MESSAGE_LENGTH) {
     action_core.setFailed(
       'The message is too long. The message may contain up to 280 characters.'
-    )
-    action_core.info(`
-    *** ACTION RUN - END ***
-    `)
-    return
-  }
-
-  if (media.length > MAX_MEDIA_ELEMENT) {
-    action_core.setFailed(
-      `Too many media elements. The maximum number is ${MAX_MEDIA_ELEMENT}.`
     )
     action_core.info(`
     *** ACTION RUN - END ***

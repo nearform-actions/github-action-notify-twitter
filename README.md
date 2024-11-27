@@ -49,7 +49,7 @@ jobs:
 ```
 
 You can add media (image, GIF or video) to your post using the `media` parameter. This refers to the path of an image within the repository.
-The maximum number of media that can be added to a post is 4.
+The Twitter API currently supports a maximum of four media elements.
 For images and GIFs, you can also add an alt text using the `media-alt-text` parameter. This parameter is also a list and maintains the structure of the `media` parameter. So if you want to add an alt text only to the second content you have to write it in the second position of the list leaving the previous ones empty.
 
 ```yml

@@ -214,25 +214,6 @@ describe('action', () => {
     )
   })
 
-  it('fail the action when media are more then 4 elements', async () => {
-    const MEDIA_ACTION_INPUTS = {
-      ...ACTION_INPUTS,
-      media: `./image.png,
-        ./image.png,
-        ./image.png,
-        ./image.png,
-        ./image.png`
-    }
-    getInput.mockImplementation(
-      inputName => MEDIA_ACTION_INPUTS[inputName] ?? ''
-    )
-    await run()
-
-    expect(setFailed).toHaveBeenCalledWith(
-      'Too many media elements. The maximum number is 4.'
-    )
-  })
-
   it('tweet with multiple media and multiple alt text was sent successfully (different number of element)', async () => {
     const MEDIA_ACTION_INPUTS = {
       ...ACTION_INPUTS,
