@@ -1,7 +1,7 @@
 'use strict'
 const { getInput, setFailed, info, warning } = require('@actions/core')
 const { TwitterApi } = require('twitter-api-v2')
-const { run } = require('./action')
+const { run, uploadMedia } = require('./action')
 
 const ACTION_INPUTS = {
   message: 'Hello twitter',
@@ -231,7 +231,7 @@ describe('action', () => {
             tweet: async message => message || null
           },
           v1: {
-            uploadMedia: jest.fn(async () => 'id1'),
+            uploadMedia: async () => 'id1',
             createMediaMetadata: async () => null
           }
         }
@@ -240,5 +240,48 @@ describe('action', () => {
     await run()
 
     expect(setFailed).not.toHaveBeenCalled()
+  })
+})
+
+describe('uploadMedia', () => {
+  beforeEach(() => {
+    info.mockImplementation(message => message)
+    warning.mockImplementation(message => message)
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('upload media without alt text', async () => {
+    const client = {
+      v1: {
+        uploadMedia: jest.fn(),
+        createMediaMetadata: jest.fn()
+      }
+    }
+    const media = ['file1.png', 'file2.png']
+
+    const mediaIds = await uploadMedia(client, media, null)
+    expect(client.v1.uploadMedia).toHaveBeenCalledTimes(media.length)
+    expect(client.v1.createMediaMetadata).toHaveBeenCalledTimes(0)
+    expect(mediaIds).toHaveLength(media.length)
+  })
+
+  it('upload media with alt text', async () => {
+    const client = {
+      v1: {
+        uploadMedia: jest.fn(),
+        createMediaMetadata: jest.fn()
+      }
+    }
+
+    const media = ['file1.png', 'file2.png']
+    const alt_text = ['alt_text1']
+
+    const mediaIds = await uploadMedia(client, media, alt_text)
+    expect(client.v1.uploadMedia).toHaveBeenCalledTimes(media.length)
+    expect(client.v1.createMediaMetadata).toHaveBeenCalledTimes(alt_text.length)
+    expect(mediaIds).toHaveLength(media.length)
   })
 })

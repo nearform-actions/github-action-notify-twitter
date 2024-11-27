@@ -34718,12 +34718,11 @@ async function run() {
   })
 
   const rwClient = client.readWrite
-
-  let tweetOpts = {}
+  const tweetOpts = {}
 
   try {
-    const media_ids = await uploadMedia(rwClient, media, mediaAltText)
-    if (media_ids?.length) {
+    if (media.length) {
+      const media_ids = await uploadMedia(rwClient, media, mediaAltText)
       tweetOpts.media = { media_ids }
     }
   } catch (err) {
@@ -34747,41 +34746,34 @@ async function run() {
 }
 
 async function uploadMedia(client, media, mediaAltText) {
-  if (media?.length) {
-    action_core.info(`Twitter upload media: ${media.join('; ')}`)
+  action_core.info(`Twitter upload media: ${media.join('; ')}`)
 
-    const mediaIds = await Promise.all(
-      media.map(media => client.v1.uploadMedia(media))
-    )
-    action_core.info(`Twitter upload completed - mediaId: ${mediaIds.join('; ')}`)
+  const mediaIds = await Promise.all(
+    media.map(media => client.v1.uploadMedia(media))
+  )
+  action_core.info(`Twitter upload completed - mediaIds: ${mediaIds.join('; ')}`)
 
-    if (mediaAltText?.length) {
-      try {
-        await Promise.all(
-          mediaIds.map((mediaId, index) => {
-            action_core.info(
-              `Twitter createMediaMetadata - mediaId: 
+  if (mediaAltText?.length) {
+    try {
+      await Promise.all(
+        mediaIds.map((mediaId, index) => {
+          action_core.info(
+            `Twitter createMediaMetadata - mediaId: 
             ${mediaId} ; alt-text: ${mediaAltText[index]}`
-            )
-            if (!mediaAltText?.[index]?.trim()) return Promise.resolve()
-            return client.v1.createMediaMetadata(mediaId, {
-              alt_text: { text: mediaAltText[index] }
-            })
+          )
+          if (!mediaAltText?.[index]?.trim()) return Promise.resolve()
+          return client.v1.createMediaMetadata(mediaId, {
+            alt_text: { text: mediaAltText[index] }
           })
-        )
-      } catch (err) {
-        action_core.warning(
-          `Twitter createMediaMetadata - Failed. ${err} ${
-            err.data ?? ''
-          }`.trim()
-        )
-      }
+        })
+      )
+    } catch (err) {
+      action_core.warning(
+        `Twitter createMediaMetadata - Failed. ${err} ${err.data ?? ''}`.trim()
+      )
     }
-    return mediaIds
-  } else {
-    action_core.info(`Twitter no media to upload`)
-    return null
   }
+  return mediaIds
 }
 
 ;// CONCATENATED MODULE: ./src/index.js
