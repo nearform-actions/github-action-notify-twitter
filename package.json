@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/nearform-actions/github-action-notify-twitter#readme",
   "devDependencies": {
-    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-env": "^7.26.7",
     "@commitlint/cli": "^19.6.1",
     "@commitlint/config-conventional": "^19.6.0",
     "@vercel/ncc": "^0.38.3",
