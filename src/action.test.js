@@ -64,6 +64,36 @@ describe('action', () => {
     )
   })
 
+  it('sending tweet failed with error data object', async () => {
+    getInput.mockImplementation(inputName => ACTION_INPUTS[inputName] ?? '')
+    TwitterApi.mockImplementation(() => {
+      return {
+        readWrite: {
+          v2: {
+            tweet: async () => {
+              const error = new Error('API Error')
+              error.data = {
+                code: 429,
+                message: 'Rate limit exceeded',
+                details: {
+                  reset_time: '2023-01-01T00:00:00Z',
+                  limit: 300
+                }
+              }
+              throw error
+            }
+          }
+        }
+      }
+    })
+
+    await run()
+
+    expect(setFailed).toHaveBeenCalledWith(
+      'Action failed with error. Error: API Error {"code":429,"message":"Rate limit exceeded","details":{"reset_time":"2023-01-01T00:00:00Z","limit":300}}'
+    )
+  })
+
   it('fail the action when message is more than 280 characters long', async () => {
     const MESSAGE_TOO_LONG_ACTION_INPUTS = {
       message:
@@ -180,6 +210,45 @@ describe('action', () => {
     expect(warning).toHaveBeenCalled()
   })
 
+  it('tweet with media and error on createMediaMetadata with error data object was sent successfully', async () => {
+    const MEDIA_ACTION_INPUTS = {
+      ...ACTION_INPUTS,
+      media: './image.png',
+      'media-alt-text': 'alt text'
+    }
+    getInput.mockImplementation(
+      inputName => MEDIA_ACTION_INPUTS[inputName] ?? ''
+    )
+    TwitterApi.mockImplementation(() => {
+      return {
+        readWrite: {
+          v2: {
+            tweet: async message => message || null
+          },
+          v1: {
+            uploadMedia: async () => 'id1',
+            createMediaMetadata: async () => {
+              const error = new Error('Metadata creation failed')
+              error.data = {
+                error_code: 44,
+                message: 'attachment_url parameter is invalid',
+                request: '/1.1/media/metadata/create.json'
+              }
+              throw error
+            }
+          }
+        }
+      }
+    })
+
+    await run()
+
+    expect(setFailed).not.toHaveBeenCalled()
+    expect(warning).toHaveBeenCalledWith(
+      'Twitter createMediaMetadata - Failed. Error: Metadata creation failed {"error_code":44,"message":"attachment_url parameter is invalid","request":"/1.1/media/metadata/create.json"}'
+    )
+  })
+
   it('sending tweet with media failed', async () => {
     const MEDIA_ACTION_INPUTS = {
       ...ACTION_INPUTS,
@@ -211,6 +280,46 @@ describe('action', () => {
 
     expect(setFailed).toHaveBeenCalledWith(
       'Action failed with error. Error: Something went wrong, upload fail'
+    )
+  })
+
+  it('sending tweet with media failed with error data object', async () => {
+    const MEDIA_ACTION_INPUTS = {
+      ...ACTION_INPUTS,
+      media: './image.png',
+      'media-alt-text': 'alt text'
+    }
+    getInput.mockImplementation(
+      inputName => MEDIA_ACTION_INPUTS[inputName] ?? ''
+    )
+    TwitterApi.mockImplementation(() => {
+      return {
+        readWrite: {
+          v2: {
+            tweet: async () => {
+              throw Error('Something went wrong')
+            }
+          },
+          v1: {
+            uploadMedia: async () => {
+              const error = new Error('Upload failed')
+              error.data = {
+                error_code: 324,
+                message: 'The validation of media ids failed',
+                request: '/1.1/media/upload.json'
+              }
+              throw error
+            },
+            createMediaMetadata: async () => null
+          }
+        }
+      }
+    })
+
+    await run()
+
+    expect(setFailed).toHaveBeenCalledWith(
+      'Action failed with error. Error: Upload failed {"error_code":324,"message":"The validation of media ids failed","request":"/1.1/media/upload.json"}'
     )
   })
 

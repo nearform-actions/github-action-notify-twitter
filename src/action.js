@@ -57,7 +57,11 @@ export async function run() {
       tweetOpts.media = { media_ids }
     }
   } catch (err) {
-    core.setFailed(`Action failed with error. ${err} ${err.data ?? ''}`.trim())
+    core.setFailed(
+      `Action failed with error. ${err} ${
+        JSON.stringify(err.data) ?? ''
+      }`.trim()
+    )
     core.info(`
       *** ACTION RUN - END ***
       `)
@@ -68,7 +72,11 @@ export async function run() {
     core.info(`Twitter message: ${message}`)
     await rwClient.v2.tweet(message, tweetOpts)
   } catch (err) {
-    core.setFailed(`Action failed with error. ${err} ${err.data ?? ''}`.trim())
+    core.setFailed(
+      `Action failed with error. ${err} ${
+        JSON.stringify(err.data) ?? ''
+      }`.trim()
+    )
   } finally {
     core.info(`
       *** ACTION RUN - END ***
@@ -100,7 +108,9 @@ export async function uploadMedia(client, media, mediaAltText) {
       )
     } catch (err) {
       core.warning(
-        `Twitter createMediaMetadata - Failed. ${err} ${err.data ?? ''}`.trim()
+        `Twitter createMediaMetadata - Failed. ${err} ${
+          JSON.stringify(err.data) ?? ''
+        }`.trim()
       )
     }
   }
