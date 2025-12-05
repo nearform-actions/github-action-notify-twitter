@@ -23,7 +23,7 @@
   "devDependencies": {
     "@babel/preset-env": "^7.28.5",
     "@commitlint/cli": "^20.1.0",
-    "@commitlint/config-conventional": "^20.0.0",
+    "@commitlint/config-conventional": "^20.2.0",
     "@vercel/ncc": "^0.38.4",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^10.1.8",
