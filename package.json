@@ -41,6 +41,6 @@
     "@actions/core": "^2.0.2",
     "@actions/github": "^7.0.0",
     "actions-toolkit": "github:nearform/actions-toolkit",
-    "twitter-api-v2": "^1.28.0"
+    "twitter-api-v2": "^1.29.0"
   }
 }
